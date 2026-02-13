@@ -1,0 +1,21 @@
+[Unit]
+Description=Valkey Cache para WordPress
+
+[Container]
+Image=docker.io/valkey/valkey:7.2
+ContainerName=valkey
+Network=wordpress.network
+# Optimización: Sin persistencia si solo es para caché (más rápido)
+Exec=valkey-server --save "" --appendonly no
+
+AutoUpdate=registry
+
+HealthCmd=redis-cli ping | grep PONG || exit 1
+HealthInterval=5s
+
+[Service]
+Restart=always
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" valkey)" != "healthy" ]; do sleep 2; done'
+
+[Install]
+WantedBy=multi-user.target
