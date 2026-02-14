@@ -1,0 +1,23 @@
+http:
+  middlewares:
+    compresionHeaders:
+      compress:
+        excludedContentTypes:
+          - text/event-stream
+          - application/x-xz
+    seguridadHeaders:
+      headers:
+        # HSTS (Fuerza HTTPS durante un año)
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        # Evitar Sniffing de contenido
+        contentTypeNosniff: true
+        # Evitar Clickjacking (Nadie puede meter tu web en un iframe)
+        frameDeny: true
+        # Filtro XSS básico
+        browserXssFilter: true
+        # Referrer Policy
+        referrerPolicy: "same-origin"
+        # Content Security Policy (Ajusta según necesites)
+        #contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';"

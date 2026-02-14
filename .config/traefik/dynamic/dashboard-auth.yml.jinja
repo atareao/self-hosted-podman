@@ -1,0 +1,30 @@
+http:
+  middlewares:
+    oidc-auth:
+      plugin:
+       traefik-oidc-auth:
+         Secret: {{ env.OIDC_SECRET }}
+         Provider:
+           ClientId: {{ env.OIDC_CLIENT_ID }}
+           ClientSecret: {{ env.OIDC_CLIENT_SECRET }}
+           Url: https://auth.{{ env.FQDN }}
+           TokenValidation: IdToken
+         Scopes:
+           - openid
+           - profile
+           - email
+      
+
+  routers:
+    dashboard:
+      rule: Host(`traefik.{{ env.FQDN }}`) # El subdominio para tu panel
+      service: api@internal
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: myresolver
+      middlewares:
+        - oidc-auth
+        - compresionHeaders
+        - seguridadHeaders
+    
