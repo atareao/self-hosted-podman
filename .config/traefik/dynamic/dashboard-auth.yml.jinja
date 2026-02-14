@@ -3,11 +3,11 @@ http:
     oidc-auth:
       plugin:
        traefik-oidc-auth:
-         Secret: {{ oidc_secret }}
+         Secret: {{ env.OIDC_SECRET }}
          Provider:
-           ClientId: {{ oidc_client_id }}
-           ClientSecret: {{ oidc_client_secret }}
-           Url: https://auth.{{ fqdn }}
+           ClientId: {{ env.OIDC_CLIENT_ID }}
+           ClientSecret: {{ env.OIDC_CLIENT_SECRET }}
+           Url: https://auth.{{ env.FQDN }}
            TokenValidation: IdToken
          Scopes:
            - openid
@@ -17,7 +17,7 @@ http:
 
   routers:
     dashboard:
-      rule: Host(`traefik.{{ fqdn }}`) # El subdominio para tu panel
+      rule: Host(`traefik.{{ env.FQDN }}`) # El subdominio para tu panel
       service: api@internal
       entryPoints:
         - websecure
