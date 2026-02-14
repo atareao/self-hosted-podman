@@ -148,7 +148,7 @@ Una vez completada la configuración:
 | --------------------- | --------------------------------- | -------------------------- |
 | **Traefik Dashboard** | `https://traefik.tudominio.com`   | Panel de control del proxy |
 | **PocketID**          | `https://auth.tudominio.com`      | Servidor de autenticación  |
-| **WordPress**         | `https://wordpress.tudominio.com` | Sitio web principal        |
+| **WordPress**         | `https://blog.tudominio.com` | Sitio web principal        |
 
 ## 📚 Documentación adicional
 
