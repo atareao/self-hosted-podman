@@ -1,0 +1,27 @@
+[Unit]
+Descripcion=MariaDB
+
+[Container]
+Image=docker.io/library/mariadb:11
+ContainerName=mariadb
+# Inyectamos los secretos en el contenedor
+Secret=mariadb_root_password
+Secret=wordpress_db_password
+# Le decimos a MariaDB dónde buscar la contraseña
+Environment=MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
+Environment=MARIADB_PASSWORD_FILE=/run/secrets/wordpress_db_password
+Environment=MARIADB_DATABASE=wordpress
+Environment=MARIADB_USER=wp_user
+
+HealthCmd=mariadb-admin ping --user=root --password=$(cat /run/secrets/mariadb_root_password) --silent
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
+
+Volume=mariadb.volume:/var/lib/mysql:Z
+Network=wordpress.network
+Exec=--innodb-buffer-pool-size=256M --innodb-flush-log-at-trx-commit=2
+
+[Install]
+WantedBy=multi-user.target

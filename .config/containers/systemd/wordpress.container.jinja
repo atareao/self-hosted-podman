@@ -1,0 +1,50 @@
+[Unit]
+Description=WordPress Engine
+After=wordpress.network mariadb.service valkey.service
+Requires=mariadb.service valkey.service
+
+[Container]
+Image=docker.io/library/wordpress:latest
+ContainerName=wordpress
+
+Network=wordpress.network
+Network=traefik-net.network
+
+AutoUpdate=registry
+Volume=wordpress.volume:/var/www/html/wp-content:Z
+
+HealthCmd=curl -f http://localhost/wp-login.php || exit 1
+HealthInterval=10s
+HealthRetries=3
+HealthStartPeriod=30s
+
+Secret=wordpress_db_password
+
+Environment=WORDPRESS_DB_HOST=mariadb
+Environment=WORDPRESS_DB_USER=wp_user
+Environment=WORDPRESS_DB_NAME=wordpress
+Environment=WORDPRESS_DB_PASSWORD_FILE=/run/secrets/wordpress_db_password
+Environment="WORDPRESS_CONFIG_EXTRA=define('WP_REDIS_HOST', 'valkey');"
+
+# Configuración para que WP reconozca el Proxy Inverso (Traefik)
+#Environment=WORDPRESS_CONFIG_EXTRA=define('FORCE_SSL_ADMIN', true); if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $_SERVER['HTTPS']='on';
+
+# Labels para Traefik v3 + HTTP/3 + Middlewares
+Label=traefik.enable=true
+Label=traefik.http.routers.wp.rule=Host(`blog.{{ env.FQDN }}`)
+Label=traefik.http.routers.wp.entrypoints=websecure
+Label=traefik.http.routers.wp.tls.certresolver=myresolver
+# Aplicamos tus nuevos middlewares de seguridad y compresión
+Label=traefik.http.routers.wp.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+# Tiempo máximo para que el healthcheck pase a healthy
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress)" != "healthy" ]; do sleep 2; done'
+
+[Install]
+WantedBy=multi-user.target
