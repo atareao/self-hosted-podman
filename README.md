@@ -23,22 +23,30 @@ Una solución robusta y segura para desplegar servicios auto-alojados utilizando
 
 ### Herramientas necesarias
 
-| Herramienta   | Descripción          | Instalación             |
-| ------------- | -------------------- | ----------------------- |
-| **git**       | Control de versiones | `sudo apt install git`  |
-| **yadm**      | Gestor de dotfiles   | `sudo apt install yadm` |
-| **sops**      | Cifrado de secretos  | Manual (ver abajo)      |
-| **age**       | Cifrado moderno      | `sudo apt install age`  |
-| **yq**        | Procesador YAML/JSON | `sudo apt install yq`   |
-| **jinrender** | Motor de templates   | Manual (ver abajo)      |
-| **crypta**    | Gestión de secretos  | Manual (ver abajo)      |
+| Herramienta       | Descripción                          | Instalación                      |
+| ----------------- | ------------------------------------ | -------------------------------- |
+| **git**           | Control de versiones                 | `sudo apt install git`           |
+| **yadm**          | Gestor de dotfiles                   | `sudo apt install yadm`          |
+| **sops**          | Cifrado de secretos                  | Manual (ver abajo)               |
+| **age**           | Cifrado moderno                      | `sudo apt install age`           |
+| **yq**            | Procesador YAML/JSON                 | `sudo apt install yq`            |
+| **jinrender**     | Motor de templates                   | Manual (ver abajo)               |
+| **crypta**        | Gestión de secretos                  | Manual (ver abajo)               |
+| **bat**           | Visualizador de archivos mejorado    | `sudo apt install bat`           |
+| **jq**            | Procesador JSON                      | `sudo apt install jq`            |
+| **zoxide**        | Navegador de directorios inteligente | `sudo apt install zoxide`        |
+| **neovim**        | Editor de texto avanzado             | `sudo apt install neovim`        |
+| **apache2-utils** | Utilidades web (htpasswd)            | `sudo apt install apache2-utils` |
+| **starship**      | Prompt personalizable                | Manual (ver abajo)               |
+| **fish**          | Shell interactivo amigable           | `sudo apt install fish`          |
+| **podman**        | Motor de contenedores                | `sudo apt install podman`        |
 
 ## 🔧 Instalación
 
 ### 1. Instalar dependencias del sistema
 
 ```bash
-sudo apt update && sudo apt install git yadm age yq
+sudo apt update && sudo apt install git yadm age yq jq zoxide neovim apache2-utils fish podman
 mkdir -p ~/.local/bin
 ```
 
@@ -59,6 +67,12 @@ chmod +x ~/.local/bin/jinrender
 curl -LO https://github.com/atareao/crypta/releases/download/v0.1.8/crypta-linux-x86_64
 mv crypta-linux-x86_64 ~/.local/bin/crypta
 chmod +x ~/.local/bin/crypta
+
+# Starship - Mejora del prompt
+curl -LO https://github.com/starship/starship/releases/download/v1.24.2/starship-i686-unknown-linux-musl.tar.gz -o starship.tar.gz
+tar xvzf starship.tar.gz
+mv starship ~/.local/bin/starship
+chmod +x ~/.local/bin/starship
 ```
 
 ## 🛠️ Configuración inicial
