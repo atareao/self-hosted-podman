@@ -7,6 +7,8 @@ Image=docker.io/library/nginx:alpine
 ContainerName=nginx-web
 Network=traefik-net.network
 
+Secret=temporal,type=env,target=TEMPORAL
+
 # Etiquetas para que Traefik haga su magia
 Label=traefik.enable=true
 Label=traefik.http.routers.nginx.rule=Host(`prueba.{{ env.FQDN }}`)
@@ -15,6 +17,8 @@ Label=traefik.http.routers.nginx.tls.certresolver=myresolver
 Label=traefik.http.routers.nginx.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 [Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 
 [Install]
