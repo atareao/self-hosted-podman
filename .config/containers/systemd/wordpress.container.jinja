@@ -44,9 +44,9 @@ StartLimitIntervalSec=300
 StartLimitBurst=3
 # Tiempo máximo para que el healthcheck pase a healthy
 TimeoutStartSec=60
-{{% raw %}}
+{% raw %}
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress)" != "healthy" ]; do sleep 2; done'
-{{% endraw %}}
+{% endraw %}
 
 [Install]
 WantedBy=multi-user.target
