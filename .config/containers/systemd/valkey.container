@@ -6,7 +6,7 @@ Image=docker.io/valkey/valkey:7.2
 ContainerName=valkey
 Network=wordpress.network
 # Optimización: Sin persistencia si solo es para caché (más rápido)
-Exec=valkey-server --save "" --appendonly no
+Exec=valkey-server --save "" --appendonly no --maxmemory 128mb --maxmemory-policy allkeys-lru
 
 AutoUpdate=registry
 
