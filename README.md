@@ -26,6 +26,7 @@ Una solución robusta y segura para desplegar servicios auto-alojados utilizando
 | Herramienta       | Descripción                          | Instalación                      |
 | ----------------- | ------------------------------------ | -------------------------------- |
 | **git**           | Control de versiones                 | `sudo apt install git`           |
+| **ansifilter**    | Para los journals                    | `sudo apt install ansifilter`    |
 | **yadm**          | Gestor de dotfiles                   | `sudo apt install yadm`          |
 | **sops**          | Cifrado de secretos                  | Manual (ver abajo)               |
 | **age**           | Cifrado moderno                      | `sudo apt install age`           |
