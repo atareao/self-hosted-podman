@@ -6,6 +6,3 @@ abbr -a scr  'systemctl --user restart'
 abbr -a scs  'systemctl --user start'
 abbr -a sck  'systemctl --user stop'
 abbr -a scl  'systemctl --user status'
-# Logs
-abbr -a jcu  'journalctl --user -xeu'
-abbr -a jcf  'journalctl --user -f -u'
