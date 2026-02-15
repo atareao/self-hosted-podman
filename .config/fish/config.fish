@@ -4,4 +4,5 @@ if status is-interactive
     zoxide init fish | source
     # starship
     starship init fish | source
-end
+    set -gx SOPS_AGE_KEY_FILE "$HOME/.secrets/sops/age/key.txt"
+end 
