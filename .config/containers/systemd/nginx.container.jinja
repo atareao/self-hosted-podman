@@ -5,7 +5,7 @@ After=traefik.service
 [Container]
 Image=docker.io/library/nginx:alpine
 ContainerName=nginx-web
-Network=traefik-net.network
+Network=proxy.network
 
 # Etiquetas para que Traefik haga su magia
 Label=traefik.enable=true

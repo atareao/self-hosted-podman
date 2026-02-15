@@ -8,7 +8,7 @@ Image=docker.io/library/wordpress:latest
 ContainerName=wordpress
 
 Network=wordpress.network
-Network=traefik-net.network
+Network=proxy.network
 
 AutoUpdate=registry
 Volume=wordpress.volume:/var/www/html/wp-content:Z

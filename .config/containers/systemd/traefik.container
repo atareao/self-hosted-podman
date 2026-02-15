@@ -22,7 +22,7 @@ Volume=%h/.config/traefik/dynamic:/etc/traefik/dynamic:ro,Z
 # 5. Persistencia de Plugins
 Volume=traefik-plugins.volume:/plugins-storage:rw,Z
 
-Network=traefik-net.network
+Network=proxy.network
 
 # Definición del Healthcheck
 HealthCmd=traefik healthcheck --ping --ping.address=:8082
