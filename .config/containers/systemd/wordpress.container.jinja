@@ -38,6 +38,8 @@ Label=traefik.http.routers.wp.tls.certresolver=myresolver
 Label=traefik.http.routers.wp.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 [Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=on-failure
 RestartSec=10s
 StartLimitIntervalSec=300

@@ -33,7 +33,7 @@ Una solución robusta y segura para desplegar servicios auto-alojados utilizando
 | **yq**            | Procesador YAML/JSON                 | `sudo apt install yq`            |
 | **jinrender**     | Motor de templates                   | Manual (ver abajo)               |
 | **crypta**        | Gestión de secretos                  | Manual (ver abajo)               |
-| **bat**           | Visualizador de archivos mejorado    | `sudo apt install bat`           |
+| **bat**           | Visualizador de archivos mejorado    | `sudo apt install batcat`        |
 | **jq**            | Procesador JSON                      | `sudo apt install jq`            |
 | **zoxide**        | Navegador de directorios inteligente | `sudo apt install zoxide`        |
 | **neovim**        | Editor de texto avanzado             | `sudo apt install neovim`        |
@@ -47,7 +47,7 @@ Una solución robusta y segura para desplegar servicios auto-alojados utilizando
 ### 1. Instalar dependencias del sistema
 
 ```bash
-sudo apt update && sudo apt install git yadm age yq jq zoxide neovim apache2-utils fish podman
+sudo apt update && sudo apt install git ansifilter yadm age yq jq batcat zoxide neovim apache2-utils fish podman
 mkdir -p ~/.local/bin
 ```
 

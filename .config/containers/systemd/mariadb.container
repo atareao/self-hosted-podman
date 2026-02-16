@@ -23,5 +23,15 @@ Volume=mariadb.volume:/var/lib/mysql:Z
 Network=wordpress.network
 Exec=--innodb-buffer-pool-size=256M --innodb-flush-log-at-trx-commit=2
 
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+# Tiempo máximo para que el healthcheck pase a healthy
+TimeoutStartSec=60
+
 [Install]
 WantedBy=multi-user.target

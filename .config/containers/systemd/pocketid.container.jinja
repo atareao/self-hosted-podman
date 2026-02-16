@@ -33,6 +33,8 @@ HealthRetries=3
 HealthStartPeriod=10s
 
 [Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 
 [Install]

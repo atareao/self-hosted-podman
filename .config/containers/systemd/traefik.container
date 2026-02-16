@@ -43,6 +43,8 @@ DropCapability=all
 AddCapability=cap_net_bind_service
 
 [Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 # 4. Evita ataques DoS que consuman RAM/CPU
 MemoryLimit=512M
