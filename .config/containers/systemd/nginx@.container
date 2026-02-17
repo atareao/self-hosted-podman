@@ -8,11 +8,11 @@ ContainerName=nginx-%i
 Network=proxy.network
 
 # Etiquetas para que Traefik haga su magia
-Label=traefik.enable=true
-Label=traefik.http.routers.nginx-%i.rule=Host(`%i`)
-Label=traefik.http.routers.nginx-%i.entrypoints=websecure
-Label=traefik.http.routers.nginx-%i.tls.certresolver=myresolver
-Label=traefik.http.routers.nginx-%i.middlewares=seguridadHeaders@file,compresionHeaders@file
+PodmanArgs=--label "traefik.enable=true" \
+           --label "traefik.http.routers.nginx-%i.rule=Host(`%i`)" \
+           --label "traefik.http.routers.nginx-%i.entrypoints=websecure" \
+           --label "traefik.http.routers.nginx-%i.tls.certresolver=myresolver" \
+           --label "traefik.http.routers.nginx-%i.middlewares=seguridadHeaders@file,compresionHeaders@file"
 
 [Service]
 Restart=always
