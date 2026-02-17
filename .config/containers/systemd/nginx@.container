@@ -9,10 +9,10 @@ Network=proxy.network
 
 # Etiquetas para que Traefik haga su magia
 PodmanArgs=--label "traefik.enable=true" \
-           --label "traefik.http.routers.nginx-%i.rule=Host(`%i`)" \
-           --label "traefik.http.routers.nginx-%i.entrypoints=websecure" \
-           --label "traefik.http.routers.nginx-%i.tls.certresolver=myresolver" \
-           --label "traefik.http.routers.nginx-%i.middlewares=seguridadHeaders@file,compresionHeaders@file"
+           --label "traefik.http.routers.nginx-%j.rule=Host(`%i`)" \
+           --label "traefik.http.routers.nginx-%j.entrypoints=websecure" \
+           --label "traefik.http.routers.nginx-%j.tls.certresolver=myresolver" \
+           --label "traefik.http.routers.nginx-%j.middlewares=seguridadHeaders@file,compresionHeaders@file"
 
 [Service]
 Restart=always
