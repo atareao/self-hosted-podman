@@ -2,7 +2,11 @@
 
 # --- CONFIGURACIÓN ---
 DOMINIO="tudominio.es"
-
+echo "--------------------------------------------------------"
+# Persistencia de usuario
+loginctl enable-linger $USER
+# Habilitar e iniciar el socket de Podman
+systemctl --user enable --now podman.socket
 echo "--------------------------------------------------------"
 # Instalación de herramientas útiles para administración y desarrollo
 mkdir -p ~/.local/bin
