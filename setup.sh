@@ -97,36 +97,3 @@ echo "Usuario '$NUEVO_USUARIO' desbloqueado y con sudo."
 echo "Usuario '$USUARIO_APPS' listo para apps."
 echo "SSH configurado en puerto $NUEVO_PUERTO_SSH (Solo llave)."
 echo "--------------------------------------------------------"
-
-echo "--------------------------------------------------------"
-echo "POST Configuración"
-# Instalación de herramientas útiles para administración y desarrollo
-apt update && sudo apt install git ansifilter yadm age yq jq batcat zoxide neovim apache2-utils fish podman
-mkdir -p ~/.local/bin
-# SOPS - Gestión de secretos
-curl -LO https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.linux.amd64
-mv sops-v3.11.0.linux.amd64 ~/.local/bin/sops
-chmod +x ~/.local/bin/sops
-# Jinrender - Motor de templates
-curl -LO https://github.com/atareao/jinrender/releases/download/v0.1.2/jinrender-linux-x86_64
-mv jinrender-linux-x86_64 ~/.local/bin/jinrender
-chmod +x ~/.local/bin/jinrender
-# Crypta - Gestión de secretos simplificada
-curl -LO https://github.com/atareao/crypta/releases/download/v0.1.8/crypta-linux-x86_64
-mv crypta-linux-x86_64 ~/.local/bin/crypta
-chmod +x ~/.local/bin/crypta
-# Starship - Mejora del prompt
-curl -LO https://github.com/starship/starship/releases/download/v1.24.2/starship-i686-unknown-linux-musl.tar.gz -o starship.tar.gz
-tar xvzf starship.tar.gz
-mv starship ~/.local/bin/starship
-chmod +x ~/.local/bin/starship
-# Inicializar gestión de secretos
-crypta init
-crytpa set --key fqdn --value "$DOMINIO"
-# Configurar dotfiles con YADM
-yadm init -b main
-yadm remote add origin https://github.com/atareao/self-hosted-podman.git
-yadm pull origin main
-yadmalt
-
-
