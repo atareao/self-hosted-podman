@@ -16,6 +16,7 @@ Label=traefik.enable=true
 Label=traefik.http.services.dockge.loadbalancer.server.port=5001
 Label=traefik.http.routers.dockge.rule=Host(`dockge.{{ env.FQDN }}`)
 Label=traefik.http.routers.dockge.entrypoints=websecure
+Label=traefik.http.routers.dockge.tls.certresolver=myresolver
 Label=traefik.http.routers.dockge.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 [Service]
