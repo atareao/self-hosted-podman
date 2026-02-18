@@ -1,0 +1,26 @@
+[Unit]
+Descripcion=Dockge
+
+[Container]
+Image=docker.io/louislam/dockge
+ContainerName=dockge
+
+# Persistencia
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=%h/.config/dockge/stacks:/opt/stacks:Z
+Volume=%h/.config/dockge/data:/app/data:Z
+# Network
+Network=proxy.network
+# Labels
+Label=traefik.enable=true
+Label=traefik.http.services.dockge.loadbalancer.server.port=5001
+Label=traefik.http.routers.dockge.rule=Host(`dockge.{{ env.FQDN }}`)
+Label=traefik.http.routers.dockge.entrypoints=websecure
+Label=traefik.http.routers.dockge.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+[Service]
+Restart=unless-stopped
+
+[Install]
+WantedBy=multi-user.target
+
