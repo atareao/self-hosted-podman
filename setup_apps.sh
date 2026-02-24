@@ -27,6 +27,13 @@ curl -LO https://github.com/starship/starship/releases/download/v1.24.2/starship
 tar xvzf starship.tar.gz
 mv starship ~/.local/bin/starship
 chmod +x ~/.local/bin/starship
+# Hardening
+chmod 700 ~/.local/bin
+chmod 700 ~/.secrets
+chmod 600 ~/.secrets/sops/age/key.txt
+chmod 700 ~/.local/share/containers
+chmod 700 ~/.gnupg
+chmod 700 ~/.ssh
 # Inicializar gestión de secretos
 crypta init
 crytpa set --key fqdn --value "$DOMINIO"
