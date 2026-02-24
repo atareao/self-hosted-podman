@@ -7,53 +7,56 @@ function qlist
         return 1
     end
 
-    # --- Sección del Spinner ---
-    # Creamos un proceso en segundo plano para el spinner
+    # 1. Recopilar stacks
+    set -l stacks (ls "$available_dir")
+    if test -z "$stacks"
+        echo "No hay stacks disponibles en $available_dir"
+        return 0
+    end
+
+    # 2. Spinner visual mientras procesamos
     echo -n "🔍 Analizando stacks... "
     set -l frames "⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏"
-    
-    # Recopilamos los datos primero
-    set -l results
-    set -l stacks (ls "$available_dir")
-    
+    set -l i 1
+
+    # Cabecera de la tabla (la imprimimos después para que no la borre el spinner)
+    set -l table_header "------------------------------------------\n"
+    set -l table_titles (printf "%-7s %-12s %s\n" "LINK" "STATUS" "STACK")
+    set -l table_body ""
+
     for stack in $stacks
-        # Dibujar spinner
-        set -l frame $frames[(math (math $status % 10) + 1)]
-        printf "\r%s %s" (set_color cyan)$frame(set_color normal) "Analizando stacks..."
+        # Actualizar spinner
+        printf "\r%s Analizando: %s" (set_color cyan)$frames[$i](set_color normal) $stack
+        set i (math $i + 1); if test $i -gt 10; set i 1; end
         
         set -l dest "$systemd_dir/$stack"
-        set -l link_status
-        set -l run_status
+        set -l link_color red
+        set -l link_text "OFF"
+        set -l run_status (set_color white)"---"(set_color normal)
 
         if test -L "$dest"
-            set link_status (set_color green)"ON"(set_color normal)
+            set link_color green
+            set link_text "ON " # Espacio para alinear
+            
             if systemctl --user is-active --quiet "$stack"
                 set run_status (set_color green)"running"(set_color normal)
             else
                 set run_status (set_color yellow)"stopped"(set_color normal)
             end
-        else
-            set link_status (set_color red)"OFF"(set_color normal)
-            set run_status (set_color white)"---"(set_color normal)
         end
-        
-        # Guardamos el resultado formateado en una lista
-        set -a results " [$link_status]    $run_status    $stack"
+
+        # Construir la línea de la tabla
+        # Usamos string collect para evitar problemas con printf y variables complejas
+        set -l link_part (set_color $link_color)"$link_text"(set_color normal)
+        set -l line (printf " [%b]    %-19b %s\n" "$link_part" "$run_status" "$stack")
+        set table_body $table_body$line
     end
 
-    # Limpiar la línea del spinner
-    printf "\r%-30s\n" "✅ Análisis completado:"
-    
-    # --- Mostrar Tabla Final ---
+    # Limpiar línea del spinner y mostrar tabla
+    printf "\r%-40s\n" "✅ Análisis completado"
     echo "------------------------------------------"
-    printf "%-7s %-19s %s\n" "LINK" "STATUS" "STACK"
+    printf "%-7s %-12s %s\n" "LINK" "STATUS" "STACK"
     echo "------------------------------------------"
-    for line in $results
-        # Usamos printf con %b para interpretar los códigos de color guardados
-        set -l col_link (echo $line | awk '{print $1}')
-        set -l col_stat (echo $line | awk '{print $2}')
-        set -l col_name (echo $line | awk '{print $3}')
-        printf " %b    %-19b %s\n" "$col_link" "$col_stat" "$col_name"
-    end
+    echo -e $table_body
     echo "------------------------------------------"
 end
