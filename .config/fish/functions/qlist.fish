@@ -11,21 +11,34 @@ function qlist
         set -l link_color red
         set -l run_color white
 
-        # Buscamos el primer archivo Quadlet para comprobar el enlace
-        set -l main_file (ls $src | grep -E '\.(container|kube|pod|volume|network)$' | head -n 1)
-
-        if test -n "$main_file"; and test -L "$systemd_dir/$main_file"
-            set link_status "ON"
-            set link_color green
-            set -l service_name (string split -r -m1 . $main_file)[1]
-            if systemctl --user is-active --quiet "$service_name"
-                set run_status "running"
-                set run_color green
-            else
-                set run_status "stopped"
-                set run_color yellow
+        # 1. Comprobar si el stack está habilitado (si existe algún enlace)
+        set -l linked_files (ls $src 2>/dev/null)
+        for f in $linked_files
+            if test -L "$systemd_dir/$f"
+                set link_status "ON"
+                set link_color green
+                break
             end
         end
+
+        # 2. Si está ON, buscar si ALGUNO de sus servicios está activo
+        if test "$link_status" = "ON"
+            set run_status "stopped"
+            set run_color yellow
+            
+            for f in $linked_files
+                # Solo comprobamos archivos que generan servicios (.container, .kube, .pod)
+                if string match -qr '\.(container|kube|pod)$' "$f"
+                    set -l service_name (string split -r -m1 . $f)[1]
+                    if systemctl --user is-active --quiet "$service_name"
+                        set run_status "running"
+                        set run_color green
+                        break # Si uno está running, el stack está running
+                    end
+                end
+            end
+        end
+        
         set -a table_data "$link_color|$link_status|$run_color|$run_status|$stack"
     end
 
