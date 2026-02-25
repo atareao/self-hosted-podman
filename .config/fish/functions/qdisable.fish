@@ -7,44 +7,43 @@ function qdisable --argument-names stack
         return 1
     end
 
-    set -l dest "$HOME/.config/containers/systemd/$stack"
+    set -l dest_dir "$HOME/.config/containers/systemd"
 
-    # 2. ¿Existe el destino y es un enlace simbólico?
-    if not test -L "$dest"
-        set_color red
-        if test -e "$dest"
-            echo "❌ Error: '$dest' existe pero NO es un enlace simbólico (es un archivo o directorio real)."
-            echo "⚠️ No lo borraré automáticamente para evitar pérdida de datos."
-        else
-            echo "❌ Error: El stack '$stack' no parece estar habilitado (no existe $dest)."
+    # 2. Gestión de servicios activos
+    # Con el namespacing, detener los servicios es muy sencillo y preciso
+    echo "Deteniendo servicios asociados al stack '$stack'..."
+    systemctl --user stop "$stack-*" 2>/dev/null
+
+    # 3. Eliminar los enlaces simbólicos con namespacing
+    # Buscamos archivos que empiecen por "stack-"
+    set -l files_removed 0
+    
+    # Usamos un comodín para capturar todos los enlaces del namespace del stack
+    for link in $dest_dir/$stack-*
+        # Verificación de seguridad: que sea un enlace simbólico
+        if test -L "$link"
+            if rm "$link"
+                set files_removed (math $files_removed + 1)
+            end
         end
-        set_color normal
-        return 1
     end
 
-    # 3. Gestión de servicios activos (Opcional pero recomendado)
-    # Intentamos detener los servicios asociados antes de romper el enlace.
-    # Usamos el wildcard para capturar todas las unidades que genera el stack.
-    echo "Deteniendo servicios asociados a '$stack'..."
-    systemctl --user stop "$stack*" 2>/dev/null
+    # 4. Verificar si realmente se borró algo
+    if test $files_removed -eq 0
+        set_color yellow
+        echo "⚠️ No se encontraron enlaces activos para el stack '$stack' en $dest_dir."
+        set_color normal
+    end
 
-    # 4. Eliminar el enlace simbólico
-    if rm "$dest"
-        # 5. Recargar para que systemd limpie las unidades generadas
-        if systemctl --user daemon-reload
-            set_color green
-            echo "✅ Stack '$stack' deshabilitado correctamente."
-            set_color normal
-            echo "Las definiciones de Quadlet han sido eliminadas de systemd."
-        else
-            set_color red
-            echo "❌ Error al recargar systemd tras eliminar el enlace."
-            set_color normal
-            return 1
-        end
+    # 5. Recargar systemd para limpiar el estado
+    if systemctl --user daemon-reload
+        set_color green
+        echo "✅ Stack '$stack' deshabilitado correctamente ($files_removed enlaces eliminados)."
+        set_color normal
+        echo "Las unidades de systemd han sido eliminadas."
     else
         set_color red
-        echo "❌ Error físico al intentar borrar el enlace en $dest."
+        echo "❌ Error al recargar systemd."
         set_color normal
         return 1
     end
