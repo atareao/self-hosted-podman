@@ -1,15 +1,15 @@
 [Unit]
-Description=Servidor Nginx de ejemplo para %I
+Description=Servidor Nginx de ejemplo para web
 After=traefik.service
 
 [Container]
 Image=docker.io/library/nginx:alpine
-ContainerName=nginx-%I
+ContainerName=nginx-web
 Network=proxy.network
 
 # Etiquetas para que Traefik haga su magia
 PodmanArgs=--label "traefik.enable=true" \
-           --label "traefik.http.routers.nginx-%I.rule=Host(`%I.{{ env.FQDN }}`)" \
+           --label "traefik.http.routers.nginx-%I.rule=Host(`web.{{ env.FQDN }}`)" \
            --label "traefik.http.routers.nginx-%I.entrypoints=websecure" \
            --label "traefik.http.routers.nginx-%I.tls.certresolver=myresolver" \
            --label "traefik.http.routers.nginx-%I.middlewares=seguridadHeaders@file,compresionHeaders@file" \
