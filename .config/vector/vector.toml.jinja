@@ -39,8 +39,8 @@ data_dir = "/var/lib/vector"
   inputs = ["process_traefik"]
   uri = "http://openobserve:5080/api/default/${.container_name:-syslog}/_json"
   auth.strategy = "basic"
-  auth.user = {{ env.OO_USER_EMAIL }}
-  auth.password = {{ env.OO_USER_PASSWORD }}
+  auth.user = "{{ env.OO_USER_EMAIL }}"
+  auth.password = "{{ env.OO_USER_PASSWORD }}"
   encoding.codec = "json"
 
 [sinks.crowdsec]
