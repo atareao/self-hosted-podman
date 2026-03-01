@@ -51,6 +51,10 @@ sinks:
       - "process_traefik"
     uri: "http://crowdsec:8080/v1/common/line"
     method: "post"
+    auth:
+      strategy: "basic"
+      user: "vector-ingest"
+      password: "{{ env.VECTOR_INGEST_PASSWORD }}"
     encoding:
       codec: "json"
     batch:
