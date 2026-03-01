@@ -8,7 +8,7 @@ ContainerName=crowdsec
 AutoUpdate=registry
 
 # Persistencia
-Volume=%h/.config/crowdsec/acquis.yml:/etc/crowdsec/acquis.yaml:Z
+Volume=%h/.config/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:Z
 Volume=crowdsec-data.volume:/var/lib/crowdsec/data:Z
 Volume=crowdsec-config.volume:/etc/crowdsec:Z
 
