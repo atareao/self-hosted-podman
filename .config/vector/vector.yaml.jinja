@@ -51,8 +51,6 @@ sinks:
       - "process_traefik"
     uri: "http://crowdsec:8080/v1/common/line"
     method: "post"
-    auth:
-      strategy: "none"
     encoding:
       codec: "json"
     batch:
