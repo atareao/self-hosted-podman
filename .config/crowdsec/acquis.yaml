@@ -1,5 +1,5 @@
-# Configuración para recibir logs desde Vector vía HTTP
-source: notification
-format: json
+source: file
+filenames:
+  - /dev/null # Un truco para que no falle si no hay archivos
 labels:
   type: traefik
