@@ -49,7 +49,7 @@ sinks:
     type: "http"
     inputs:
       - "process_traefik"
-    uri: "http://crowdsec:8080/v1/common/line"
+    uri: "http://crowdsec:8080/v1/logs"
     method: "post"
     auth:
       strategy: "basic"
