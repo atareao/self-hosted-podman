@@ -61,9 +61,8 @@ log:
   format: common
 
 accessLog:
-  # Al no poner filePath, sale por stdout/stderr
+  filePath: "/var/log/traefik/access.log"
   format: json
-  bufferingSize: 100
   fields:
     names:
       StartLocal: keep # Útil para tener la hora local del VPS
@@ -71,5 +70,8 @@ accessLog:
 experimental:
   plugins:
     traefik-oidc-auth:
-      moduleName: "github.com/sevensolutions/traefik-oidc-auth"
+      moduleName: "github.com/sevensolutions/traefik-oidc-auth5
       version: "v0.11.0"
+    crowdsec:
+      moduleName: "github.com/maxlerebourg/traefik-bouncer"
+      version: "v1.5.1"

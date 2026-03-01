@@ -46,5 +46,11 @@ data_dir = "/var/lib/vector"
   type = "http"
   inputs = ["process_traefik"]
   # Aquí enviaríamos a la API de CrowdSec (LAPI) o a un bouncer de logs
-  uri = "http://crowdsec:8080/v1/watchers/logs"
+  uri = "http://crowdsec:8080/v1/common/line"
+  method = "post"
+  auth.strategy = "none" # La LAPI interna suele confiar en la red del contenedor
   encoding.codec = "json"
+
+  [sinks.crowdsec.batch]
+    max_events = 10 # No esperes a tener 1000 logs para enviar, mejor de 10 en 10
+    timeout_secs = 1

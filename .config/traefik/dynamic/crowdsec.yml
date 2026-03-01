@@ -1,0 +1,11 @@
+http:
+  middlewares:
+    crowdsec-bouncer:
+      plugin:
+        crowdsec:
+          enabled: true
+          crowdsecLapiScheme: http
+          crowdsecLapiHost: "crowdsec:8080"
+          crowdsecLapiKey: "TU_API_KEY_GENERADA_CON_CSCLI"
+          remediationStrategy: ban
+          updateIntervalSeconds: 60
