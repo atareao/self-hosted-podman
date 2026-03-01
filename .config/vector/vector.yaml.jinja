@@ -1,0 +1,60 @@
+idata_dir: "/var/lib/vector"
+
+api:
+  enabled: true
+  address: "0.0.0.0:8686"
+  playground: false
+
+# --- SOURCES ---
+sources:
+  podman_hybrid:
+    type: "docker_logs"
+
+# --- TRANSFORMS ---
+transforms:
+  process_traefik:
+    type: "remap"
+    inputs:
+      - "podman_hybrid"
+    source: |
+      # Filtramos por el nombre del contenedor que viene del socket
+      if .container_name == "traefik" {
+          parsed, err = parse_json(.message)
+          if err == null {
+              . = merge(., parsed)
+              del(.message)
+          }
+          .service_type = "edge-proxy"
+      }
+      
+      # Añadimos metadatos del host y eliminamos basura
+      .host_node = "${HOSTNAME:-desconocido}"
+      del(.image)
+
+# --- SINKS ---
+sinks:
+  openobserve:
+    type: "http"
+    inputs:
+      - "process_traefik"
+    uri: "http://openobserve:5080/api/default/${.container_name:-syslog}/_json"
+    auth:
+      strategy: "basic"
+      user: "{{ env.OO_USER_EMAIL }}"
+      password: "{{ env.OO_USER_PASSWORD }}"
+    encoding:
+      codec: "json"
+
+  crowdsec:
+    type: "http"
+    inputs:
+      - "process_traefik"
+    uri: "http://crowdsec:8080/v1/common/line"
+    method: "post"
+    auth:
+      strategy: "none"
+    encoding:
+      codec: "json"
+    batch:
+      max_events: 10
+      timeout_secs: 1
