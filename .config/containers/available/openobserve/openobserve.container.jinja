@@ -24,7 +24,7 @@ Environment=ZO_DATA_RETENTION_DAYS=30
 
 # Labels
 Label=traefik.enable=true
-Label=traefik.http.services.openobserve.loadbalancer.server.port: 5080
+Label=traefik.http.services.openobserve.loadbalancer.server.port=5080
 Label=traefik.http.routers.openobserve.rule=Host(`openobserve.{{ env.FQDN }}`)
 Label=traefik.http.routers.openobserve.entrypoints=websecure
 Label=traefik.http.routers.openobserve.tls.certresolver=myresolver
