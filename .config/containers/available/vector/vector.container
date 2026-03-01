@@ -11,7 +11,7 @@ AutoUpdate=registry
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=/var/log/journal:/var/log/journal:ro
 Volume=/run/log/journal:/run/log/journal:ro
-Volume=%h/.config/vector/vector.toml:/etc/vector/vector.toml:ro,Z
+Volume=%h/.config/vector/vector.yaml:/etc/vector/vector.yaml:ro,Z
 Volume=vector-data.volume:/var/lib/vector:Z
 
 # Networking
