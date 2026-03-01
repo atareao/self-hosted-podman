@@ -1,0 +1,5 @@
+# Configuración para recibir logs desde Vector vía HTTP
+source: notification
+format: json
+labels:
+  type: traefik

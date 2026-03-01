@@ -1,0 +1,38 @@
+[Unit]
+Description=CrowdSec Security Engine
+After=network-online.target
+
+[Container]
+Image=docker.io/crowdsecurity/crowdsec:latest
+ContainerName=crowdsec
+AutoUpdate=registry
+
+# Persistencia
+Volume=%h/.config/crowdsec:/etc/crowdsec:Z
+Volume=crowdsec-data.volume:/var/lib/crowdsec/data:Z
+
+# Newtworking
+Network=security.network
+
+# Environment
+Environment=COLLECTIONS=crowdsecurity/linux crowdsecurity/traefik crowdsecurity/http-cve
+Environment=DISABLE_LOCAL_CONFIG=false
+
+# Healthcheck
+HealthCmd=curl -f http://localhost:8080/v1/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=15s
+
+[Service]
+# Restart
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" crowdsec)" != "healthy" ]; do sleep 2; done'
+
+[Install]
+WantedBy=default.target

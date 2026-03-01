@@ -1,0 +1,47 @@
+[Unit]
+Description=Vector Log Router (Rust-based)
+After=network-online.target
+
+[Container]
+Image=docker.io/timberio/vector:latest-alpine
+ContainerName=vector
+AutoUpdate=registry
+
+# Persistencia
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=/var/log/journal:/var/log/journal:ro
+Volume=/run/log/journal:/run/log/journal:ro
+Volume=%h/.config/vector/vector.toml:/etc/vector/vector.toml:ro,Z
+Volume=vector-data.volume:/var/lib/vector:Z
+
+# Networking
+Network=security.network
+
+# Capabilities
+Capability=CAP_DAC_READ_SEARCH
+
+# Environment
+Environment=VECTOR_SELF_DATA_DIR=/var/lib/vector
+
+# Healthcheck
+HealthCmd=vector validate --config-yaml /etc/vector/vector.toml || exit 1
+HealthInterval=90s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=15s
+
+[Service]
+# Environemnt
+# Restart
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+# Tiempo máximo para que el healthcheck pase a healthy
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" vector)" != "healthy" ]; do sleep 2; done'
+# Le damos un margen para que el socket de Podman esté disponible
+ExecStartPre=/usr/bin/sleep 2
+
+[Install]
+WantedBy=default.target

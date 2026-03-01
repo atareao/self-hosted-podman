@@ -1,0 +1,50 @@
+data_dir = "/var/lib/vector"
+
+[api]
+  enabled = true
+  address = "127.0.0.1:8686"
+
+# --- SOURCES ---
+
+[sources.podman_hybrid]
+  type = "docker_logs" # Al apuntar al socket, Vector gestiona internamente la lectura
+  # Podman envía los logs al journal, y Vector los recupera enriquecidos
+
+# --- TRANSFORMS ---
+
+[transforms.process_traefik]
+  type = "remap"
+  inputs = ["podman_hybrid"]
+  source = '''
+  # Filtramos por el nombre del contenedor que viene del socket
+  if .container_name == "traefik" {
+      parsed, err = parse_json(.message)
+      if err == null {
+          . = merge(., parsed)
+          del(.message)
+      }
+      .service_type = "edge-proxy"
+  }
+  
+  # Añadimos metadatos del host y eliminamos basura
+  .host_node = "${HOSTNAME:-desconocido}"
+  del(.image) 
+  '''
+
+# --- SINKS ---
+
+[sinks.openobserve]
+  type = "http"
+  inputs = ["process_traefik"]
+  uri = "http://openobserve:5080/api/default/${.container_name:-syslog}/_json"
+  auth.strategy = "basic"
+  auth.user = {{ env.OO_USER_EMAIL }}
+  auth.password = {{ env.OO_USER_PASSWORD }}
+  encoding.codec = "json"
+
+[sinks.crowdsec]
+  type = "http"
+  inputs = ["process_traefik"]
+  # Aquí enviaríamos a la API de CrowdSec (LAPI) o a un bouncer de logs
+  uri = "http://crowdsec:8080/v1/watchers/logs"
+  encoding.codec = "json"

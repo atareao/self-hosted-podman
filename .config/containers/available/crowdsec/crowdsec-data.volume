@@ -1,0 +1,6 @@
+[Unit]
+Description=Volumen para datos de Crowdsec
+
+[Volume]
+Label=app=crowdsec
+
