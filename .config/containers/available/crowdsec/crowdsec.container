@@ -21,10 +21,23 @@ Environment=DISABLE_LOCAL_CONFIG=false
 Environment=TZ=Europe/Madrid
 
 # Healthcheck
+HealthCmd=cscli lapi status || exit 1
+HealthInterval=90s
+HealthRetries=3
+HealthTimeout=10s
+HealthStartPeriod=20s
 
 [Service]
 # Restart
-Restart=unless-stopped
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+# Tiempo máximo para que el healthcheck pase a healthy
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" crowdsec)" != "healthy" ]; do sleep 2; done'
+# Le damos un margen para que el socket de Podman esté disponible
+ExecStartPre=/usr/bin/sleep 2
 
 [Install]
 WantedBy=default.target
