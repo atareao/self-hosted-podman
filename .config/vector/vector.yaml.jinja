@@ -21,7 +21,7 @@ transforms:
       if .container_name == "traefik" {
           parsed, err = parse_json(.message)
           if err == null {
-              . = merge(., parsed)
+              . = merge!(., parsed)
               del(.message)
           }
           .service_type = "edge-proxy"
