@@ -8,3 +8,5 @@ abbr -a sck  'systemctl --user stop'
 abbr -a scl  'systemctl --user status'
 # Inspecciona
 abbr -a qi '/usr/libexec/podman/quadlet -user -dryrun'
+# Propios de fish
+abbr -a fr 'source ~/.config/fish/config.fish'

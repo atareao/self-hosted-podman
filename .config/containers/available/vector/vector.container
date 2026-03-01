@@ -24,7 +24,7 @@ AddCapability=CAP_DAC_READ_SEARCH
 Environment=VECTOR_SELF_DATA_DIR=/var/lib/vector
 
 # Healthcheck
-HealthCmd=vector validate --config-yaml /etc/vector/vector.toml || exit 1
+HealthCmd=vector validate --config-yaml /etc/vector/vector.yaml || exit 1
 HealthInterval=90s
 HealthRetries=3
 HealthTimeout=5s
