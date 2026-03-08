@@ -4,7 +4,7 @@ Description=Dockge
 [Container]
 Image=docker.io/louislam/dockge
 ContainerName=dockge
-PodmanArgs==--init
+PodmanArgs=--init
 
 # Persistencia
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
