@@ -4,9 +4,10 @@ Description=Dockge
 [Container]
 Image=docker.io/louislam/dockge
 ContainerName=dockge
+AutoUpdate=registry
 PodmanArgs=--init
 
-# Persistencia
+# Volumes
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=%h/.config/dockge/stacks:/opt/stacks:Z
 Volume=%h/.config/dockge/data:/app/data:Z
@@ -28,7 +29,19 @@ HealthStartPeriod=60s
 HealthRetries=5
 
 [Service]
-Restart=always
+# Environment variables
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+# Restart
+Restart=on-failure
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+# Tiempo máximo para que el healthcheck pase a healthy
+TimeoutStartSec=60
+{% raw %}
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" dockge)" != "healthy" ]; do sleep 2; done'
+{% endraw %}
 
 [Install]
 WantedBy=multi-user.target
