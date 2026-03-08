@@ -21,6 +21,7 @@ Label=traefik.http.routers.dockge.tls.certresolver=myresolver
 Label=traefik.http.routers.dockge.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # HealthCheck
+HealthCmd=/app/extra/healthcheck
 HealthInterval=60s
 HealthTimeout=30s
 HealthStartPeriod=60s
