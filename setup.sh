@@ -13,11 +13,23 @@ PASS_APPS="ContraseñaSeguraApps456!"
 # PEGA AQUÍ TU CLAVE PÚBLICA
 MI_CLAVE_PUBLICA="tu_clave_publica_aqui"
 
+# 01NORECOMMENDS
+cat <<EOF >> /etc/apt/apt.conf.d/01norecommend
+APT::Install-Recommends "0";
+APT::Install-Suggests "0";
+EOF
+# 10NORECOMMENDS
+cat <<EOF >> /etc/apt/apt.conf.d/10norecommends
+APT::Install-Recommends "false";
+APT::Install-Suggets "false";
+EOF
+
 # Actualización y Dependencias
 apt update && apt upgrade -y
-apt install -y ufw fail2ban libpam-tmpdir needrestart unattended-upgrades libcap2-bin
+apt install -y ufw fail2ban libpam-tmpdir needrestart unattended-upgrades libcap2-bin uidmap slirp4netns passt nftables
 # Herramientas para podman y otras utilidades
-install - y git ansifilter yadm age yq jq batcat zoxide neovim apache2-utils fish podman
+apt install -y git ansifilter yadm age yq jq batcat zoxide neovim apache2-utils fish podman
+
 # Crear admin, asignar pass y desbloquear
 useradd -m -s /bin/bash "$NUEVO_USUARIO"
 echo "$NUEVO_USUARIO:$PASS_ADMIN" | chpasswd
@@ -32,7 +44,8 @@ chmod 700 /home/"$NUEVO_USUARIO"/.ssh
 chmod 600 /home/"$NUEVO_USUARIO"/.ssh/authorized_keys
 
 # Crear usuario apps y asignar pass
-useradd -m -s /bin/bash "$USUARIO_APPS"
+# useradd -m -s /bin/bash "$USUARIO_APPS"
+useradd -m -s /bin/fish "$USUARIO_APPS"
 echo "$USUARIO_APPS:$PASS_APPS" | chpasswd
 
 # Hardening del Kernel (Sysctl)

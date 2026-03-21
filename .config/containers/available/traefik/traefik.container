@@ -22,6 +22,8 @@ Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=%h/.config/traefik/dynamic:/etc/traefik/dynamic:ro,Z
 # 5. Persistencia de Plugins
 Volume=traefik-plugins.volume:/plugins-storage:rw,Z
+# 6. Directorio de logs para que crowdsec los tenga disponible
+Volume=%h/.local/share/traefik/logs:/var/log/traefik:Z
 
 Network=proxy.network
 

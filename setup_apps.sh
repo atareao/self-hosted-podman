@@ -36,7 +36,7 @@ chmod 700 ~/.gnupg
 chmod 700 ~/.ssh
 # Inicializar gestión de secretos
 crypta init
-crytpa set --key fqdn --value "$DOMINIO"
+crypta set --key fqdn --value "$DOMINIO"
 # Incializar secretos para podman
 openssl rand -hex 16 | podman secret create pocketid_encryption_key -
 openssl rand -base64 32 | podman secret create temporal -

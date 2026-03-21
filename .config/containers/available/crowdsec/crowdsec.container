@@ -11,6 +11,7 @@ AutoUpdate=registry
 Volume=%h/.config/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:Z
 Volume=crowdsec-data.volume:/var/lib/crowdsec/data:Z
 Volume=crowdsec-config.volume:/etc/crowdsec:Z
+Volume=%h/.local/share/traefik/logs:/var/log/traefik:ro,Z
 
 # Newtworking
 Network=security.network

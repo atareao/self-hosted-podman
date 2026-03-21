@@ -1,5 +1,5 @@
 source: file
 filenames:
-  - /dev/null # Un truco para que no falle si no hay archivos
+  - /var/log/traefik/access.log
 labels:
   type: traefik
