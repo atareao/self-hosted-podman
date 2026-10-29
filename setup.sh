@@ -15,9 +15,9 @@ MI_CLAVE_PUBLICA="tu_clave_publica_aqui"
 
 # Actualización y Dependencias
 apt update && apt upgrade -y
-apt install -y ufw fail2ban libpam-tmpdir needrestart unattended-upgrades libcap2-bin
+apt install -y libpam-tmpdir needrestart unattended-upgrades libcap2-bin
 # Herramientas para podman y otras utilidades
-install - y git ansifilter yadm age yq jq batcat zoxide neovim apache2-utils fish podman
+apt install -y git ansifilter yadm age yq jq bat zoxide neovim apache2-utils fish podman
 # Crear admin, asignar pass y desbloquear
 useradd -m -s /bin/bash "$NUEVO_USUARIO"
 echo "$NUEVO_USUARIO:$PASS_ADMIN" | chpasswd
@@ -32,7 +32,7 @@ chmod 700 /home/"$NUEVO_USUARIO"/.ssh
 chmod 600 /home/"$NUEVO_USUARIO"/.ssh/authorized_keys
 
 # Crear usuario apps y asignar pass
-useradd -m -s /bin/bash "$USUARIO_APPS"
+useradd -m -s /bin/fish "$USUARIO_APPS"
 echo "$USUARIO_APPS:$PASS_APPS" | chpasswd
 
 # Hardening del Kernel (Sysctl)
@@ -72,6 +72,8 @@ systemctl daemon-reload
 systemctl restart ssh.socket
 
 # Fail2Ban con Baneo Agresivo (24h)
+curl -sSfL https://raw.githubusercontent.com/aejimmi/fail2ban-rs/main/scripts/install.sh | bash
+
 cat <<EOF > /etc/fail2ban/jail.local
 [sshd]
 enabled = true
@@ -82,14 +84,39 @@ findtime = 1h
 EOF
 systemctl restart fail2ban
 
-# Firewall (UFW) - Soporte HTTP/3
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow "$NUEVO_PUERTO_SSH"/tcp
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw allow 443/udp
-ufw --force enable
+cat <<EOF > /etc/nftables.conf
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        # Permitir loopback y tráfico de respuestas
+        iifname "lo" accept
+        ct state established,related accept
+
+        # Servicios permitidos
+        tcp dport $NUEVO_PUERTO_SSH accept
+        tcp dport 80 accept
+        tcp dport 443 accept
+        udp dport 443 accept  # HTTP/3 (QUIC)
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}
+EOF
+
+# Aplicar las reglas y habilitar el servicio
+nft -f /etc/nftables.conf
+systemctl enable --now nftables
 
 echo "--------------------------------------------------------"
 echo "SERVIDOR LISTO Y PROTEGIDO"

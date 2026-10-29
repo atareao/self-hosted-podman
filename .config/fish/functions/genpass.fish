@@ -14,3 +14,4 @@ function genpass --description "Genera una contraseña aleatoria usando OpenSSL"
     # Añadimos un salto de línea al final para que no se pegue al prompt
     echo "" 
 end
+

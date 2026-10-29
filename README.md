@@ -55,8 +55,8 @@ mkdir -p ~/.local/bin
 
 ```bash
 # SOPS - Gestión de secretos
-curl -LO https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.linux.amd64
-mv sops-v3.11.0.linux.amd64 ~/.local/bin/sops
+curl -LO https://github.com/getsops/sops/releases/download/v3.13.0/sops-v3.13.0.linux.amd64
+mv sops-v3.13.0.linux.amd64 ~/.local/bin/sops
 chmod +x ~/.local/bin/sops
 
 # Jinrender - Motor de templates
@@ -65,12 +65,12 @@ mv jinrender-linux-x86_64 ~/.local/bin/jinrender
 chmod +x ~/.local/bin/jinrender
 
 # Crypta - Gestión de secretos simplificada
-curl -LO https://github.com/atareao/crypta/releases/download/v0.1.8/crypta-linux-x86_64
+curl -LO https://github.com/atareao/crypta/releases/download/v0.3.0/crypta-linux-x86_64
 mv crypta-linux-x86_64 ~/.local/bin/crypta
 chmod +x ~/.local/bin/crypta
 
 # Starship - Mejora del prompt
-curl -LO https://github.com/starship/starship/releases/download/v1.24.2/starship-i686-unknown-linux-musl.tar.gz -o starship.tar.gz
+curl -LO https://github.com/starship/starship/releases/download/v1.27.0/starship-i686-unknown-linux-musl.tar.gz -o starship.tar.gz
 tar xvzf starship.tar.gz
 mv starship ~/.local/bin/starship
 chmod +x ~/.local/bin/starship
