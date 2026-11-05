@@ -65,17 +65,12 @@ providers:
     watch: true
 
 certificatesResolvers:
-  cloudflare:
+  letsencrypt:
     acme:
       email: tu-email@atareao.es
       storage: /etc/traefik/certs/acme.json
-      dnsChallenge:
-        provider: cloudflare
-        propagation:
-          delayBeforeChecks: 10s
-        resolvers:
-          - "1.1.1.1:53"
-          - "8.8.8.8:53"
+      httpChallenge:
+        entryPoint: web
 
 experimental:
   plugins:
