@@ -28,8 +28,7 @@ Network=proxy.network
 
 # ==== Environment ==== 
 Environment=TZ=Europe/Madrid
-EnvironmentSecret=CF_DNS_API_TOKEN=cf_dns_api_token
-
+Secret=cf_dns_api_token,type=Env,target=Secret=CF_DNS_API_TOKEN
 # ==== Healthcheck ====
 HealthCmd=traefik healthcheck --ping --ping.address=:8082
 HealthInterval=30s
