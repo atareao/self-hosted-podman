@@ -25,6 +25,7 @@ Volume=traefik-plugins.volume:/plugins-storage:rw,Z
 
 # ==== Networks ====
 Network=proxy.network
+AddHost=auth.{{ env.FQDN }}
 
 # ==== Secret ====
 Secret=cf_dns_api_token,type=env,target=CF_DNS_API_TOKEN

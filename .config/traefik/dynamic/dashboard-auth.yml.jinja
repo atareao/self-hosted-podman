@@ -7,7 +7,7 @@ http:
          Provider:
            ClientId: {{ env.OIDC_CLIENT_ID }}
            ClientSecret: {{ env.OIDC_CLIENT_SECRET }}
-           Url: http://au
+           Url: http://auth.{{ env.FQDN }}
            TokenValidation: IdToken
          Scopes:
            - openid
