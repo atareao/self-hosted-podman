@@ -17,8 +17,8 @@ api:
   dashboard: false
   insecure: false
 
-ping:
-  entryPoint: healthcheck
+# ping:
+#   entryPoint: healthcheck
 
 # Desactivar protocolos TLS antiguos (Solo TLS 1.2 y 1.3)
 tls:
