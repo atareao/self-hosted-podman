@@ -22,7 +22,7 @@ http:
       entryPoints:
         - websecure
       tls:
-        certResolver: cloudflare
+        certResolver: letsencrypt
       middlewares:
         - oidc-auth
         - compresionHeaders
