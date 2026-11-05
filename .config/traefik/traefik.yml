@@ -47,7 +47,7 @@ entryPoints:
     address: 0.0.0.0:443
     http:
       tls: {}
-    http2: true
+    http3: true
     # Optimización: Mantener conexiones abiertas para mejorar performance
     transport:
       respondingTimeouts:
