@@ -15,7 +15,7 @@ accessLog:
        - "400-499" # Captura errores de autenticación y accesos no autorizados
 api:
   dashboard: false
-   insecure: false
+  insecure: false
 
 ping:
   entryPoint: healthcheck
