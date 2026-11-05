@@ -1,17 +1,17 @@
 [Unit]
 Description=Traefik Edge Router (Rootless)
-After=network-online.target
+After=network-online.target http.socket https.socket podman.socket
+requires=http.socket https.socket podman.socket
 
 [Container]
 Image=docker.io/library/traefik:latest
 ContainerName=traefik
 PodmanArgs=--init
+Notify=true
 
-# Puertos (Recuerda haber bajado el net.ipv4.ip_unprivileged_port_start a 80)
-PublishPort=80:80
-PublishPort=443:443/tcp
-PublishPort=443:443/udp
+# ==== Ports ====
 
+# ==== Volumes ====
 # 1. Archivo de configuración estática
 Volume=%h/.config/traefik/traefik.yml:/etc/traefik/traefik.yml:ro,Z
 # 2. Volumen de Podman para certificados (Gestionado por Podman, no bind-mount)
@@ -23,27 +23,27 @@ Volume=%h/.config/traefik/dynamic:/etc/traefik/dynamic:ro,Z
 # 5. Persistencia de Plugins
 Volume=traefik-plugins.volume:/plugins-storage:rw,Z
 
+# ==== Networks ====
 Network=proxy.network
 
-# Definición del Healthcheck
+# ==== Environment ==== 
+Environment=TZ=Europe/Madrid
+EnvironmentSecret=CF_DNS_API_TOKEN=cf_dns_api_token
+
+# ==== Healthcheck ====
 HealthCmd=traefik healthcheck --ping --ping.address=:8082
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
 HealthStartPeriod=10s
 
-# Hardening
-# 1. No permitir escalada de privilegios y limitamos recursos.
-PodmanArgs=--security-opt=no-new-privileges
-# 2. Hacer el sistema de archivos del contenedor de solo lectura
-# (Traefik solo necesita escribir en /etc/traefik/certs y /plugins-storage que son volúmenes)
+# ==== Hardening ====
 ReadOnly=true
-# 3. Eliminar capacidades de root innecesarias
-# Traefik solo necesita NET_BIND_SERVICE para los puertos 80/443
-DropCapability=all
-AddCapability=cap_net_bind_service
+NoNewPrivileges=true
+SecurityLabelDisable=true
 
 [Service]
+Sockets=http.socket https.socket
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
