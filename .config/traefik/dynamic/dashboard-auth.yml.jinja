@@ -7,7 +7,7 @@ http:
          Provider:
            ClientId: {{ env.OIDC_CLIENT_ID }}
            ClientSecret: {{ env.OIDC_CLIENT_SECRET }}
-           Url: https://auth.{{ env.FQDN }}
+           Url: http://pocketid:1411
            TokenValidation: IdToken
          Scopes:
            - openid

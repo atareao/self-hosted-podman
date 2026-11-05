@@ -15,7 +15,7 @@ Notify=true
 # 1. Archivo de configuración estática
 Volume=%h/.config/traefik/traefik.yml:/etc/traefik/traefik.yml:ro,Z
 # 2. Volumen de Podman para certificados (Gestionado por Podman, no bind-mount)
-Volume=traefik-certs.volume:/etc/traefik/certs:Z
+Volume=traefik-certs.volume:/etc/traefik/certs:rw,Z
 # 3. Socket de Podman del usuario para el discovery
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 # 4. Directorio dinámico opcional
