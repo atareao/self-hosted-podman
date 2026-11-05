@@ -14,7 +14,7 @@ accessLog:
     statusCodes:
        - "400-499" # Captura errores de autenticación y accesos no autorizados
 api:
-  dashboard: false
+  dashboard: true
   insecure: false
 
 ping:
