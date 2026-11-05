@@ -68,7 +68,7 @@ certificatesResolvers:
   cloudflare:
     acme:
       email: tu-email@atareao.es
-      storage: /etc/traefik/acme.json
+      storage: /etc/traefik/certs/acme.json
       dnsChallenge:
         provider: cloudflare
         propagation:
