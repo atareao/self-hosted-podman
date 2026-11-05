@@ -17,8 +17,8 @@ api:
   dashboard: false
   insecure: false
 
-# ping:
-#   entryPoint: healthcheck
+ping:
+  entryPoint: healthcheck
 
 # Desactivar protocolos TLS antiguos (Solo TLS 1.2 y 1.3)
 tls:
@@ -32,8 +32,6 @@ tls:
         - TLS_AES_128_GCM_SHA256
         - TLS_AES_256_GCM_SHA384
         - TLS_CHACHA20_POLY1305_SHA256
-ping:
-  entryPoint: healthcheck
 
 entryPoints:
   web:
@@ -57,7 +55,7 @@ entryPoints:
 
 providers:
   docker:
-    endpoint: "unix:///run/user/1002/podman/podman.sock"
+    endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
   file:
     directory: /etc/traefik/dynamic/
