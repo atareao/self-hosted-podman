@@ -10,3 +10,6 @@
 
 # overrides por-maquina de los .env de stack (se auto-crean en el hook post_pull)
 .config/**/*.env.local
+
+# relevo de sesion (local, no se despliega)
+HANDOFF.md
