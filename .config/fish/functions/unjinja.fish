@@ -5,6 +5,12 @@ function unjinja --description="Fill scripts"
         return 1
     end
 
+    # sops necesita la clave age. En shells NO interactivos (p.ej. el hook
+    # post_pull de yadm) config.fish no se ejecuta, asi que la fijamos aqui.
+    if not set -q SOPS_AGE_KEY_FILE
+        set -gx SOPS_AGE_KEY_FILE $HOME/.secrets/sops/age/key.txt
+    end
+
     # 1. Carga de secretos
     sops -d $STORE | yq -r 'to_entries[] | select(.key != "sops") | [(.key | upcase), (.value | tostring)] | @tsv' | while read -l -d \t key value
         if test -n "$key"
@@ -13,6 +19,15 @@ function unjinja --description="Fill scripts"
         end
     end
     echo "🚀 Secretos cargados"
+
+    # FQDN del host: environment.d es la fuente de verdad (no es un secreto).
+    # Plantillas en TIEMPO DE RENDER (p.ej. traefik/dynamic/dashboard-auth.yml)
+    # lo necesitan como {{ env.FQDN }}; los quadlets usan ${FQDN} de systemd.
+    set -l fqdn_file $HOME/.config/environment.d/fqdn.conf
+    if test -f $fqdn_file
+        set -gx FQDN (string replace -r '^FQDN=' '' (cat $fqdn_file) | head -1)
+        echo "🌐 FQDN=$FQDN"
+    end
 
     # 2. Procesado de plantillas Jinja
     yadm list -a | while read -l item
