@@ -21,6 +21,7 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 - `qctl` (source at `/data/rust/qctl`) discovers quadlets **non-recursively** in `./quadlets/` or the current directory only.
 - Run it **from inside a stack dir**, e.g. `cd .config/containers/available/traefik && qctl status`. Run from the repo root it finds nothing.
 - It targets the same `~/.config/containers/systemd` symlink dir as `qenable`.
+- Binario en `~/.local/bin/qctl` del usuario de apps (estatico x86_64 + checksum, de la ultima release `atareao/qctl`).
 
 ## Quadlet validation
 
@@ -126,7 +127,7 @@ Composition rules:
 - `{% raw %}`/`{% endraw %}` around a shell `{{ ... }}` ONLY in `.jinja` files; a plain `.container` must carry the literal `{{.State.Health.Status}}` unescaped (adding the markers there is a systemd syntax error).
 - File naming: a unit is `.jinja` iff it contains any **template** variable (`{{ env.* }}` other than FQDN); otherwise plain (e.g. `available/umami/umamidb.container`). `${FQDN}` is NOT a template variable — it is expanded by systemd at runtime, so a unit using only `${FQDN}` is a plain `.container`.
 - `docker-compose.yml` mapping: `image`→`Image`, `container_name`→`ContainerName`, `command`→`Exec`, `init: true`→`PodmanArgs=--init`, `ports`→`PublishPort`, `volumes`→`Volume`, `networks`→`Network`, `secrets`→`Secret`, `environment`→`Environment`, `labels`→`Label`, `healthcheck`→`Health*`, `cap_add`→`AddCapability`, `read_only`→`ReadOnly`, `user`→`User`, `deploy.resources.limits`→`Memory`/`PidsLimit`, `restart`→`Restart=` (systemd values only — NEVER `unless-stopped`).
-- Pending migration: `available/openobserve` and `available/vector` still pass credentials as `{{ env.* }}` in `Environment`; per the secrets rule these should move to `Secret=...,type=env,target=...`.
+- Credenciales migradas: `openobserve` inyecta su password con `Secret=openobserve_root_password,type=env,target=ZO_ROOT_USER_PASSWORD`. `vector` no lleva credenciales en `Environment`; las suyas (OpenObserve y vector ingest) viven en `vector.yaml.jinja`, renderizado por `unjinja` desde SOPS (patrón legítimo para ficheros que consume la app en runtime).
 
 ## Import: docker-compose → quadlet
 
