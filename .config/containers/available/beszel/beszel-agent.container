@@ -1,0 +1,51 @@
+[Unit]
+Description=Beszel Agent
+After=network-online.target beszel.service
+Requires=beszel.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/henrygd/beszel-agent:latest
+ContainerName=beszel-agent
+AutoUpdate=registry
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=beszel-agent-data.volume:/var/lib/beszel-agent:Z
+Volume=beszel-socket.volume:/beszel_socket:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+
+# ==== Networks ====
+Network=beszel.network
+
+# ==== Secrets ====
+Secret=beszel_key,type=env,target=KEY
+Secret=beszel_token,type=env,target=TOKEN
+
+# ==== Environment ====
+Environment=LISTEN=/beszel_socket/beszel.sock
+Environment=HUB_URL=http://beszel:8090
+
+# ==== Labels ====
+
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
