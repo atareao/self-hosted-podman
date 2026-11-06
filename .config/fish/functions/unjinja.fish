@@ -12,7 +12,7 @@ function unjinja --description="Fill scripts"
     end
 
     # 1. Carga de secretos
-    sops -d $STORE | yq -r 'to_entries[] | select(.key != "sops") | [(.key | upcase), (.value | tostring)] | @tsv' | while read -l -d \t key value
+    sops -d $STORE | yq -r 'to_entries[] | select(.key != "sops") | [(.key | ascii_upcase), (.value | tostring)] | @tsv' | while read -l -d \t key value
         if test -n "$key"
             echo "✅ Loading $key"
             set -gx $key $value
