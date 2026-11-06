@@ -39,7 +39,7 @@ Environment=TZ=Europe/Madrid
 # ==== Labels ====
 
 # ==== Healthcheck ====
-HealthCmd=traefik healthcheck --ping --ping.address=:8082
+HealthCmd=traefik healthcheck --ping
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s

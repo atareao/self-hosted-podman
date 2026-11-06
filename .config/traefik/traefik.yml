@@ -52,9 +52,8 @@ entryPoints:
         readTimeout: 60s
         writeTimeout: 60s
         idleTimeout: 180s
-  # ping:
-  #   healthcheck:
-  #     address: 0.0.0.0:8082
+  healthcheck:
+    address: 0.0.0.0:8082
 
 providers:
   docker:
