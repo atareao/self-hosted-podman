@@ -19,7 +19,7 @@ PodmanArgs=--init
 
 
 # ==== Networks ====
-
+Network=wger.network
 
 # ==== Secrets ====
 

@@ -17,7 +17,8 @@ Exec=--save 60 1 --loglevel warning
 Volume=authentik-redis.volume:/data:Z
 
 # ==== Networks ====
-
+Network=authentik.network
+NetworkAlias=redis
 
 # ==== Secrets ====
 

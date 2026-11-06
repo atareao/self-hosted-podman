@@ -19,7 +19,7 @@ PublishPort=11434:11434
 Volume=open-webui-ollama.volume:/root/.ollama:Z
 
 # ==== Networks ====
-
+Network=open-webui.network
 
 # ==== Secrets ====
 

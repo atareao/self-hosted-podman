@@ -19,7 +19,7 @@ PodmanArgs=--init
 Volume=publirs-db.volume:/app/db:Z
 
 # ==== Networks ====
-
+Network=publirs.network
 
 # ==== Secrets ====
 Secret=publirs_token,type=env,target=TOKEN

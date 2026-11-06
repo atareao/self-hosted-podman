@@ -19,7 +19,7 @@ PodmanArgs=--init
 Volume=authentik-geoip.volume:/usr/share/GeoIP:Z
 
 # ==== Networks ====
-
+Network=authentik.network
 
 # ==== Secrets ====
 

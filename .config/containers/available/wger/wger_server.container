@@ -20,7 +20,7 @@ Volume=wger-static.volume:/home/wger/static:Z
 Volume=wger-media.volume:/home/wger/media:Z
 
 # ==== Networks ====
-
+Network=wger.network
 
 # ==== Secrets ====
 

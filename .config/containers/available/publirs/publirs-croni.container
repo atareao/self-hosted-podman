@@ -20,7 +20,8 @@ Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 # ==== Networks ====
-
+Network=publirs.network
+NetworkAlias=croni
 
 # ==== Secrets ====
 

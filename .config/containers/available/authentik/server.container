@@ -21,7 +21,7 @@ Volume=%h/.config/authentik/custom-templates:/templates:Z
 Volume=authentik-geoip.volume:/geoip:Z
 
 # ==== Networks ====
-
+Network=authentik.network
 
 # ==== Secrets ====
 Secret=authentik_postgresql__password,type=env,target=AUTHENTIK_POSTGRESQL__PASSWORD

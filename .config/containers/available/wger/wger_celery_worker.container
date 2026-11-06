@@ -19,7 +19,7 @@ Exec=/start-worker
 Volume=wger-media.volume:/home/wger/media:Z
 
 # ==== Networks ====
-
+Network=wger.network
 
 # ==== Secrets ====
 

@@ -19,7 +19,7 @@ Exec=/start-beat
 Volume=wger-celery-beat.volume:/home/wger/beat/:Z
 
 # ==== Networks ====
-
+Network=wger.network
 
 # ==== Secrets ====
 

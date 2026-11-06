@@ -18,7 +18,7 @@ PodmanArgs=--init
 Volume=authentik-database.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
-
+Network=authentik.network
 
 # ==== Secrets ====
 Secret=authentik_postgres_password,type=env,target=POSTGRES_PASSWORD

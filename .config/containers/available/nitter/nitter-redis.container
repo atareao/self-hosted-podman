@@ -17,7 +17,7 @@ Exec=redis-server --save 60 1 --loglevel warning
 Volume=nitter-nitter-redis.volume:/data:Z
 
 # ==== Networks ====
-
+Network=nitter.network
 
 # ==== Secrets ====
 
