@@ -23,7 +23,7 @@ Network=security.network
 # ==== Secrets ====
 
 # ==== Environment ====
-Environment=COLLECTIONS=crowdsecurity/linux crowdsecurity/traefik crowdsecurity/http-cve
+Environment=COLLECTIONS="crowdsecurity/linux crowdsecurity/traefik crowdsecurity/http-cve"
 Environment=DISABLE_LOCAL_CONFIG=false
 Environment=TZ=Europe/Madrid
 
