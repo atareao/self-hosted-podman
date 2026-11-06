@@ -442,6 +442,8 @@ QUADLET_UNIT_DIRS=<dir-con-units-y-redes> /usr/lib/podman/quadlet -user -dryrun
 - Rootless: `WantedBy=default.target` (nunca `multi-user.target`).
 - FQDN deploy: editar `fqdn.conf` → `systemctl --user daemon-reexec` y **reiniciar** la unidad (las unidades en marcha conservan el valor antiguo).
 - Los hooks y funciones del repo son **fish**, no bash.
+- **`yq` versión**: `unjinja`/`yadmalt` evitan `ascii_upcase`/`upcase` (mutuamente excluyentes entre `yq` v3 jq-based y v4 mikefarah). Usan una expresión válida en ambas y suben a mayúsculas con `string upper` de fish.
+- **PATH en shells no interactivos**: el hook `post_pull` y `fish -c` no ejecutan `config.fish`, así que `unjinja`/`yadmalt` fijan por sí mismos `~/.local/bin` en `PATH` y `SOPS_AGE_KEY_FILE` (si no, `sops`/`jinrender` no se encuentran y el render falla en silencio).
 
 ---
 
