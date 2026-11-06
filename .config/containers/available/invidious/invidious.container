@@ -1,0 +1,54 @@
+[Unit]
+Description=invidious
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/sriegler/invidious-auth:latest
+ContainerName=invidious
+AutoUpdate=registry
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+
+# ==== Networks ====
+Network=proxy.network
+Network=invidious.network
+NetworkAlias=invidious
+
+# ==== Secrets ====
+
+# ==== Environment ====
+Environment=INVIDIOUS_CONFIG="{admins: [], captcha_enabled: false, channel_threads: 1, check_tables: true, db: {dbname: invidious, host: postgres, password: kemal, port: 5432, user: kemal}, disable_proxy: false, domain: 'invidious.${FQDN}', external_port: 443, feed_threads: 1, full_refresh: false, geo_bypass: false, https_only: false, popular_enabled: false, registration_enabled: false, statistics_enabled: false}"
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.invidious.loadbalancer.server.port=3000
+Label=traefik.http.routers.invidious.rule=Host(`invidious.${FQDN}`)
+Label=traefik.http.routers.invidious.entrypoints=websecure
+Label=traefik.http.routers.invidious.tls.certresolver=letsencrypt
+Label=traefik.http.routers.invidious.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
+Memory=1024M
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+CPUQuota=50%
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,57 @@
+[Unit]
+Description=metube
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/alexta69/metube
+AutoUpdate=registry
+ContainerName=metube
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=metube-metube.volume:/downloads:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=metube
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.metube.loadbalancer.server.port=8081
+Label=traefik.http.routers.metube.rule=Host(`metube.${FQDN}`)
+Label=traefik.http.routers.metube.entrypoints=websecure
+Label=traefik.http.routers.metube.tls.certresolver=letsencrypt
+Label=traefik.http.routers.metube.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

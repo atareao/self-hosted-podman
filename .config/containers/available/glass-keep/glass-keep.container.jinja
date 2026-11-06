@@ -33,7 +33,7 @@ Environment=ADMIN_EMAILS="{{ env.ADMIN_EMAILS }}"
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.keep.loadbalancer.server.port=8080
-Label=traefik.http.routers.keep.rule=Host(`keep.{{ env.FQDN }}`)
+Label=traefik.http.routers.keep.rule=Host(`keep.${FQDN}`)
 Label=traefik.http.routers.keep.entrypoints=websecure
 Label=traefik.http.routers.keep.tls.certresolver=letsencrypt
 Label=traefik.http.routers.keep.middlewares=seguridadHeaders@file,compresionHeaders@file

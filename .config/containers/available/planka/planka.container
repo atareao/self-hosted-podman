@@ -1,0 +1,61 @@
+[Unit]
+Description=planka
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/plankanban/planka:latest
+AutoUpdate=registry
+ContainerName=planka
+PodmanArgs=--init
+
+# ==== Command ====
+Exec=bash -c "for i in `seq 1 30`; do ./start.sh && s=$? && break || s=$?; echo \"Tried $i times. Waiting 5 seconds...\"; sleep 5; done; (exit $s)"
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=planka-user-avatars.volume:/app/public/user-avatars:Z
+Volume=planka-project-background-images.volume:/app/public/project-background-images:Z
+Volume=planka-attachments.volume:/app/private/attachments:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=planka
+
+# ==== Secrets ====
+Secret=planka_secret_key,type=env,target=SECRET_KEY
+
+# ==== Environment ====
+Environment=BASE_URL="http://planka.${FQDN}"
+Environment=TRUST_PROXY=0
+Environment=DATABASE_URL=postgresql://postgres@postgres/planka
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.planka.loadbalancer.server.port=1337
+Label=traefik.http.routers.planka.rule=Host(`planka.${FQDN}`)
+Label=traefik.http.routers.planka.entrypoints=websecure
+Label=traefik.http.routers.planka.tls.certresolver=letsencrypt
+Label=traefik.http.routers.planka.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

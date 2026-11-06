@@ -1,0 +1,57 @@
+[Unit]
+Description=sftpgo
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/drakkan/sftpgo:alpine
+ContainerName=sftpgo
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=sftpgo-data.volume:/sfv/sftpgo:Z
+Volume=sftpgo-home.volume:/var/lib/sftpgo:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=sftpgo
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=SFTPGO_WEBDAV__BINDINGS__0__PORT=10080
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.sftpgo.loadbalancer.server.port=8080
+Label=traefik.http.routers.sftpgo.rule=Host(`sftpgo.${FQDN}`)
+Label=traefik.http.routers.sftpgo.entrypoints=websecure
+Label=traefik.http.routers.sftpgo.tls.certresolver=letsencrypt
+Label=traefik.http.routers.sftpgo.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

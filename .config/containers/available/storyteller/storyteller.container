@@ -1,0 +1,56 @@
+[Unit]
+Description=storyteller
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=registry.gitlab.com/storyteller-platform/storyteller:latest
+AutoUpdate=registry
+ContainerName=storyteller
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=storyteller-data.volume:/data:rw:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=storyteller
+
+# ==== Secrets ====
+Secret=storyteller_secret_key,type=env,target=STORYTELLER_SECRET_KEY
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.storyteller.loadbalancer.server.port=8001
+Label=traefik.http.routers.storyteller.rule=Host(`storyteller.${FQDN}`)
+Label=traefik.http.routers.storyteller.entrypoints=websecure
+Label=traefik.http.routers.storyteller.tls.certresolver=letsencrypt
+Label=traefik.http.routers.storyteller.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

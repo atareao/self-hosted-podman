@@ -1,0 +1,3 @@
+
+# environment.d: FQDN real es especifico del host (no se versiona)
+.config/environment.d/fqdn.conf

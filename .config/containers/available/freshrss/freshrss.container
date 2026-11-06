@@ -1,0 +1,52 @@
+[Unit]
+Description=FreshRSS - RSS Reader
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/freshrss/freshrss:latest
+ContainerName=freshrss
+AutoUpdate=registry
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=%h/.config/freshrss/data:/var/www/FreshRSS/data:Z
+Volume=%h/.config/freshrss/extensions:/var/www/FreshRSS/extensions:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+# ==== Environment ====
+Environment=TZ=Europe/Madrid
+Environment=CRON_MIN=4,34
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.freshrss.loadbalancer.server.port=80
+Label=traefik.http.routers.freshrss.rule=Host(`freshrss.${FQDN}`)
+Label=traefik.http.routers.freshrss.entrypoints=websecure
+Label=traefik.http.routers.freshrss.tls.certresolver=letsencrypt
+Label=traefik.http.routers.freshrss.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

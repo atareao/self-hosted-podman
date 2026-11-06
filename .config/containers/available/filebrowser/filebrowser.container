@@ -1,0 +1,59 @@
+[Unit]
+Description=filebrowser
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/filebrowser/filebrowser
+AutoUpdate=registry
+ContainerName=filebrowser
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/filebrowser/srv:/srv:Z
+Volume=%h/.config/filebrowser/filebrowser.db:/database.db:Z
+Volume=%h/.config/filebrowser/filebrowser.json:/.filebrowser.json:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=filebrowser
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.filebrowser.loadbalancer.server.port=80
+Label=traefik.http.routers.filebrowser.rule=Host(`filebrowser.${FQDN}`)
+Label=traefik.http.routers.filebrowser.entrypoints=websecure
+Label=traefik.http.routers.filebrowser.tls.certresolver=letsencrypt
+Label=traefik.http.routers.filebrowser.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+User=1000:1000
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

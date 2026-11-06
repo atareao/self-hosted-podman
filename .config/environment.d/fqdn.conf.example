@@ -1,0 +1,8 @@
+# Dominio base del host. NO es un secreto, pero es especifico de cada maquina,
+# por eso el fichero real (fqdn.conf) esta en .gitignore.
+#
+# Deploy:  cp fqdn.conf.example fqdn.conf   y pon tu dominio.
+# Uso:     systemd expande ${FQDN} en el ExecStart generado por quadlet
+#          (labels de Traefik, APP_URL, etc.). Tras cambiarlo:
+#            systemctl --user daemon-reexec && systemctl --user restart <stack>
+FQDN=tuservidor.es

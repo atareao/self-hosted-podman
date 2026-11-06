@@ -1,0 +1,57 @@
+[Unit]
+Description=cloudbeaver
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/dbeaver/cloudbeaver:latest
+AutoUpdate=registry
+ContainerName=cloudbeaver
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=cloudbeaver-cloudbeaver.volume:/opt/cloudbeaver/workspace:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=cloudbeaver
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.cloudbeaver.loadbalancer.server.port=8978
+Label=traefik.http.routers.cloudbeaver.rule=Host(`cloudbeaver.${FQDN}`)
+Label=traefik.http.routers.cloudbeaver.entrypoints=websecure
+Label=traefik.http.routers.cloudbeaver.tls.certresolver=letsencrypt
+Label=traefik.http.routers.cloudbeaver.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

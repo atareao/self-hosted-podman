@@ -1,0 +1,62 @@
+[Unit]
+Description=custom-code-server
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/custom-code-server
+AutoUpdate=registry
+ContainerName=custom-code-server
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=custom-code-server-code_server_data.volume:/config:Z
+Volume=custom-code-server-code_server_workspace.volume:/config/workspace:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=custom-code-server
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Madrid
+Environment=AUTH=none
+Environment=DOCKER_USER=abc
+Environment=DEFAULT_WORKSPACE=/config/workspace
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.code-server.loadbalancer.server.port=8443
+Label=traefik.http.routers.code-server.rule=Host(`code.${FQDN}`)
+Label=traefik.http.routers.code-server.entrypoints=websecure
+Label=traefik.http.routers.code-server.tls.certresolver=letsencrypt
+Label=traefik.http.routers.code-server.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

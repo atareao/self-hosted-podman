@@ -1,0 +1,56 @@
+[Unit]
+Description=fireflyiii
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/fireflyiii/core:latest
+AutoUpdate=registry
+ContainerName=fireflyiii
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/firefly/firefly_upload:/var/www/html/storage/upload:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=fireflyiii
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.firefly.loadbalancer.server.port=8080
+Label=traefik.http.routers.firefly.rule=Host(`firefly.${FQDN}`)
+Label=traefik.http.routers.firefly.entrypoints=websecure
+Label=traefik.http.routers.firefly.tls.certresolver=letsencrypt
+Label=traefik.http.routers.firefly.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

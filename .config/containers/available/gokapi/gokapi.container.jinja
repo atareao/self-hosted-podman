@@ -27,12 +27,12 @@ NetworkAlias=gokapi
 
 # ==== Environment ====
 Environment=GOKAPI_PORT="{{ env.PORT }}"
-Environment=GOKAPI_EXTERNAL_URL="https://gokapi.{{ env.FQDN }}"
+Environment=GOKAPI_EXTERNAL_URL="https://gokapi.${FQDN}"
 
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.gokapi.loadbalancer.server.port=80
-Label=traefik.http.routers.gokapi.rule=Host(`gokapi.{{ env.FQDN }}`)
+Label=traefik.http.routers.gokapi.rule=Host(`gokapi.${FQDN}`)
 Label=traefik.http.routers.gokapi.entrypoints=websecure
 Label=traefik.http.routers.gokapi.tls.certresolver=letsencrypt
 Label=traefik.http.routers.gokapi.middlewares=seguridadHeaders@file,compresionHeaders@file

@@ -37,7 +37,7 @@ Environment=WAKAPI_ALLOW_SIGNUP=False
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.wakapi.loadbalancer.server.port=3000
-Label=traefik.http.routers.wakapi.rule=Host(`wakapi.{{ env.FQDN }}`)
+Label=traefik.http.routers.wakapi.rule=Host(`wakapi.${FQDN}`)
 Label=traefik.http.routers.wakapi.entrypoints=websecure
 Label=traefik.http.routers.wakapi.tls.certresolver=letsencrypt
 Label=traefik.http.routers.wakapi.middlewares=seguridadHeaders@file,compresionHeaders@file

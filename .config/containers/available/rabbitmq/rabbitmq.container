@@ -1,0 +1,56 @@
+[Unit]
+Description=rabbitmq
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/rabbitmq:3-management
+ContainerName=rabbitmq
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=rabbitmq-rabbitmq.volume:/var/lib/rabbitmq/mnseia/:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=rabbitmq
+
+# ==== Secrets ====
+Secret=rabbitmq_default_pass,type=env,target=RABBITMQ_DEFAULT_PASS
+
+# ==== Environment ====
+Environment=RABBITMQ_DEFAULT_USER=usuario
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+Label=traefik.http.routers.rabbitmq.rule=Host(`mq.${FQDN}`)
+Label=traefik.http.routers.rabbitmq.entrypoints=websecure
+Label=traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt
+Label=traefik.http.routers.rabbitmq.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

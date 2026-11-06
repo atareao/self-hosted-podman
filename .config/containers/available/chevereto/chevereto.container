@@ -1,0 +1,63 @@
+[Unit]
+Description=chevereto
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/chevereto/chevereto:latest
+AutoUpdate=registry
+ContainerName=chevereto
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=chevereto-chevereto.volume:/var/www/html/images:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=chevereto
+
+# ==== Secrets ====
+Secret=chevereto_db_pass,type=env,target=CHEVERETO_DB_PASS
+
+# ==== Environment ====
+Environment=CHEVERETO_DB_HOST=mariadb
+Environment=CHEVERETO_DB_USER=chevereto_user
+Environment=CHEVERETO_DB_PORT=3306
+Environment=CHEVERETO_DB_NAME=cheveretor
+Environment=CHEVERETO_ASSET_STORAGE_TYPE=local
+Environment=CHEVERETO_ASSET_STORAGE_URL=/images/_assets
+Environment=CHEVERETO_ASSET_STORAGE_BUCKET=/var/www/html/images/_assets
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.chevereto.loadbalancer.server.port=80
+Label=traefik.http.routers.chevereto.rule=Host(`chevereto.${FQDN}`)
+Label=traefik.http.routers.chevereto.entrypoints=websecure
+Label=traefik.http.routers.chevereto.tls.certresolver=letsencrypt
+Label=traefik.http.routers.chevereto.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

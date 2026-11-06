@@ -1,0 +1,56 @@
+[Unit]
+Description=vaultwarden
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/vaultwarden/server:latest
+AutoUpdate=registry
+ContainerName=vaultwarden
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/vaultwarden/data:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=vaultwarden
+
+# ==== Secrets ====
+Secret=vaultwarden_admin_token,type=env,target=ADMIN_TOKEN
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.vaultwarden.loadbalancer.server.port=80
+Label=traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.${FQDN}`)
+Label=traefik.http.routers.vaultwarden.entrypoints=websecure
+Label=traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt
+Label=traefik.http.routers.vaultwarden.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

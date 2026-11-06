@@ -1,0 +1,55 @@
+[Unit]
+Description=ntfy
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/ntfy:v1.0
+ContainerName=ntfy
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/ntfy/etc:/etc/ntfy:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=ntfy
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.ntfy.loadbalancer.server.port=80
+Label=traefik.http.routers.ntfy.rule=Host(`ntfy.${FQDN}`)
+Label=traefik.http.routers.ntfy.entrypoints=websecure
+Label=traefik.http.routers.ntfy.tls.certresolver=letsencrypt
+Label=traefik.http.routers.ntfy.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

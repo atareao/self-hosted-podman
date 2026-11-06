@@ -1,0 +1,59 @@
+[Unit]
+Description=atuin
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/ellieh/atuin:latest
+AutoUpdate=registry
+ContainerName=atuin
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=atuin
+
+# ==== Secrets ====
+Secret=atuin_db_uri,type=env,target=ATUIN_DB_URI
+
+# ==== Environment ====
+Environment=ATUIN_HOST=0.0.0.0
+Environment=ATUIN_PORT=8888
+Environment=ATUIN_OPEN_REGISTRATION=true
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.atuin.loadbalancer.server.port=8888
+Label=traefik.http.routers.atuin.rule=Host(`atuin.${FQDN}`)
+Label=traefik.http.routers.atuin.entrypoints=websecure
+Label=traefik.http.routers.atuin.tls.certresolver=letsencrypt
+Label=traefik.http.routers.atuin.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

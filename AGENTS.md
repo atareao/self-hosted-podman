@@ -30,7 +30,9 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 ## Templating & secrets
 
 - `*.jinja` files are rendered by `unjinja` (uses `jinrender`) to the same path without the `.jinja` extension. **Edit the `.jinja`; never edit the generated file** — it is overwritten and usually gitignored (e.g. `.config/traefik/dynamic/dashboard-auth.yml`).
-- `unjinja`/`yadmalt` read `$HOME/.secrets/secrets.yml` (SOPS + age, key at `~/.secrets/sops/age/key.txt`), export each key as an UPPERCASE env var, render, then unset them. Template values like `{{ env.FQDN }}` come from there.
+- `unjinja`/`yadmalt` read `$HOME/.secrets/secrets.yml` (SOPS + age, key at `~/.secrets/sops/age/key.txt`), export each key as an UPPERCASE env var, render, then unset them. This covers **secrets and non-secret stack config** that the origin left in `sample.env` (`DB_USER`, `PORT`, `ADMIN_EMAILS`…). The host domain is **not** here.
+- **Host domain (FQDN) is NOT a secret and does NOT go through templates.** It lives in `~/.config/environment.d/fqdn.conf` (plain text, `FQDN=<your-domain>`), which systemd injects into every user unit (verified). In quadlets write `${FQDN}` — systemd expands it in the generated `ExecStart`, including Traefik `Host(...)` labels. **Never** `{{ env.FQDN }}`.
+- Deploy of the domain: the real `fqdn.conf` is **gitignored** (host-specific); `fqdn.conf.example` is versioned. After `cp fqdn.conf.example fqdn.conf` and editing it: `systemctl --user daemon-reexec` then `systemctl --user restart <stack>` (running units keep the old value until restarted).
 - **Credentials go through Podman secrets, not `{{ env.* }}`**: use `Secret=<name>,type=env,target=<VAR>` sourced from `crypta` (e.g. `openssl rand -base64 32 | crypta store umamidb_password`; the `crypta` shell driver is configured in `containers.conf`). A value that must be composed (e.g. a full `DATABASE_URL`) is stored whole as one secret and injected with `type=env,target=DATABASE_URL`.
 - Any `Secret=` name in a quadlet must exist via `crypta store` before the unit starts.
 
@@ -114,7 +116,7 @@ Composition rules:
 - The eleven `[Container]` sections are fixed; `[Unit]` (`Description`, then `After`, then `Requires`) and `[Service]`/`[Install]` follow the fixed shapes above.
 - Rootless units MUST use `WantedBy=default.target` (never `multi-user.target` — it is not pulled in by the user manager, so the container would not autostart).
 - `{% raw %}`/`{% endraw %}` around a shell `{{ ... }}` ONLY in `.jinja` files; a plain `.container` must carry the literal `{{.State.Health.Status}}` unescaped (adding the markers there is a systemd syntax error).
-- File naming: a unit is `.jinja` iff it contains any template variable (`{{ env.* }}`); otherwise plain (e.g. `available/umami/umamidb.container`).
+- File naming: a unit is `.jinja` iff it contains any **template** variable (`{{ env.* }}` other than FQDN); otherwise plain (e.g. `available/umami/umamidb.container`). `${FQDN}` is NOT a template variable — it is expanded by systemd at runtime, so a unit using only `${FQDN}` is a plain `.container`.
 - `docker-compose.yml` mapping: `image`→`Image`, `container_name`→`ContainerName`, `command`→`Exec`, `init: true`→`PodmanArgs=--init`, `ports`→`PublishPort`, `volumes`→`Volume`, `networks`→`Network`, `secrets`→`Secret`, `environment`→`Environment`, `labels`→`Label`, `healthcheck`→`Health*`, `cap_add`→`AddCapability`, `read_only`→`ReadOnly`, `user`→`User`, `deploy.resources.limits`→`Memory`/`PidsLimit`, `restart`→`Restart=` (systemd values only — NEVER `unless-stopped`).
 - Pending migration: `available/openobserve` and `available/vector` still pass credentials as `{{ env.* }}` in `Environment`; per the secrets rule these should move to `Secret=...,type=env,target=...`.
 
@@ -129,13 +131,13 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
   ```
   Label=traefik.enable=true
   Label=traefik.http.services.<name>.loadbalancer.server.port=<port>
-  Label=traefik.http.routers.<name>.rule=Host(`<stack>.{{ env.FQDN }}`)
+  Label=traefik.http.routers.<name>.rule=Host(`<stack>.${FQDN}`)
   Label=traefik.http.routers.<name>.entrypoints=websecure
   Label=traefik.http.routers.<name>.tls.certresolver=letsencrypt
   Label=traefik.http.routers.<name>.middlewares=seguridadHeaders@file,compresionHeaders@file
   ```
   The `web` entrypoint already redirects to `websecure` globally (static `traefik.yml`), so per-router redirect middlewares are dropped.
-- **Domain**: `{{ env.FQDN }}` for the main service; `<stack>.{{ env.FQDN }}` for subdomains (as openobserve/nginx/pocketid). Drop the origin's per-stack `FQDN` from `sample.env`.
+- **Domain**: `${FQDN}` for the main service; `<stack>.${FQDN}` for subdomains (as openobserve/nginx/pocketid). Drop the origin's per-stack `FQDN` from `sample.env`.
 - **HTTP ports**: compose `ports:` for HTTP services behind traefik disappear (traefik reaches the container port via the service label). Only publish ports that must be reachable directly (e.g. gitea SSH).
 - **Drop**: `version:`, `x-dockge`, `depends_on` (replaced by `After=`/`Requires=`), `restart: unless-stopped` → `Restart=always`/`on-failure`.
 - **crypta**: any `Secret=` name must be created with `crypta store <name>` before the unit starts; list them per stack.

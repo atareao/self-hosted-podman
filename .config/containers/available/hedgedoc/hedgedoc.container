@@ -1,0 +1,67 @@
+[Unit]
+Description=hedgedoc
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=lscr.io/linuxserver/hedgedoc:latest
+AutoUpdate=registry
+ContainerName=hedgedoc
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=hedgedoc-config.volume:/config:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=hedgedoc.network
+NetworkAlias=hedgedoc
+
+# ==== Secrets ====
+Secret=hedgedoc_db_pass,type=env,target=DB_PASS
+
+# ==== Environment ====
+Environment=DB_HOST=mariadb
+Environment=DB_USER=hedgedoc
+Environment=DB_NAME=hedgedoc
+Environment=DB_PORT=3306
+Environment=PGID=1000
+Environment=PUID=1000
+Environment=TZ=Europe/Madrid
+Environment=CMD_DOMAIN=doc.${FQDN}
+Environment=CMD_URL_ADDPORT=false
+Environment=CMD_PROTOCOL_USESSL=true
+Environment=CMD_PORT=3000
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.hedgedoc.loadbalancer.server.port=3000
+Label=traefik.http.routers.hedgedoc.rule=Host(`doc.${FQDN}`)
+Label=traefik.http.routers.hedgedoc.entrypoints=websecure
+Label=traefik.http.routers.hedgedoc.tls.certresolver=letsencrypt
+Label=traefik.http.routers.hedgedoc.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

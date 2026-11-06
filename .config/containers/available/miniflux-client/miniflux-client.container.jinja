@@ -29,10 +29,10 @@ Secret=miniflux_client_telegram_token,type=env,target=TELEGRAM_TOKEN
 
 # ==== Environment ====
 Environment=MATRIX_ROOM="{{ env.MATRIX_ROOM }}"
-Environment=MATRIX_URL="matrix.{{ env.FQDN }}"
+Environment=MATRIX_URL="matrix.${FQDN}"
 Environment=MAX_ENTRIES="{{ env.MAX_ENTRIES }}"
 Environment=MINIFLUX_CATEGORIES=Linux
-Environment=MINIFLUX_URL="miniflux.{{ env.FQDN }}"
+Environment=MINIFLUX_URL="miniflux.${FQDN}"
 Environment=MODEL_NAME=gpt-4.1-nano
 Environment=MODEL_URL=https://api.openai.com
 Environment=SLEEP_TIME="{{ env.SLEEP_TIME }}"

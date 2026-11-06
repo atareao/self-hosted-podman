@@ -1,0 +1,74 @@
+[Unit]
+Description=pinepods
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/madeofpendletonwool/pinepods:latest
+AutoUpdate=registry
+ContainerName=pinepods
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=pinepods-downloads.volume:/opt/pinepods/downloads:Z
+Volume=pinepods-backups.volume:/opt/pinepods/backups:Z
+Volume=/etc/localtime:/etc/localtime:ro
+Volume=/etc/timezone:/etc/timezone:ro
+
+# ==== Networks ====
+Network=proxy.network
+Network=pinepods.network
+NetworkAlias=pinepods
+
+# ==== Secrets ====
+Secret=pinepods_db_password,type=env,target=DB_PASSWORD
+
+# ==== Environment ====
+Environment=SEARCH_API_URL=https://search.pinepods.online/api/search
+Environment=PEOPLE_API_URL=https://people.pinepods.online
+Environment=HOSTNAME=https://{FQDN}
+Environment=DB_TYPE=postgresql
+Environment=DB_HOST=pinepods_db
+Environment=DB_PORT=5432
+Environment=DB_USER=postgres
+Environment=DB_NAME=pinepods_database
+Environment=VALKEY_HOST=pinepods_valkey
+Environment=VALKEY_PORT=6379
+Environment=DEBUG_MODE=False
+Environment=PUID=911
+Environment=PGID=911
+Environment=TZ=Europe/Madrid
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.pinepods.loadbalancer.server.port=8040
+Label=traefik.http.routers.pinepods.rule=Host(`podcasts.${FQDN}`)
+Label=traefik.http.routers.pinepods.entrypoints=websecure
+Label=traefik.http.routers.pinepods.tls.certresolver=letsencrypt
+Label=traefik.http.routers.pinepods.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

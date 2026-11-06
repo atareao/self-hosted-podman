@@ -1,0 +1,57 @@
+[Unit]
+Description=plausible
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/plausible/analytics:latest
+AutoUpdate=registry
+ContainerName=plausible
+
+# ==== Command ====
+Exec=sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=proxy.network
+Network=plausible.network
+NetworkAlias=plausible
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.plausible.loadbalancer.server.port=8000
+Label=traefik.http.routers.plausible.rule=Host(`plausible.${FQDN}`)
+Label=traefik.http.routers.plausible.entrypoints=websecure
+Label=traefik.http.routers.plausible.tls.certresolver=letsencrypt
+Label=traefik.http.routers.plausible.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

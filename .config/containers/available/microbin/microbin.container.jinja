@@ -42,7 +42,7 @@ Environment=MICROBIN_PRIVATE=true
 Environment=MICROBIN_PURE_HTML=false
 Environment=MICROBIN_DATA_DIR=microbin_data
 Environment=MICROBIN_JSON_DB=false
-Environment=MICROBIN_PUBLIC_PATH="https://microbin.{{ env.FQDN }}/"
+Environment=MICROBIN_PUBLIC_PATH="https://microbin.${FQDN}/"
 Environment=MICROBIN_SHORT_PATH="{{ env.MICROBIN_SHORT_PATH }}"
 Environment=MICROBIN_READONLY=true
 Environment=MICROBIN_SHOW_READ_STATS=true
@@ -67,7 +67,7 @@ Environment=MICROBIN_MAX_FILE_SIZE_UNENCRYPTED_MB=2048
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.microbin.loadbalancer.server.port=8080
-Label=traefik.http.routers.microbin.rule=Host(`microbin.{{ env.FQDN }}`)
+Label=traefik.http.routers.microbin.rule=Host(`microbin.${FQDN}`)
 Label=traefik.http.routers.microbin.entrypoints=websecure
 Label=traefik.http.routers.microbin.tls.certresolver=letsencrypt
 Label=traefik.http.routers.microbin.middlewares=seguridadHeaders@file,compresionHeaders@file

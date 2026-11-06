@@ -1,0 +1,64 @@
+[Unit]
+Description=wp2
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/wordpress
+AutoUpdate=registry
+ContainerName=wp2
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=wordpress-wp2-wp2.volume:/var/www/html:Z
+Volume=%h/.config/wordpress-wp2/plugins:/var/www/html/wp-content/plugins:Z
+Volume=%h/.config/wordpress-wp2/themes:/var/www/html/wp-content/themes:Z
+Volume=%h/.config/wordpress-wp2/uploads:/var/www/html/wp-content/uploads:Z
+Volume=%h/.config/wordpress-wp2/wp-config.php:/var/www/html/wp-config.php:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=wordpress-wp2.network
+NetworkAlias=wordpress
+
+# ==== Secrets ====
+Secret=wordpress_wp2_wordpress_db_password,type=env,target=WORDPRESS_DB_PASSWORD
+
+# ==== Environment ====
+Environment=WORDPRESS_DB_HOST=mariadb
+Environment=WORDPRESS_DB_USER=wp2
+Environment=WORDPRESS_DB_NAME=wp2
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.wordpress-wp2.loadbalancer.server.port=80
+Label=traefik.http.routers.wordpress-wp2.rule=Host(`wp2.${FQDN}`)
+Label=traefik.http.routers.wordpress-wp2.entrypoints=websecure
+Label=traefik.http.routers.wordpress-wp2.tls.certresolver=letsencrypt
+Label=traefik.http.routers.wordpress-wp2.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

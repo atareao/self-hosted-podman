@@ -1,0 +1,57 @@
+[Unit]
+Description=yacht
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/selfhostedpro/yacht
+AutoUpdate=registry
+ContainerName=yacht
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/yacht/config:/config:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=yacht
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.yacht.loadbalancer.server.port=3000
+Label=traefik.http.routers.yacht.rule=Host(`yacht.${FQDN}`)
+Label=traefik.http.routers.yacht.entrypoints=websecure
+Label=traefik.http.routers.yacht.tls.certresolver=letsencrypt
+Label=traefik.http.routers.yacht.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
