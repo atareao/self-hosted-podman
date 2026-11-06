@@ -25,10 +25,11 @@ NetworkAlias=keep
 Secret=glass_keep_jwt_secret,type=env,target=JWT_SECRET
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/glass-keep/glass-keep.env
+EnvironmentFile=%h/.config/glass-keep/glass-keep.env.local
 Environment=NODE_ENV=production
 Environment=API_PORT=8080
 Environment=DB_FILE=/app/data/notes.db
-Environment=ADMIN_EMAILS="{{ env.ADMIN_EMAILS }}"
 
 # ==== Labels ====
 Label=traefik.enable=true

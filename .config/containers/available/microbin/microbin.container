@@ -28,10 +28,9 @@ Secret=microbin_basic_auth_password,type=env,target=MICROBIN_BASIC_AUTH_PASSWORD
 Secret=microbin_admin_password,type=env,target=MICROBIN_ADMIN_PASSWORD
 
 # ==== Environment ====
-Environment=MICROBIN_BASIC_AUTH_USERNAME="{{ env.MICROBIN_BASIC_AUTH_USERNAME }}"
-Environment=MICROBIN_ADMIN_USERNAME="{{ env.USERNAME }}"
+EnvironmentFile=%h/.config/microbin/microbin.env
+EnvironmentFile=%h/.config/microbin/microbin.env.local
 Environment=MICROBIN_EDITABLE=true
-Environment=MICROBIN_FOOTER_TEXT="{{ env.MICROBIN_FOOTER_TEXT }}"
 Environment=MICROBIN_HIDE_FOOTER=false
 Environment=MICROBIN_HIDE_HEADER=false
 Environment=MICROBIN_HIDE_LOGO=false
@@ -43,7 +42,6 @@ Environment=MICROBIN_PURE_HTML=false
 Environment=MICROBIN_DATA_DIR=microbin_data
 Environment=MICROBIN_JSON_DB=false
 Environment=MICROBIN_PUBLIC_PATH="https://microbin.${FQDN}/"
-Environment=MICROBIN_SHORT_PATH="{{ env.MICROBIN_SHORT_PATH }}"
 Environment=MICROBIN_READONLY=true
 Environment=MICROBIN_SHOW_READ_STATS=true
 Environment=MICROBIN_TITLE=PasteBin
@@ -57,7 +55,6 @@ Environment=MICROBIN_ETERNAL_PASTA=true
 Environment=MICROBIN_ENABLE_READONLY=true
 Environment=MICROBIN_DEFAULT_EXPIRY=never
 Environment=MICROBIN_NO_FILE_UPLOAD=false
-Environment=MICROBIN_CUSTOM_CSS="{{ env.MICROBIN_CUSTOM_CSS }}"
 Environment=MICROBIN_HASH_IDS=false
 Environment=MICROBIN_ENCRYPTION_CLIENT_SIDE=true
 Environment=MICROBIN_ENCRYPTION_SERVER_SIDE=true

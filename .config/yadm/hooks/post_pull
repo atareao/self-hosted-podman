@@ -33,6 +33,12 @@ unjinja
 
 # 2) Recargar systemd de usuario (solo si hay manager de usuario disponible)
 if type -q systemctl; and systemctl --user show-environment >/dev/null 2>&1
+    # Scaffold de overrides por-maquina: crea <stack>.env.local vacio si falta
+    for f in $HOME/.config/*/*.env
+        test -e $f; or continue
+        set -l local_file (string replace -r '\.env$' '.env.local' $f)
+        test -e $local_file; or touch $local_file
+    end
     systemctl --user daemon-reload
 end
 

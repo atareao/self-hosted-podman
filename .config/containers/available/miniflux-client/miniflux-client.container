@@ -28,16 +28,18 @@ Secret=miniflux_client_model_api_key,type=env,target=MODEL_API_KEY
 Secret=miniflux_client_telegram_token,type=env,target=TELEGRAM_TOKEN
 
 # ==== Environment ====
-Environment=MATRIX_ROOM="{{ env.MATRIX_ROOM }}"
+EnvironmentFile=%h/.config/miniflux-client/miniflux-client.env
+EnvironmentFile=%h/.config/miniflux-client/miniflux-client.env.local
+
 Environment=MATRIX_URL="matrix.${FQDN}"
-Environment=MAX_ENTRIES="{{ env.MAX_ENTRIES }}"
+
 Environment=MINIFLUX_CATEGORIES=Linux
 Environment=MINIFLUX_URL="miniflux.${FQDN}"
 Environment=MODEL_NAME=gpt-4.1-nano
 Environment=MODEL_URL=https://api.openai.com
-Environment=SLEEP_TIME="{{ env.SLEEP_TIME }}"
-Environment=TELEGRAM_CHAT_ID="{{ env.TELEGRAM_CHAT_ID }}"
-Environment=TELEGRAM_THREAD_ID="{{ env.TELEGRAM_THREAD_ID }}"
+
+
+
 Environment=RUST_LOG=DEBUG
 Environment=MODEL_DESCRIPTION="Eres un asistente especializado en noticias internacionales"
 Environment=MODEL_PROMPT="Analiza todas las noticias proporcionadas y genera un JSON de la siguiente forma: `{\"news\": [{\"url\": \"<url>\", \"title\": \"<title>\", \"summary\": \"<summary>\"}]}`, reemplazando `<url>`, `<title>` y `<summary>` por la url, el título traducido al español y un resumen explicando la noticia en español. Tiene que ir todo en una única línea. No indiques que me devuelves un JSON, simplemente devuelve el JSON como te indiqué."

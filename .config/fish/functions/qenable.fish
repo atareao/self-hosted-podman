@@ -15,6 +15,28 @@ function qenable --argument-names stack
     mkdir -p "$dest_dir"
     set -l files_linked 0
 
+    # --- PRE-SCAN DE COLISIÓN DE NOMBRE GLOBAL (atómico) ---
+    # El directorio systemd/ es plano: si otro stack ya tiene un unit con el
+    # mismo basename, colisionaría. Comprobamos TODOS los units a habilitar
+    # antes de enlazar nada; si hay colisión, abortamos sin dejar el stack a medias.
+    for file in $src/*
+        set -l fname (basename "$file")
+        if string match -qr '\.(container|volume|network|kube|pod)$' "$fname"
+            for other in $HOME/.config/containers/available/*/
+                set -l other_stack (basename "$other")
+                if test "$other_stack" = "$stack"; continue; end
+                if test -e "$other$fname"
+                    set_color red
+                    echo "❌ ERROR DE COLISIÓN DE NOMBRE GLOBAL:"
+                    echo "   El unit '$fname' ya existe en el stack '$other_stack'."
+                    echo "   Abortando sin enlazar."
+                    set_color normal
+                    return 1
+                end
+            end
+        end
+    end
+
     for file in $src/*
         set -l fname (basename "$file")
         if string match -qr '\.(container|volume|network|kube|pod)$' "$fname"

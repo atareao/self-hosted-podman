@@ -1,43 +1,51 @@
 [Unit]
-Description=recorder
+Description=miniflux-postgresql
 After=network-online.target
 
 [Container]
 # ==== Image ====
-Image=docker.io/kaffetorsk/mumble-recorder
-ContainerName=recorder
-AutoUpdate=registry
+Image=docker.io/library/postgres:18-alpine
+ContainerName=miniflux-postgresql
 PodmanArgs=--init
 
 # ==== Command ====
 
+
 # ==== Ports ====
 
+
 # ==== Volumes ====
+Volume=miniflux-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
-Network=mumble.network
-NetworkAlias=recorder
+Network=miniflux.network
+NetworkAlias=miniflux_db
 
 # ==== Secrets ====
+Secret=miniflux_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-Environment=SERVER={{ env.SERVER_IP }}
-Environment=PASSWORD=
-Environment=FFMPEG_OUT="-c:v copy -c:a copy -f flv rtmp://127.0.0.1:1935/live/{name}"
+EnvironmentFile=%h/.config/miniflux/miniflux.env
+EnvironmentFile=%h/.config/miniflux/miniflux.env.local
+
 
 # ==== Labels ====
 
+
 # ==== Healthcheck ====
+HealthCmd=pg_isready -U miniflux || exit 1
+HealthInterval=30s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
+
 
 # ==== Resources ====
 
 [Service]
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-Restart=on-failure
+Restart=always
 RestartSec=10s
 StartLimitIntervalSec=300
 StartLimitBurst=3

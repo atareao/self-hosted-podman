@@ -3,17 +3,10 @@
 .config/environment.d/fqdn.conf
 
 # Renders generados por `unjinja` (la fuente es el .jinja hermano). NO se versionan.
-# Si añades/quitas un *.container.jinja, actualiza esta lista.
-.config/containers/available/glass-keep/glass-keep.container
-.config/containers/available/gokapi/gokapi.container
-.config/containers/available/microbin/microbin.container
-.config/containers/available/miniflux-client/miniflux-client.container
-.config/containers/available/miniflux/miniflux_db.container
-.config/containers/available/mumble/recorder.container
-.config/containers/available/openobserve/openobserve.container
-.config/containers/available/wakapi/wakapi.container
-.config/containers/available/wakapi/wakapi_db.container
 .config/vector/vector.yaml
 
 # fish universal variables: especificas de cada maquina (fish las reescribe)
 .config/fish/fish_variables
+
+# overrides por-maquina de los .env de stack (se auto-crean en el hook post_pull)
+.config/**/*.env.local

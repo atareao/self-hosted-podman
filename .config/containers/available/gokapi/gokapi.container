@@ -26,7 +26,8 @@ NetworkAlias=gokapi
 
 
 # ==== Environment ====
-Environment=GOKAPI_PORT="{{ env.PORT }}"
+EnvironmentFile=%h/.config/gokapi/gokapi.env
+EnvironmentFile=%h/.config/gokapi/gokapi.env.local
 Environment=GOKAPI_EXTERNAL_URL="https://gokapi.${FQDN}"
 
 # ==== Labels ====
