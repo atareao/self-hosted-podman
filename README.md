@@ -120,8 +120,6 @@ setup_apps.sh                     # bootstrap del usuario apps: podman.socket, c
 | **git**           | Control de versiones                 | `sudo apt install git`                   |
 | **yadm**          | Gestor de dotfiles                   | `sudo apt install yadm`                  |
 | **age**           | Cifrado moderno                      | `sudo apt install age`                   |
-| **yq**            | Procesador YAML/JSON                 | `sudo apt install yq`                    |
-| **jq**            | Procesador JSON                      | `sudo apt install jq`                    |
 | **bat**           | Visor de archivos mejorado           | `sudo apt install batcat`                |
 | **zoxide**        | Navegador de directorios             | `sudo apt install zoxide`                |
 | **ansifilter**    | Limpia ANSI de los journals          | `sudo apt install ansifilter`            |
@@ -136,6 +134,7 @@ setup_apps.sh                     # bootstrap del usuario apps: podman.socket, c
 | **sops**      | Cifrado de secretos                  | Binario (ver abajo)|
 | **jinrender** | Motor de plantillas                  | Binario (ver abajo)|
 | **crypta**    | Gestión de secretos simplificada     | Binario (ver abajo)|
+| **yq**        | Procesador YAML/JSON (mikefarah)     | Binario (ver abajo)|
 | **starship**  | Prompt personalizable                | Binario (ver abajo)|
 | **qctl**      | CLI para gestionar quadlets          | Binario (ver abajo)|
 | **nevi**      | Editor de terminal (Vim moderno)     | `cargo install`    |
@@ -151,7 +150,7 @@ setup_apps.sh                     # bootstrap del usuario apps: podman.socket, c
 
 ```bash
 sudo apt update
-sudo apt install -y git ansifilter yadm age yq jq bat zoxide apache2-utils fish podman
+sudo apt install -y git ansifilter yadm age bat zoxide apache2-utils fish podman
 mkdir -p ~/.local/bin
 ```
 
@@ -183,6 +182,15 @@ install -m 755 jinrender-linux-x86_64 ~/.local/bin/jinrender && rm jinrender-lin
 # Crypta - Gestión de secretos simplificada
 curl -LO https://github.com/atareao/crypta/releases/download/v0.3.0/crypta-linux-x86_64
 install -m 755 crypta-linux-x86_64 ~/.local/bin/crypta && rm crypta-linux-x86_64
+
+# yq (mikefarah) - Procesador YAML/JSON (binario único, última release + checksum SHA-256)
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/checksums
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/checksums_hashes_order
+COL=$(($(grep -n '^SHA-256$' checksums_hashes_order | cut -d: -f1) + 1))
+EXPECTED=$(awk -v c="$COL" '$1=="yq_linux_amd64"{print $c}' checksums)
+echo "$EXPECTED  yq_linux_amd64" | sha256sum -c -
+install -m 755 yq_linux_amd64 ~/.local/bin/yq && rm -f yq_linux_amd64 checksums checksums_hashes_order
 
 # Starship - Mejora del prompt
 curl -LO https://github.com/starship/starship/releases/download/v1.27.0/starship-x86_64-unknown-linux-musl.tar.gz
@@ -442,7 +450,7 @@ QUADLET_UNIT_DIRS=<dir-con-units-y-redes> /usr/lib/podman/quadlet -user -dryrun
 - Rootless: `WantedBy=default.target` (nunca `multi-user.target`).
 - FQDN deploy: editar `fqdn.conf` → `systemctl --user daemon-reexec` y **reiniciar** la unidad (las unidades en marcha conservan el valor antiguo).
 - Los hooks y funciones del repo son **fish**, no bash.
-- **`yq` versión**: `unjinja`/`yadmalt` evitan `ascii_upcase`/`upcase` (mutuamente excluyentes entre `yq` v3 jq-based y v4 mikefarah). Usan una expresión válida en ambas y suben a mayúsculas con `string upper` de fish.
+- **`yq`**: se instala **mikefarah/yq** (v4, binario único) en `~/.local/bin`; el que da `apt` es kislyuk/yq (v3, sobre `jq`). `unjinja`/`yadmalt` usan una expresión válida en ambos y suben a mayúsculas con `string upper` de fish. Ya no se instala `jq`.
 - **PATH en shells no interactivos**: el hook `post_pull` y `fish -c` no ejecutan `config.fish`, así que `unjinja`/`yadmalt` fijan por sí mismos `~/.local/bin` en `PATH` y `SOPS_AGE_KEY_FILE` (si no, `sops`/`jinrender` no se encuentran y el render falla en silencio).
 
 ---

@@ -17,7 +17,7 @@ MI_CLAVE_PUBLICA="tu_clave_publica_aqui"
 apt update && apt upgrade -y
 apt install -y libpam-tmpdir needrestart unattended-upgrades libcap2-bin
 # Herramientas para podman y otras utilidades
-apt install -y git ansifilter yadm age yq jq bat zoxide apache2-utils fish podman
+apt install -y git ansifilter yadm age bat zoxide apache2-utils fish podman
 # Dependencias de compilacion para herramientas Rust (nevi)
 apt install -y build-essential cmake pkg-config libssl-dev zlib1g-dev libx11-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 # Crear admin, asignar pass y desbloquear

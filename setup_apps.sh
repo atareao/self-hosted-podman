@@ -29,6 +29,17 @@ tar xzf starship-x86_64-unknown-linux-musl.tar.gz
 mv starship ~/.local/bin/starship
 chmod +x ~/.local/bin/starship
 rm -f starship-x86_64-unknown-linux-musl.tar.gz
+# yq (mikefarah) - Procesador YAML/JSON (binario estatico; ultima release + checksum)
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/checksums
+curl -LO https://github.com/mikefarah/yq/releases/latest/download/checksums_hashes_order
+# 'checksums' es una tabla multihash; SHA-256 es el campo (nº de linea de orden + 1)
+COL=$(($(grep -n '^SHA-256$' checksums_hashes_order | cut -d: -f1) + 1))
+EXPECTED=$(awk -v c="$COL" '$1=="yq_linux_amd64"{print $c}' checksums)
+echo "$EXPECTED  yq_linux_amd64" | sha256sum -c -
+mv yq_linux_amd64 ~/.local/bin/yq
+chmod +x ~/.local/bin/yq
+rm -f checksums checksums_hashes_order
 # qctl - Gestión de quadlets (siempre la última release, binario estático + checksum)
 curl -LO https://github.com/atareao/qctl/releases/latest/download/qctl-linux-x86_64
 curl -LO https://github.com/atareao/qctl/releases/latest/download/qctl-linux-x86_64.sha256
