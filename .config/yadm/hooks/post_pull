@@ -1,3 +1,42 @@
 #!/usr/bin/env fish
+# yadm post_pull — se ejecuta tras `yadm pull`.
+#   1. Comprueba que el FQDN del host este definido (no es un secreto: vive en
+#      ~/.config/environment.d/fqdn.conf, lo expande systemd en arranque).
+#   2. Renderiza las plantillas *.jinja (unjinja: secretos + config de stack).
+#   3. Recarga systemd de usuario para recoger cambios en las unidades.
+# Ver AGENTS.md, seccion "Templating & secrets".
 
+set -l fqdn_file $HOME/.config/environment.d/fqdn.conf
+set -l fqdn_ok 1
+
+if not test -f $fqdn_file
+    set fqdn_ok 0
+else if not string match -qr '^FQDN=.+' (cat $fqdn_file 2>/dev/null)
+    set fqdn_ok 0
+end
+
+if test $fqdn_ok -eq 0
+    set_color red
+    echo "❌ post_pull: FQDN no definido en $fqdn_file"
+    echo "   Copia .config/environment.d/fqdn.conf.example y pon tu dominio."
+    echo "   Sin FQDN, systemd expande \${FQDN} a vacio -> labels de Traefik sin Host()."
+    set_color normal
+else if not systemctl --user show-environment 2>/dev/null | grep -q '^FQDN='
+    set_color yellow
+    echo "⚠️  post_pull: FQDN esta en $fqdn_file pero no en el entorno de systemd."
+    echo "   Ejecuta:  systemctl --user daemon-reexec"
+    set_color normal
+end
+
+# 1) Render de plantillas
 unjinja
+
+# 2) Recargar systemd de usuario (solo si hay manager de usuario disponible)
+if type -q systemctl; and systemctl --user show-environment >/dev/null 2>&1
+    systemctl --user daemon-reload
+end
+
+# Falla ruidosamente si el FQDN no estaba definido
+if test $fqdn_ok -eq 0
+    return 1
+end
