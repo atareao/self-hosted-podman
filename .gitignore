@@ -2,8 +2,8 @@
 # environment.d: FQDN real es especifico del host (no se versiona)
 .config/environment.d/fqdn.conf
 
-# Renders generados por `unjinja` (la fuente es el .jinja hermano). NO se versionan.
-.config/vector/vector.yaml
+# Nota: .config/vector/vector.yaml YA NO es un render; es fuente versionada
+# (usa interpolacion ${VAR} nativa de Vector). Solo dashboard-auth.yml se renderiza.
 
 # fish universal variables: especificas de cada maquina (fish las reescribe)
 .config/fish/fish_variables

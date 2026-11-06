@@ -69,12 +69,13 @@ El directorio destino es **plano**, así que el **basename de cada unidad debe s
 
 ### Plantillas (`*.jinja`)
 
-Solo quedan **dos** plantillas, y son ficheros que consume una **app en tiempo de ejecución** (no systemd):
+Solo queda **una** plantilla, y es un fichero que consume una **app en tiempo de ejecución** (no systemd):
 
 - `.config/traefik/dynamic/dashboard-auth.yml.jinja`
-- `.config/vector/vector.yaml.jinja`
 
-Las renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERCASE` + el `FQDN`, renderiza con [jinrender](https://github.com/atareao/jinrender) y limpia las variables). El resto de config va por `.env` y quadlets normales.
+La renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERCASE` + el `FQDN`, renderiza con [jinrender](https://github.com/atareao/jinrender) y limpia las variables). El resto de config va por `.env` y quadlets normales.
+
+> **`vector.yaml` ya NO es plantilla.** Es un fichero **plano** versionado que usa la interpolación `${VAR}` **nativa de Vector**. La config no secreta (`OO_USER_EMAIL`) vive en `.config/vector/vector.env` (inyectado con `EnvironmentFile=`) y las credenciales llegan por `Secret=`. O sea: no necesita Jinja en absoluto.
 
 ---
 
@@ -102,8 +103,8 @@ Las renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERC
 ├── fish/
 │   ├── config.fish               # añade ~/.local/bin al PATH, zoxide, starship
 │   └── functions/                # qenable, qdisable, qlist, qcheck, unjinja, jcu, jcf, scupdate, genpass, yadmalt
-├── traefik/dynamic/*.jinja       # plantilla de auth del dashboard
-├── vector/vector.yaml.jinja      # plantilla de configuración de Vector
+├── traefik/dynamic/*.jinja       # plantilla de auth del dashboard (la única)
+├── vector/vector.yaml            # config de Vector (PLANA; ${VAR} nativo) + vector.env (no secreto)
 └── yadm/hooks/post_pull          # hook de despliegue (render + scaffold + daemon-reload)
 setup.sh                          # bootstrap del host (root): usuarios, SSH, nftables
 setup_apps.sh                     # bootstrap del usuario apps: podman.socket, crypta, secretos, herramientas
@@ -386,7 +387,7 @@ openssl rand -base64 32 | podman secret create mi_password -     # o:  genpass 3
 
 > ⚠️ **A FUEGO — `podman secret create`, NUNCA `crypta store`.** Los secretos de Podman se resuelven por el **ID** del secreto (driver `shell` → `crypta`): `podman secret create` hace que Podman genere el ID y le entregue el valor a `crypta`; `crypta store <nombre>` escribe una clave huérfana bajo el nombre literal que Podman jamás encontrará (`no secret with name or id`).
 >
-> La **única excepción** es `crypta store`, usado para las **dos plantillas `.jinja`** que renderiza `unjinja` (p. ej. `dashboard-auth.yml.jinja`), porque `unjinja` lee `secrets.yml` directamente.
+> La **única excepción** es `crypta store`, usado para la **plantilla `.jinja`** que renderiza `unjinja` (`dashboard-auth.yml.jinja`), porque `unjinja` lee `secrets.yml` directamente.
 
 Un nombre de `Secret=` **debe existir** (vía `podman secret create`) **antes** de arrancar la unidad, o el contenedor no inicia.
 

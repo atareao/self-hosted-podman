@@ -3,7 +3,6 @@ data_dir: "/var/lib/vector"
 api:
   enabled: true
   address: "0.0.0.0:8686"
-  playground: false
 
 # --- SOURCES ---
 sources:
@@ -26,12 +25,16 @@ transforms:
           }
           .service_type = "edge-proxy"
       }
-      
+
       # Añadimos metadatos del host y eliminamos basura
       .host_node = "${HOSTNAME:-desconocido}"
       del(.image)
 
 # --- SINKS ---
+# Las credenciales las inyecta la unidad (vector.container) como entorno:
+#   - OO_USER_EMAIL  -> EnvironmentFile=.config/vector/vector.env   (NO secreto)
+#   - OO_USER_PASSWORD -> Secret=openobserve_root_password          (mismo secret que OpenObserve)
+#   - VECTOR_INGEST_PASSWORD -> Secret pendiente (CrowdSec aún sin ingest)
 sinks:
   openobserve:
     type: "http"
@@ -40,8 +43,8 @@ sinks:
     uri: "http://openobserve:5080/api/default/${.container_name:-syslog}/_json"
     auth:
       strategy: "basic"
-      user: "{{ env.OO_USER_EMAIL }}"
-      password: "{{ env.OO_USER_PASSWORD }}"
+      user: "${OO_USER_EMAIL}"
+      password: "${OO_USER_PASSWORD}"
     encoding:
       codec: "json"
 
@@ -54,7 +57,7 @@ sinks:
     auth:
       strategy: "basic"
       user: "vector-ingest"
-      password: "{{ env.VECTOR_INGEST_PASSWORD }}"
+      password: "${VECTOR_INGEST_PASSWORD:-}"
     encoding:
       codec: "json"
     batch:
