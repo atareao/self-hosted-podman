@@ -19,10 +19,13 @@ chmod +x ~/.local/bin/sops
 curl -LO https://github.com/atareao/jinrender/releases/download/v0.1.2/jinrender-linux-x86_64
 mv jinrender-linux-x86_64 ~/.local/bin/jinrender
 chmod +x ~/.local/bin/jinrender
-# Crypta - Gestión de secretos simplificada
-curl -LO https://github.com/atareao/crypta/releases/download/v0.3.0/crypta-linux-x86_64
+# Crypta - Gestión de secretos simplificada (siempre la última release, binario + checksum)
+curl -LO https://github.com/atareao/crypta/releases/latest/download/crypta-linux-x86_64
+curl -LO https://github.com/atareao/crypta/releases/latest/download/crypta-linux-x86_64.sha256
+sha256sum -c crypta-linux-x86_64.sha256
 mv crypta-linux-x86_64 ~/.local/bin/crypta
 chmod +x ~/.local/bin/crypta
+rm -f crypta-linux-x86_64.sha256
 # Starship - Mejora del prompt
 curl -LO https://github.com/starship/starship/releases/download/v1.27.0/starship-x86_64-unknown-linux-musl.tar.gz
 tar xzf starship-x86_64-unknown-linux-musl.tar.gz
