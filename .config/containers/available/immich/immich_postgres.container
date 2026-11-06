@@ -18,6 +18,7 @@ Volume=immich-pgdata.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=immich.network
+NetworkAlias=database
 
 # ==== Secrets ====
 Secret=immich_postgres_password,type=env,target=POSTGRES_PASSWORD

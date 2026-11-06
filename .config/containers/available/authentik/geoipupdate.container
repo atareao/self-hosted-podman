@@ -20,6 +20,7 @@ Volume=authentik-geoip.volume:/usr/share/GeoIP:Z
 
 # ==== Networks ====
 Network=authentik.network
+NetworkAlias=geoipupdate
 
 # ==== Secrets ====
 

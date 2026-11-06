@@ -19,6 +19,7 @@ Volume=pinepods-pgdata.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=pinepods.network
+NetworkAlias=pinepods_db
 
 # ==== Secrets ====
 Secret=pinepods_postgres_password,type=env,target=POSTGRES_PASSWORD

@@ -20,6 +20,7 @@ Volume=dev-dev_mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=dev.network
+NetworkAlias=mariadb
 
 # ==== Secrets ====
 Secret=dev_mysql_password,type=env,target=MYSQL_PASSWORD

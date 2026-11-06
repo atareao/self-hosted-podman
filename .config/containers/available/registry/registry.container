@@ -22,6 +22,7 @@ Volume=%h/.config/registry/htpasswd:/auth/htpasswd:ro
 
 # ==== Networks ====
 Network=registry.network
+NetworkAlias=registry
 
 # ==== Secrets ====
 

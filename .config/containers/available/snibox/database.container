@@ -19,6 +19,7 @@ Volume=snibox-pg-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=snibox.network
+NetworkAlias=database
 
 # ==== Secrets ====
 

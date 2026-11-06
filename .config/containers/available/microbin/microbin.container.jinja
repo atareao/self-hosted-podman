@@ -21,6 +21,7 @@ Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=microbin
 
 # ==== Secrets ====
 Secret=microbin_basic_auth_password,type=env,target=MICROBIN_BASIC_AUTH_PASSWORD

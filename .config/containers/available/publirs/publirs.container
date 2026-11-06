@@ -20,6 +20,7 @@ Volume=publirs-db.volume:/app/db:Z
 
 # ==== Networks ====
 Network=publirs.network
+NetworkAlias=publirs
 
 # ==== Secrets ====
 Secret=publirs_token,type=env,target=TOKEN

@@ -19,6 +19,7 @@ Volume=focalboard-focalboarddb.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=focalboard.network
+NetworkAlias=focalboarddb
 
 # ==== Secrets ====
 

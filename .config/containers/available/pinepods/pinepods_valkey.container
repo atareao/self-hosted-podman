@@ -19,6 +19,7 @@ PodmanArgs=--init
 
 # ==== Networks ====
 Network=pinepods.network
+NetworkAlias=pinepods_valkey
 
 # ==== Secrets ====
 

@@ -21,6 +21,7 @@ Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=flame
 
 # ==== Secrets ====
 Secret=flame_password,type=env,target=PASSWORD

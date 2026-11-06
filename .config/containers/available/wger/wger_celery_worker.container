@@ -20,6 +20,7 @@ Volume=wger-media.volume:/home/wger/media:Z
 
 # ==== Networks ====
 Network=wger.network
+NetworkAlias=celery_worker
 
 # ==== Secrets ====
 

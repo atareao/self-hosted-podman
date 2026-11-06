@@ -20,6 +20,7 @@ Volume=atuin-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=atuin.network
+NetworkAlias=postgres_for_atuin
 
 # ==== Secrets ====
 Secret=atuin_postgres_password,type=env,target=POSTGRES_PASSWORD

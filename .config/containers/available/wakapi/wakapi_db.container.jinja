@@ -19,6 +19,7 @@ Volume=wakapi-pg_data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=wakapi.network
+NetworkAlias=db
 
 # ==== Secrets ====
 Secret=wakapi_postgres_password,type=env,target=POSTGRES_PASSWORD

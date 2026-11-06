@@ -20,6 +20,7 @@ Volume=open-webui-ollama.volume:/root/.ollama:Z
 
 # ==== Networks ====
 Network=open-webui.network
+NetworkAlias=ollama
 
 # ==== Secrets ====
 

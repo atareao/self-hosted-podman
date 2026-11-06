@@ -18,6 +18,7 @@ ContainerName=immich_redis
 
 # ==== Networks ====
 Network=immich.network
+NetworkAlias=redis
 
 # ==== Secrets ====
 

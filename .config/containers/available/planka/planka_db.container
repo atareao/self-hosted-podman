@@ -19,6 +19,7 @@ Volume=planka-db-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=planka.network
+NetworkAlias=postgres
 
 # ==== Secrets ====
 

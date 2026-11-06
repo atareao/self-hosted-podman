@@ -19,6 +19,7 @@ Volume=%h/.config/bookstack/config:/config:Z
 
 # ==== Networks ====
 Network=bookstack.network
+NetworkAlias=bookstack_db
 
 # ==== Secrets ====
 Secret=bookstack_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD

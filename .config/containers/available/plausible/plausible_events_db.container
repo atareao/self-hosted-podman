@@ -20,6 +20,7 @@ Volume=%h/.config/plausible/clickhouse/clickhouse-user-config.xml:/etc/clickhous
 
 # ==== Networks ====
 Network=plausible.network
+NetworkAlias=plausible_events_db
 
 # ==== Secrets ====
 

@@ -21,6 +21,7 @@ PodmanArgs=--init
 # ==== Networks ====
 Network=proxy.network
 Network=dev.network
+NetworkAlias=phpmyadmin
 
 # ==== Secrets ====
 

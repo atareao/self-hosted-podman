@@ -20,6 +20,7 @@ Volume=huginn-huginn_mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=huginn.network
+NetworkAlias=mariadb
 
 # ==== Secrets ====
 Secret=huginn_mysql_password,type=env,target=MYSQL_PASSWORD

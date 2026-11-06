@@ -19,6 +19,7 @@ Volume=hedgedoc-data.volume:/config:Z
 
 # ==== Networks ====
 Network=hedgedoc.network
+NetworkAlias=mariadb
 
 # ==== Secrets ====
 Secret=hedgedoc_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD

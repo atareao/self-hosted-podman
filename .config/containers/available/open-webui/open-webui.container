@@ -19,6 +19,7 @@ Volume=open-webui-open-webui.volume:/app/backend/data:Z
 
 # ==== Networks ====
 Network=open-webui.network
+NetworkAlias=open-webui
 
 # ==== Secrets ====
 

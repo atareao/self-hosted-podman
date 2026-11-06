@@ -18,6 +18,7 @@ ContainerName=immich-web
 
 # ==== Networks ====
 Network=immich.network
+NetworkAlias=immich-web
 
 # ==== Secrets ====
 

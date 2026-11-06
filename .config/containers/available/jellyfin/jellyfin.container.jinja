@@ -7,6 +7,7 @@ After=network-online.target traefik.service
 Image=docker.io/jellyfin/jellyfin
 AutoUpdate=registry
 ContainerName=jellyfin
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -15,19 +16,19 @@ ContainerName=jellyfin
 
 
 # ==== Volumes ====
-Volume=%h/.config/jellyfin/config:/config:Z
-Volume=%h/.config/jellyfin/cache:/cache:Z
-Volume=%h/.config/jellyfin/media:/media:Z
-Volume=%h/.config/jellyfin/media2:/media2:ro
+Volume=jellyfin-config.volume:/config:Z
+Volume=jellyfin-cache.volume:/cache:Z
+Volume=jellyfin-media.volume:/media:Z
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=jellyfin
 
 # ==== Secrets ====
 
 
 # ==== Environment ====
-Environment=JELLYFIN_PublishedServerUrl="jellyfin.{{ env.FQDN }}"
+
 
 # ==== Labels ====
 Label=traefik.enable=true

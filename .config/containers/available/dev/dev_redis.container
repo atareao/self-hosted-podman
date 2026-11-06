@@ -19,6 +19,7 @@ Volume=dev-dev_redis.volume:/data:Z
 
 # ==== Networks ====
 Network=dev.network
+NetworkAlias=redis
 
 # ==== Secrets ====
 

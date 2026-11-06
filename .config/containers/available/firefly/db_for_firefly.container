@@ -19,6 +19,7 @@ Volume=%h/.config/firefly/firefly_db:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=firefly.network
+NetworkAlias=db_for_firefly
 
 # ==== Secrets ====
 Secret=firefly_mysql_random_root_password,type=env,target=MYSQL_RANDOM_ROOT_PASSWORD

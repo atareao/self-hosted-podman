@@ -20,6 +20,7 @@ PodmanArgs=--init
 
 # ==== Networks ====
 Network=huginn.network
+NetworkAlias=threaded
 
 # ==== Secrets ====
 Secret=huginn_database_password,type=env,target=DATABASE_PASSWORD

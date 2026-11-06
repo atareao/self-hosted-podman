@@ -20,6 +20,7 @@ Volume=wger-celery-beat.volume:/home/wger/beat/:Z
 
 # ==== Networks ====
 Network=wger.network
+NetworkAlias=celery_beat
 
 # ==== Secrets ====
 

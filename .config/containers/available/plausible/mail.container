@@ -19,6 +19,7 @@ ContainerName=mail
 
 # ==== Networks ====
 Network=plausible.network
+NetworkAlias=mail
 
 # ==== Secrets ====
 

@@ -19,6 +19,7 @@ Volume=postgres-pgadmin.volume:/var/lib/pgadmin:Z
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=pgadmin
 
 # ==== Secrets ====
 Secret=postgres_pgadmin_default_password,type=env,target=PGADMIN_DEFAULT_PASSWORD

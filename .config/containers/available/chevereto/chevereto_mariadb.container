@@ -20,6 +20,7 @@ Volume=chevereto-chevereto_mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=chevereto.network
+NetworkAlias=mariadb
 
 # ==== Secrets ====
 Secret=chevereto_mysql_password,type=env,target=MYSQL_PASSWORD

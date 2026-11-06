@@ -19,6 +19,7 @@ Volume=rabbitmq-rabbitmq.volume:/var/lib/rabbitmq/mnseia/:Z
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=rabbitmq
 
 # ==== Secrets ====
 Secret=rabbitmq_default_pass,type=env,target=RABBITMQ_DEFAULT_PASS

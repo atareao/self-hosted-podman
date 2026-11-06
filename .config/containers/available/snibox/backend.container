@@ -20,6 +20,7 @@ Volume=snibox-static-files.volume:/app/public:Z
 
 # ==== Networks ====
 Network=snibox.network
+NetworkAlias=backend
 
 # ==== Secrets ====
 Secret=snibox_db_pass,type=env,target=DB_PASS

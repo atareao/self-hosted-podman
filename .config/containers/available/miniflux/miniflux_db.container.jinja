@@ -19,6 +19,7 @@ Volume=miniflux-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=miniflux.network
+NetworkAlias=miniflux_db
 
 # ==== Secrets ====
 Secret=miniflux_postgres_password,type=env,target=POSTGRES_PASSWORD

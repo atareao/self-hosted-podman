@@ -19,6 +19,7 @@ Volume=cells-mysqldir.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=cells.network
+NetworkAlias=mysql
 
 # ==== Secrets ====
 Secret=cells_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD

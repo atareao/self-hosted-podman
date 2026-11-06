@@ -25,6 +25,7 @@ Volume=%h/.config/dev/wp-config.php:/var/www/html/wp-config.php:Z
 # ==== Networks ====
 Network=proxy.network
 Network=dev.network
+NetworkAlias=wordpress
 
 # ==== Secrets ====
 Secret=dev_wordpress_db_password,type=env,target=WORDPRESS_DB_PASSWORD
