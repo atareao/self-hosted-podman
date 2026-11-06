@@ -5,7 +5,7 @@ After=traefik.service
 [Container]
 # ==== Image ====
 Image=docker.io/library/nginx:alpine
-ContainerName=nginx-web
+ContainerName=nginx
 
 # ==== Command ====
 
