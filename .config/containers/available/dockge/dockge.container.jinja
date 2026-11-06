@@ -1,48 +1,60 @@
 [Unit]
 Description=Dockge
+After=network-online.target
 
 [Container]
+# ==== Image ====
 Image=docker.io/louislam/dockge
 ContainerName=dockge
 AutoUpdate=registry
 PodmanArgs=--init
 
-# Volumes
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=%h/.config/dockge/stacks:/opt/stacks:Z
 Volume=%h/.config/dockge/data:/app/data:Z
-# Network
+
+# ==== Networks ====
 Network=proxy.network
-# Labels
+
+# ==== Secrets ====
+
+# ==== Environment ====
+
+# ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.dockge.loadbalancer.server.port=5001
 Label=traefik.http.routers.dockge.rule=Host(`dockge.{{ env.FQDN }}`)
 Label=traefik.http.routers.dockge.entrypoints=websecure
-Label=traefik.http.routers.dockge.tls.certresolver=myresolver
+Label=traefik.http.routers.dockge.tls.certresolver=letsencrypt
 Label=traefik.http.routers.dockge.middlewares=seguridadHeaders@file,compresionHeaders@file
 
-# HealthCheck
+# ==== Healthcheck ====
 HealthCmd=/app/extra/healthcheck
 HealthInterval=60s
 HealthTimeout=30s
 HealthStartPeriod=60s
 HealthRetries=5
 
+# ==== Hardening ====
+
+# ==== Resources ====
+
 [Service]
-# Environment variables
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-# Restart
 Restart=on-failure
 RestartSec=10s
 StartLimitIntervalSec=300
 StartLimitBurst=3
-# Tiempo máximo para que el healthcheck pase a healthy
 TimeoutStartSec=90
 {% raw %}
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" dockge)" != "healthy" ]; do sleep 2; done'
 {% endraw %}
 
 [Install]
-WantedBy=multi-user.target
-
+WantedBy=default.target

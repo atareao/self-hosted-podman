@@ -3,17 +3,36 @@ Description=Servidor Nginx de ejemplo para web
 After=traefik.service
 
 [Container]
+# ==== Image ====
 Image=docker.io/library/nginx:alpine
 ContainerName=nginx-web
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+
+# ==== Networks ====
 Network=proxy.network
 
-# Etiquetas para que Traefik haga su magia
-PodmanArgs=--label "traefik.enable=true" \
-           --label "traefik.http.routers.nginx-web.rule=Host(`web.{{ env.FQDN }}`)" \
-           --label "traefik.http.routers.nginx-web.entrypoints=websecure" \
-           --label "traefik.http.routers.nginx-web.tls.certresolver=myresolver" \
-           --label "traefik.http.routers.nginx-web.middlewares=seguridadHeaders@file,compresionHeaders@file" \
-           --label "traefik.http.services.nginx-web.loadbalancer.server.port=80"
+# ==== Secrets ====
+
+# ==== Environment ====
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.routers.nginx-web.rule=Host(`web.{{ env.FQDN }}`)
+Label=traefik.http.routers.nginx-web.entrypoints=websecure
+Label=traefik.http.routers.nginx-web.tls.certresolver=letsencrypt
+Label=traefik.http.routers.nginx-web.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.nginx-web.loadbalancer.server.port=80
+
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
 
 [Service]
 Restart=always

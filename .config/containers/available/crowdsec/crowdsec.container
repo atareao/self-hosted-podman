@@ -3,41 +3,51 @@ Description=CrowdSec Security Engine
 After=network-online.target
 
 [Container]
+# ==== Image ====
 Image=docker.io/crowdsecurity/crowdsec:latest
 ContainerName=crowdsec
 AutoUpdate=registry
 
-# Persistencia
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
 Volume=%h/.config/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:Z
 Volume=crowdsec-data.volume:/var/lib/crowdsec/data:Z
 Volume=crowdsec-config.volume:/etc/crowdsec:Z
 
-# Newtworking
+# ==== Networks ====
 Network=security.network
 
-# Environment
+# ==== Secrets ====
+
+# ==== Environment ====
 Environment=COLLECTIONS=crowdsecurity/linux crowdsecurity/traefik crowdsecurity/http-cve
 Environment=DISABLE_LOCAL_CONFIG=false
 Environment=TZ=Europe/Madrid
 
-# Healthcheck
+# ==== Labels ====
+
+# ==== Healthcheck ====
 HealthCmd=cscli lapi status || exit 1
 HealthInterval=90s
 HealthRetries=3
 HealthTimeout=10s
 HealthStartPeriod=60s
 
+# ==== Hardening ====
+
+# ==== Resources ====
+
 [Service]
-# Restart
 Restart=on-failure
 RestartSec=10s
 StartLimitIntervalSec=300
 StartLimitBurst=3
-# Tiempo máximo para que el healthcheck pase a healthy
 TimeoutStartSec=120
-ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" crowdsec)" != "healthy" ]; do sleep 2; done'
-# Le damos un margen para que el socket de Podman esté disponible
 ExecStartPre=/usr/bin/sleep 2
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" crowdsec)" != "healthy" ]; do sleep 2; done'
 
 [Install]
 WantedBy=default.target

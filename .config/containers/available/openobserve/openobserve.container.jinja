@@ -3,39 +3,48 @@ Description=OpenObserve
 After=network-online.target
 
 [Container]
+# ==== Image ====
 Image=public.ecr.aws/zinclabs/openobserve:latest
 ContainerName=openobserve
 AutoUpdate=registry
 
-# Persistencia
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
 Volume=openobserve-data.volume:/data:Z
 
-# Networking
+# ==== Networks ====
 Network=proxy.network
 Network=security.network
 
-# Environment
+# ==== Secrets ====
+
+# ==== Environment ====
 Environment=ZO_ROOT_USER_EMAIL={{ env.OO_USER_EMAIL }}
 Environment=ZO_ROOT_USER_PASSWORD={{ env.OO_USER_PASSWORD }}
 Environment=ZO_LOCAL_MODE=true
 Environment=ZO_DATA_RETENTION_DAYS=30
 
-# Healthcheck
-
-# Labels
+# ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.openobserve.loadbalancer.server.port=5080
 Label=traefik.http.routers.openobserve.rule=Host(`openobserve.{{ env.FQDN }}`)
 Label=traefik.http.routers.openobserve.entrypoints=websecure
-Label=traefik.http.routers.openobserve.tls.certresolver=myresolver
+Label=traefik.http.routers.openobserve.tls.certresolver=letsencrypt
 Label=traefik.http.routers.openobserve.middlewares=seguridadHeaders@file,compresionHeaders@file
 
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
+
 [Service]
-# Environemnt
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-# Restart
-Restart=unless-stopped
+Restart=always
 
 [Install]
 WantedBy=default.target

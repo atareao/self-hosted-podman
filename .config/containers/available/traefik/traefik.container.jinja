@@ -1,20 +1,23 @@
 [Unit]
 Description=Traefik Edge Router (Rootless)
 After=network-online.target http.socket https.socket podman.socket
-requires=http.socket https.socket podman.socket
+Requires=http.socket https.socket podman.socket
 
 [Container]
+# ==== Image ====
 Image=docker.io/library/traefik:latest
 ContainerName=traefik
 PodmanArgs=--init
 Notify=true
+
+# ==== Command ====
 
 # ==== Ports ====
 
 # ==== Volumes ====
 # 1. Archivo de configuración estática
 Volume=%h/.config/traefik/traefik.yml:/etc/traefik/traefik.yml:ro,Z
-# 2. Volumen de Podman para certificados (Gestionado por Podman, no bind-mount)
+# 2. Volumen de Podman para certificados (gestionado por Podman, no bind-mount)
 Volume=traefik-certs.volume:/etc/traefik/certs:rw,Z
 # 3. Socket de Podman del usuario para el discovery
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
@@ -27,11 +30,13 @@ Volume=traefik-plugins.volume:/plugins-storage:rw,Z
 Network=proxy.network
 AddHost=auth.{{ env.FQDN }}:host-gateway
 
-# ==== Secret ====
+# ==== Secrets ====
 Secret=cf_dns_api_token,type=env,target=CF_DNS_API_TOKEN
 
-# ==== Environment ==== 
+# ==== Environment ====
 Environment=TZ=Europe/Madrid
+
+# ==== Labels ====
 
 # ==== Healthcheck ====
 HealthCmd=traefik healthcheck --ping --ping.address=:8082
@@ -45,13 +50,15 @@ ReadOnly=true
 NoNewPrivileges=true
 SecurityLabelDisable=true
 
+# ==== Resources ====
+Memory=512M
+
 [Service]
 Sockets=http.socket https.socket
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
-# 4. Evita ataques DoS que consuman RAM/CPU
-MemoryLimit=512M
+# Recursos (límite systemd): prioridad de CPU reducida
 CPUWeight=50
 
 [Install]

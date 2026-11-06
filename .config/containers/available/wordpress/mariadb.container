@@ -1,27 +1,44 @@
 [Unit]
-Descripcion=MariaDB
+Description=MariaDB
 
 [Container]
+# ==== Image ====
 Image=docker.io/library/mariadb:11
 ContainerName=mariadb
-# Inyectamos los secretos en el contenedor
+
+# ==== Command ====
+Exec=--innodb-buffer-pool-size=256M --innodb-flush-log-at-trx-commit=2
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=mariadb.volume:/var/lib/mysql:Z
+
+# ==== Networks ====
+Network=wordpress.network
+
+# ==== Secrets ====
 Secret=mariadb_root_password
 Secret=wordpress_db_password
-# Le decimos a MariaDB dónde buscar la contraseña
+
+# ==== Environment ====
 Environment=MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
 Environment=MARIADB_PASSWORD_FILE=/run/secrets/wordpress_db_password
 Environment=MARIADB_DATABASE=wordpress
 Environment=MARIADB_USER=wp_user
 
+# ==== Labels ====
+
+# ==== Healthcheck ====
 HealthCmd=mariadb-admin ping --user=root --password=$(cat /run/secrets/mariadb_root_password) --silent
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
 HealthStartPeriod=30s
 
-Volume=mariadb.volume:/var/lib/mysql:Z
-Network=wordpress.network
-Exec=--innodb-buffer-pool-size=256M --innodb-flush-log-at-trx-commit=2
+# ==== Hardening ====
+
+# ==== Resources ====
 
 [Service]
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
@@ -30,8 +47,7 @@ Restart=on-failure
 RestartSec=10s
 StartLimitIntervalSec=300
 StartLimitBurst=3
-# Tiempo máximo para que el healthcheck pase a healthy
 TimeoutStartSec=60
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
