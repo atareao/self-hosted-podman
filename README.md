@@ -319,6 +319,35 @@ CLI en Rust para instalar/desinstalar symlinks, arrancar/parar servicios `system
 
 Añade **`--dry-run`** (no muta nada) o **`--timeout <SEG>`** (por defecto 60 s) a las operaciones que invocan herramientas externas.
 
+### Ciclo de vida de un stack con `qctl`
+
+Flujo completo para desplegar, verificar y retirar un stack (ejemplo real probado con `ittools`):
+
+```bash
+# 1. Desplegar: entrar en el stack y enlazar/arrancar
+cd ~/.config/containers/available/ittools
+qctl install            # enlaza los quadlets en ~/.config/containers/systemd
+qctl start              # arranca vía systemctl --user
+
+# 2. Verificar
+qctl status             # estado en tabla (🟢 = running)
+qctl logs ittools       # logs estáticos (qctl logsf para seguir en vivo)
+journalctl --user -u ittools -n 20 --no-pager
+curl -sS -o /dev/null -w '%{http_code}\n' https://ittools.servidorlinux.es/
+
+# 3. Retirar tras una prueba
+qctl stop               # para el servicio
+qctl uninstall          # desenlaza las unidades del target dir
+```
+
+Notas:
+
+- `qctl install`/`uninstall` solo gestionan los **symlinks** en `~/.config/containers/systemd`; nunca borran los quadlets de `available/`.
+- `qctl stop` para pero **no** desenlaza: la unidad sigue existiendo y volvería a arrancar en el siguiente arranque. Para sacarla de juego usa `qctl uninstall`.
+- Para limpiar los datos de una prueba: `qctl clean-volumes --yes` (borra los volúmenes declarados con `VolumeName=`).
+- La primera vez que se publica un subdominio, Traefik emite el certificado Let's Encrypt por HTTP-01 automáticamente; compruébalo con `curl -I https://<stack>.servidorlinux.es`.
+- Verificación visual: abre la URL en el navegador; el DNS comodín `*.servidorlinux.es` ya apunta al servidor.
+
 ### Funciones fish
 
 | Función | Descripción |
