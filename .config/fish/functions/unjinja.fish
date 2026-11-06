@@ -1,5 +1,5 @@
 function unjinja --description="Fill scripts"
-    # Herramientas en ~/.local/bin (sops, jinrender, yq). En shells NO
+    # Herramientas en ~/.local/bin (crypta, jinrender). En shells NO
     # interactivos (hook post_pull de yadm, `fish -c`) config.fish no se
     # ejecuta, asi que nos aseguramos aqui de tenerlas en el PATH.
     if test -d $HOME/.local/bin
@@ -14,19 +14,21 @@ function unjinja --description="Fill scripts"
         return 1
     end
 
-    # sops necesita la clave age. En shells NO interactivos no se ejecuta
-    # config.fish, asi que la fijamos aqui.
+    # crypta (que envuelve SOPS) necesita la clave age. En shells NO
+    # interactivos no se ejecuta config.fish, asi que la fijamos aqui.
     if not set -q SOPS_AGE_KEY_FILE
         set -gx SOPS_AGE_KEY_FILE $HOME/.secrets/sops/age/key.txt
     end
 
     # 1. Carga de secretos.
-    #    Expresion agnostica de la version de yq (v3 jq-based / v4 mikefarah):
-    #    no usamos ascii_upcase ni upcase; subimos a mayusculas con string upper.
-    sops -d $STORE | yq -r 'to_entries[] | select(.key != "sops") | [.key, (.value | tostring)] | @tsv' | while read -l -d \t key value
-        if test -n "$key"
-            echo "✅ Loading $key"
-            set -gx (string upper $key) $value
+    #    Un solo punto de verdad: crypta exporta el store entero como
+    #    KEY=VALUE (crypta envuelve SOPS; no invocamos sops/yq a mano).
+    #    Mayusculas con string upper de Fish.
+    crypta export -f env | while read -l line
+        set -l parts (string split -m1 '=' -- $line)
+        if test (count $parts) -eq 2 -a -n "$parts[1]"
+            echo "✅ Loading $parts[1]"
+            set -gx (string upper $parts[1]) $parts[2]
         end
     end
     echo "🚀 Secretos cargados"
@@ -51,7 +53,7 @@ function unjinja --description="Fill scripts"
     echo "📝 Templates configurados"
 
     # 3. Limpieza de variables (mayusculas via string upper de Fish)
-    set -l raw_keys (sops -d $STORE | yq -r 'keys[] | select(. != "sops")')
+    set -l raw_keys (crypta export -f env | string replace -r '=.*$' '')
     if test -n "$raw_keys"
         set -l keys (string upper $raw_keys)
         set -e $keys
