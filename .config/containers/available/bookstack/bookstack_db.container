@@ -25,8 +25,8 @@ Secret=bookstack_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD
 Secret=bookstack_mysql_password,type=env,target=MYSQL_PASSWORD
 
 # ==== Environment ====
-Environment=PUID=
-Environment=PGID=
+Environment=PUID=1000
+Environment=PGID=1000
 Environment=TZ=Europe/Madrid
 Environment=MYSQL_DATABASE=bookstackapp
 Environment=MYSQL_USER=bookstack

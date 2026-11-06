@@ -22,11 +22,10 @@ Volume=picoshare-picoshare.volume:/data:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=picoshare_ps_shared_secret,type=env,target=PS_SHARED_SECRET
 
 # ==== Environment ====
-Environment=PORT=
-Environment=PS_SHARED_SECRET=
+Environment=PORT=4001
 
 # ==== Labels ====
 Label=traefik.enable=true

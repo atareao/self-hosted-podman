@@ -21,11 +21,10 @@ Volume=postgres-pgadmin.volume:/var/lib/pgadmin:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=postgres_pgadmin_default_password,type=env,target=PGADMIN_DEFAULT_PASSWORD
 
 # ==== Environment ====
-Environment=PGADMIN_DEFAULT_EMAIL=
-Environment=PGADMIN_DEFAULT_PASSWORD=
+Environment=PGADMIN_DEFAULT_EMAIL=admin@admin.es
 
 # ==== Labels ====
 Label=traefik.enable=true

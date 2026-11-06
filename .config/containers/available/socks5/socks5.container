@@ -22,12 +22,11 @@ Volume=%h/.config/socks5/config.json:/etc/shadowsocks-rust/config.json:Z
 
 
 # ==== Secrets ====
-
+Secret=socks5_proxy_password,type=env,target=PROXY_PASSWORD
 
 # ==== Environment ====
-Environment=PROXY_USER=
-Environment=PROXY_PASSWORD=
-Environment=PROXY_PORT=
+Environment=PROXY_USER=someuser
+Environment=PROXY_PORT=8388
 
 # ==== Labels ====
 

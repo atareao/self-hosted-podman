@@ -22,12 +22,11 @@ Volume=atuin-data.volume:/var/lib/postgresql/data:Z
 Network=atuin.network
 
 # ==== Secrets ====
-
+Secret=atuin_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-Environment=POSTGRES_USER=
-Environment=POSTGRES_PASSWORD=
-Environment=POSTGRES_DB=
+Environment=POSTGRES_USER=atuin
+Environment=POSTGRES_DB=atuin
 
 # ==== Labels ====
 

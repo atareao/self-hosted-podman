@@ -29,11 +29,11 @@ Network=proxy.network
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.None.loadbalancer.server.port=9000
-Label=traefik.http.routers.None.rule=Host(`portainer.{{ env.FQDN }}`)
-Label=traefik.http.routers.None.entrypoints=websecure
-Label=traefik.http.routers.None.tls.certresolver=letsencrypt
-Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.portainer.loadbalancer.server.port=9000
+Label=traefik.http.routers.portainer.rule=Host(`portainer.{{ env.FQDN }}`)
+Label=traefik.http.routers.portainer.entrypoints=websecure
+Label=traefik.http.routers.portainer.tls.certresolver=letsencrypt
+Label=traefik.http.routers.portainer.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 

@@ -22,13 +22,12 @@ Network=grafana-influx-telegraf.network
 NetworkAlias=influxdb
 
 # ==== Secrets ====
-
+Secret=grafana_influx_telegraf_gf_security_admin_password,type=env,target=GF_SECURITY_ADMIN_PASSWORD
 
 # ==== Environment ====
-Environment=GF_INSTALL_PLUGINS=
-Environment=GF_SECURITY_ADMIN_USER=
-Environment=GF_SECURITY_ADMIN_PASSWORD=
-Environment=GF_USERS_ALLOW_SIGN_UP=
+Environment=GF_INSTALL_PLUGINS=grafana-clock-panel,briangann-gauge-panel,natel-plotly-panel,grafana-simple-json-datasource
+Environment=GF_SECURITY_ADMIN_USER=admin
+Environment=GF_USERS_ALLOW_SIGN_UP=FALSE
 
 # ==== Labels ====
 

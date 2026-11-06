@@ -21,13 +21,12 @@ PublishPort=8388:8889
 
 
 # ==== Secrets ====
-
+Secret=mtproxy_secret,type=env,target=SECRET
 
 # ==== Environment ====
-Environment=MTPROTO_REPO_URL=
-Environment=SECRET=
-Environment=WORKERS=
-Environment=TZ=
+Environment=MTPROTO_REPO_URL=https://github.com/TelegramMessenger/MTProxy
+Environment=WORKERS=1
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 

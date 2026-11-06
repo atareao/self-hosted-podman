@@ -25,9 +25,9 @@ Network=proxy.network
 Secret=atuin_db_uri,type=env,target=ATUIN_DB_URI
 
 # ==== Environment ====
-Environment=ATUIN_HOST=
-Environment=ATUIN_PORT=
-Environment=ATUIN_OPEN_REGISTRATION=
+Environment=ATUIN_HOST=0.0.0.0
+Environment=ATUIN_PORT=8888
+Environment=ATUIN_OPEN_REGISTRATION=true
 
 # ==== Labels ====
 Label=traefik.enable=true

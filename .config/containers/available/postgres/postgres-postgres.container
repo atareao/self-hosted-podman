@@ -22,12 +22,11 @@ Network=postgres.network
 NetworkAlias=postgres
 
 # ==== Secrets ====
-
+Secret=postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-Environment=POSTGRES_USER=
-Environment=POSTGRES_PASSWORD=
-Environment=POSTGRES_DB=
+Environment=POSTGRES_USER=root
+Environment=POSTGRES_DB=test_db
 
 # ==== Labels ====
 

@@ -21,13 +21,12 @@ Volume=zincsearch-data.volume:/data:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=zincsearch_zinc_first_admin_password,type=env,target=ZINC_FIRST_ADMIN_PASSWORD
+Secret=zincsearch_token,type=env,target=TOKEN
 
 # ==== Environment ====
-Environment=DATA_PATH=
-Environment=ZINC_FIRST_ADMIN_USER=
-Environment=ZINC_FIRST_ADMIN_PASSWORD=
-Environment=TOKEN=
+Environment=DATA_PATH=/data
+Environment=ZINC_FIRST_ADMIN_USER=atareao
 
 # ==== Labels ====
 Label=traefik.enable=true

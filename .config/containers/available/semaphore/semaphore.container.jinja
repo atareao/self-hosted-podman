@@ -23,14 +23,13 @@ Volume=semaphore-data.volume:/var/lib/semaphore:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=semaphore_admin_password,type=env,target=SEMAPHORE_ADMIN_PASSWORD
 
 # ==== Environment ====
-Environment=SEMAPHORE_DB_DIALECT=
-Environment=SEMAPHORE_ADMIN_PASSWORD=
-Environment=SEMAPHORE_ADMIN_NAME=
-Environment=SEMAPHORE_ADMIN_EMAIL=
-Environment=SEMAPHORE_ADMIN=
+Environment=SEMAPHORE_DB_DIALECT=bolt
+Environment=SEMAPHORE_ADMIN_NAME=admin
+Environment=SEMAPHORE_ADMIN_EMAIL=admin@localhost
+Environment=SEMAPHORE_ADMIN=admin
 
 # ==== Labels ====
 Label=traefik.enable=true

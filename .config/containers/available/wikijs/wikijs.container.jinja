@@ -21,18 +21,17 @@ PodmanArgs=--init
 Network=wikijs.network
 
 # ==== Secrets ====
-
+Secret=wikijs_postgres_password,type=env,target=POSTGRES_PASSWORD
+Secret=wikijs_db_pass,type=env,target=DB_PASS
 
 # ==== Environment ====
-Environment=POSTGRES_DB=
-Environment=POSTGRES_PASSWORD=
-Environment=POSTGRES_USER=
-Environment=DB_TYPE=
-Environment=DB_HOST=
-Environment=DB_PORT=
-Environment=DB_USER=
-Environment=DB_PASS=
-Environment=DB_NAME=
+Environment=POSTGRES_DB=wiki
+Environment=POSTGRES_USER=wikijs
+Environment=DB_TYPE=postgres
+Environment=DB_HOST=db
+Environment=DB_PORT=5432
+Environment=DB_USER=wikijs
+Environment=DB_NAME=wiki
 
 # ==== Labels ====
 Label=traefik.enable=true

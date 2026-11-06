@@ -37,11 +37,11 @@ Environment=CATALOG_ELEMENTS_LIMIT=1000
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.None.loadbalancer.server.port=80
-Label=traefik.http.routers.None.rule=Host(`tu.{{ env.FQDN }}`)
-Label=traefik.http.routers.None.entrypoints=websecure
-Label=traefik.http.routers.None.tls.certresolver=letsencrypt
-Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.registryui.loadbalancer.server.port=80
+Label=traefik.http.routers.registryui.rule=Host(`tu.{{ env.FQDN }}`)
+Label=traefik.http.routers.registryui.entrypoints=websecure
+Label=traefik.http.routers.registryui.tls.certresolver=letsencrypt
+Label=traefik.http.routers.registryui.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 

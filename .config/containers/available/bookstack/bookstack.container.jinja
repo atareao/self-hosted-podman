@@ -21,16 +21,15 @@ Volume=%h/.config/bookstack/config:/config:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=bookstack_db_pass,type=env,target=DB_PASS
 
 # ==== Environment ====
-Environment=PUID=
-Environment=PGID=
+Environment=PUID=1000
+Environment=PGID=1000
 Environment=APP_URL="https://bookstack.{{ env.FQDN }}"
 Environment=DB_HOST=bookstack_db
-Environment=DB_USER=
-Environment=DB_PASS=
-Environment=DB_DATABASE=
+Environment=DB_USER=bookstack
+Environment=DB_DATABASE=bookstackapp
 
 # ==== Labels ====
 Label=traefik.enable=true

@@ -1,12 +1,11 @@
 [Unit]
-Description=recorder
+Description=miniflux_db
 After=network-online.target
 
 [Container]
 # ==== Image ====
-Image=docker.io/kaffetorsk/mumble-recorder
-AutoUpdate=registry
-ContainerName=recorder
+Image=docker.io/library/postgres:18-alpine
+ContainerName=miniflux_db
 PodmanArgs=--init
 
 # ==== Command ====
@@ -16,24 +15,24 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-
+Volume=miniflux-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
-Network=mumble.network
+Network=miniflux.network
 
 # ==== Secrets ====
-
+Secret=miniflux_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-Environment=SERVER="{{ env.SERVER_IP }}"
-Environment=PASSWORD=
-Environment=FFMPEG_OUT="-c:v copy -c:a copy -f flv rtmp://127.0.0.1:1935/live/{name}"
+Environment=POSTGRES_USER="{{ env.POSTGRES_USER }}"
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
-
+HealthCmd=pg_isready -U miniflux || exit 1
+HealthInterval=30s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
 

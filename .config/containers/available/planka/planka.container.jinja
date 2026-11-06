@@ -24,13 +24,12 @@ Volume=planka-attachments.volume:/app/private/attachments:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=planka_secret_key,type=env,target=SECRET_KEY
 
 # ==== Environment ====
-Environment=BASE_URL=
-Environment=TRUST_PROXY=
-Environment=DATABASE_URL=
-Environment=SECRET_KEY=
+Environment=BASE_URL="http://planka.{{ env.FQDN }}"
+Environment=TRUST_PROXY=0
+Environment=DATABASE_URL=postgresql://postgres@postgres/planka
 
 # ==== Labels ====
 Label=traefik.enable=true

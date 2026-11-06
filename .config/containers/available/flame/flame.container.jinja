@@ -23,10 +23,10 @@ Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=flame_password,type=env,target=PASSWORD
 
 # ==== Environment ====
-Environment=PASSWORD=
+
 
 # ==== Labels ====
 Label=traefik.enable=true

@@ -28,11 +28,11 @@ Network=proxy.network
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.None.loadbalancer.server.port=3001
-Label=traefik.http.routers.None.rule=Host(`uptime.{{ env.FQDN }}`)
-Label=traefik.http.routers.None.entrypoints=websecure
-Label=traefik.http.routers.None.tls.certresolver=letsencrypt
-Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.uptime_kuma.loadbalancer.server.port=3001
+Label=traefik.http.routers.uptime_kuma.rule=Host(`uptime.{{ env.FQDN }}`)
+Label=traefik.http.routers.uptime_kuma.entrypoints=websecure
+Label=traefik.http.routers.uptime_kuma.tls.certresolver=letsencrypt
+Label=traefik.http.routers.uptime_kuma.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 

@@ -1,12 +1,12 @@
 [Unit]
-Description=miniflux_db
+Description=hedgedoc_mariadb
 After=network-online.target
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/postgres:18-alpine
-ContainerName=miniflux_db
-PodmanArgs=--init
+Image=lscr.io/linuxserver/mariadb:latest
+AutoUpdate=registry
+ContainerName=hedgedoc_mariadb
 
 # ==== Command ====
 
@@ -15,25 +15,27 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=miniflux-data.volume:/var/lib/postgresql/data:Z
+Volume=hedgedoc-data.volume:/config:Z
 
 # ==== Networks ====
-Network=miniflux.network
+Network=hedgedoc.network
 
 # ==== Secrets ====
-
+Secret=hedgedoc_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD
+Secret=hedgedoc_mysql_password,type=env,target=MYSQL_PASSWORD
 
 # ==== Environment ====
-Environment=POSTGRES_USER=
-Environment=POSTGRES_PASSWORD=
+Environment=MYSQL_DATABASE=hedgedoc
+Environment=MYSQL_USER=hedgedoc
+Environment=PGID=1000
+Environment=PUID=1000
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
-HealthCmd=pg_isready -U miniflux || exit 1
-HealthInterval=30s
-HealthStartPeriod=30s
+
 
 # ==== Hardening ====
 

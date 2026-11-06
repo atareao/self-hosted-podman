@@ -22,13 +22,12 @@ Volume=flatnotes-data.volume:/app/data:Z
 Network=proxy.network
 
 # ==== Secrets ====
-
+Secret=flatnotes_password,type=env,target=FLATNOTES_PASSWORD
+Secret=flatnotes_secret_key,type=env,target=FLATNOTES_SECRET_KEY
 
 # ==== Environment ====
-Environment=FLATNOTES_AUTH_TYPE=
-Environment=FLATNOTES_USERNAME=
-Environment=FLATNOTES_PASSWORD=
-Environment=FLATNOTES_SECRET_KEY=
+Environment=FLATNOTES_AUTH_TYPE=password
+Environment=FLATNOTES_USERNAME=user
 
 # ==== Labels ====
 Label=traefik.enable=true

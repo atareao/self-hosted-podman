@@ -24,8 +24,8 @@ Network=planka.network
 
 
 # ==== Environment ====
-Environment=POSTGRES_DB=
-Environment=POSTGRES_HOST_AUTH_METHOD=
+Environment=POSTGRES_DB=planka
+Environment=POSTGRES_HOST_AUTH_METHOD=trust
 
 # ==== Labels ====
 
