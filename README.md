@@ -294,6 +294,8 @@ echo "tu-client-secret" | crypta store oidc_client_secret
 unjinja && scupdate traefik
 ```
 
+> Aquí `crypta store` **sí es lo correcto**: estos valores los consume `unjinja` desde `secrets.yml` para renderizar una plantilla `.jinja`, no un `Secret=` de Podman.
+
 ---
 
 ## 🧩 Gestión de stacks
@@ -366,7 +368,7 @@ Notas:
 1. Crea `.config/containers/available/<stack>/` con sus quadlets (`<stack>.container`, `<stack>-<rol>.container`, `.volume`, `.network`).
 2. Respeta el **esqueleto canónico** de quadlets (secciones en orden, ver `AGENTS.md`).
 3. Config no secreta → `.config/<stack>/<stack>.env` (versionado) + `EnvironmentFile=%h/...`.
-4. Credenciales → `crypta store <nombre>` y `Secret=<nombre>,type=env,target=<VAR>`.
+4. Credenciales → **`podman secret create <nombre> -`** (a fuego: nunca `crypta store`) y `Secret=<nombre>,type=env,target=<VAR>`.
 5. Labels de Traefik con `Host(` <stack>.${FQDN} `)`.
 6. **`qcheck`** (0 colisiones) y valida con el generador real (ver *Verificación*).
 7. `qenable <stack>` (o `cd <stack> && qctl install`).
@@ -379,10 +381,14 @@ Notas:
 ### Crear un secreto
 
 ```bash
-openssl rand -base64 32 | crypta store mi_password     # o:  genpass 32 | crypta store mi_password
+openssl rand -base64 32 | podman secret create mi_password -     # o:  genpass 32 | podman secret create mi_password -
 ```
 
-Un nombre de `Secret=` **debe existir** (vía `crypta store`) **antes** de arrancar la unidad, o el contenedor no inicia.
+> ⚠️ **A FUEGO — `podman secret create`, NUNCA `crypta store`.** Los secretos de Podman se resuelven por el **ID** del secreto (driver `shell` → `crypta`): `podman secret create` hace que Podman genere el ID y le entregue el valor a `crypta`; `crypta store <nombre>` escribe una clave huérfana bajo el nombre literal que Podman jamás encontrará (`no secret with name or id`).
+>
+> La **única excepción** es `crypta store`, usado para las **dos plantillas `.jinja`** que renderiza `unjinja` (p. ej. `dashboard-auth.yml.jinja`), porque `unjinja` lee `secrets.yml` directamente.
+
+Un nombre de `Secret=` **debe existir** (vía `podman secret create`) **antes** de arrancar la unidad, o el contenedor no inicia.
 
 ### Config no secreta
 

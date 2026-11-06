@@ -36,8 +36,8 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 - `unjinja`/`yadmalt` read `$HOME/.secrets/secrets.yml` (SOPS + age, key at `~/.secrets/sops/age/key.txt`), export each key as an UPPERCASE env var, render, then unset them. `secrets.yml` es **solo para secretos** (y para las dos plantillas `.jinja` restantes); la config no secreta de cada stack vive en su `.env` de stack (ver primer bullet). The host domain is **not** here.
 - **Host domain (FQDN) is NOT a secret and does NOT live in SOPS.** It lives in `~/.config/environment.d/fqdn.conf` (plain text, `FQDN=<your-domain>`), which systemd injects into every user unit (verified). In quadlets write `${FQDN}` — systemd expands it in the generated `ExecStart`, including Traefik `Host(...)` labels. Files consumed at **runtime by an app** (not by systemd), e.g. `traefik/dynamic/dashboard-auth.yml.jinja`, cannot use `${FQDN}`; for those `unjinja` exports `FQDN` from `fqdn.conf` so `{{ env.FQDN }}` resolves host-specifically. `unjinja` also sets `SOPS_AGE_KEY_FILE` itself so it works from non-interactive shells (the `post_pull` hook).
 - Deploy of the domain: the real `fqdn.conf` is **gitignored** (host-specific); `fqdn.conf.example` is versioned. After `cp fqdn.conf.example fqdn.conf` and editing it: `systemctl --user daemon-reexec` then `systemctl --user restart <stack>` (running units keep the old value until restarted).
-- **Credentials go through Podman secrets, not `{{ env.* }}`**: use `Secret=<name>,type=env,target=<VAR>` sourced from `crypta` (e.g. `openssl rand -base64 32 | crypta store umamidb_password`; the `crypta` shell driver is configured in `containers.conf`). A value that must be composed (e.g. a full `DATABASE_URL`) is stored whole as one secret and injected with `type=env,target=DATABASE_URL`.
-- Any `Secret=` name in a quadlet must exist via `crypta store` before the unit starts.
+- **Credentials go through Podman secrets, not `{{ env.* }}`**: use `Secret=<name>,type=env,target=<VAR>`. **⚠️ A FUEGO — el secreto se crea con `podman secret create`, NUNCA con `crypta store`** (p. ej. `openssl rand -base64 32 | podman secret create umamidb_password -`). Motivo: el driver `shell` de Podman resuelve los secretos por el **ID** del secreto, así que `podman secret create` hace que Podman genere el ID y le entregue el valor a `crypta`; `crypta store <name>` escribe una clave huérfana bajo el nombre literal que Podman nunca encuentra (`no secret with name or id`). El driver `crypta` está configurado en `containers.conf`. Un valor que deba componerse (p. ej. un `DATABASE_URL` completo) se guarda entero como un secreto y se inyecta con `type=env,target=DATABASE_URL`. **Única excepción**: `crypta store` SÍ se usa para las dos plantillas `.jinja` que renderiza `unjinja` (que lee `secrets.yml` directamente).
+- Any `Secret=` name in a quadlet must be **created with `podman secret create`** before the unit starts (a fuego: never `crypta store`).
 
 ### Naming de units
 
@@ -149,7 +149,7 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
 - **Domain**: `${FQDN}` for the main service; `<stack>.${FQDN}` for subdomains (as openobserve/nginx/pocketid). Drop the origin's per-stack `FQDN` from `sample.env`.
 - **HTTP ports**: compose `ports:` for HTTP services behind traefik disappear (traefik reaches the container port via the service label). Only publish ports that must be reachable directly (e.g. gitea SSH).
 - **Drop**: `version:`, `x-dockge`, `depends_on` (replaced by `After=`/`Requires=`), `restart: unless-stopped` → `Restart=always`/`on-failure`.
-- **crypta**: any `Secret=` name must be created with `crypta store <name>` before the unit starts; list them per stack.
+- **Podman secrets**: any `Secret=` name must be created with **`podman secret create <name> -`** before the unit starts (a fuego: NEVER `crypta store`, Podman cannot resolve it); list them per stack.
 
 ## Other gotchas
 
