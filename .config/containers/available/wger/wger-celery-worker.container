@@ -1,0 +1,55 @@
+[Unit]
+Description=wger-celery-worker
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/wger/server:latest
+AutoUpdate=registry
+ContainerName=wger-celery-worker
+PodmanArgs=--init
+
+# ==== Command ====
+Exec=/start-worker
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=wger-media.volume:/home/wger/media:Z
+
+# ==== Networks ====
+Network=wger.network
+NetworkAlias=celery_worker
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+HealthCmd=celery -A wger inspect ping || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

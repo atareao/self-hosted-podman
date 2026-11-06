@@ -1,0 +1,52 @@
+[Unit]
+Description=odoo-postgresql
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:15
+ContainerName=odoo-postgresql
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=odoo-db.volume:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=odoo.network
+NetworkAlias=db
+
+# ==== Secrets ====
+Secret=odoo_postgres_password,type=env,target=POSTGRES_PASSWORD
+
+# ==== Environment ====
+Environment=POSTGRES_USER=$POSTGRES_USER
+Environment=POSTGRES_DB=postgres
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

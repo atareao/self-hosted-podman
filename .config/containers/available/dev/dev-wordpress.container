@@ -1,0 +1,59 @@
+[Unit]
+Description=dev-wordpress
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/wordpress
+AutoUpdate=registry
+ContainerName=dev-wordpress
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=dev-dev_wordpress.volume:/var/www/html:Z
+Volume=%h/.config/dev/plugins:/var/www/html/wp-content/plugins:Z
+Volume=%h/.config/dev/themes:/var/www/html/wp-content/themes:Z
+Volume=%h/.config/dev/uploads:/var/www/html/wp-content/uploads:Z
+Volume=%h/.config/dev/wp-config.php:/var/www/html/wp-config.php:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=dev.network
+NetworkAlias=wordpress
+
+# ==== Secrets ====
+Secret=dev_wordpress_db_password,type=env,target=WORDPRESS_DB_PASSWORD
+
+# ==== Environment ====
+Environment=WORDPRESS_DB_HOST=mariadb
+Environment=WORDPRESS_DB_USER=dev
+Environment=WORDPRESS_DB_NAME=dev
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

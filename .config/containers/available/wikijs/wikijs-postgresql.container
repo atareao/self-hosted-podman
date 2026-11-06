@@ -1,0 +1,58 @@
+[Unit]
+Description=wikijs-postgresql
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:14-alpine
+ContainerName=wikijs-postgresql
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/wikijs/data:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=wikijs.network
+NetworkAlias=postgres
+
+# ==== Secrets ====
+Secret=wikijs_postgres_password,type=env,target=POSTGRES_PASSWORD
+Secret=wikijs_db_pass,type=env,target=DB_PASS
+
+# ==== Environment ====
+Environment=POSTGRES_DB=wiki
+Environment=POSTGRES_USER=wikijs
+Environment=DB_TYPE=postgres
+Environment=DB_HOST=db
+Environment=DB_PORT=5432
+Environment=DB_USER=wikijs
+Environment=DB_NAME=wiki
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

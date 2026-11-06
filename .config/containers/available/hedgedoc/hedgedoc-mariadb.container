@@ -1,0 +1,56 @@
+[Unit]
+Description=hedgedoc-mariadb
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=lscr.io/linuxserver/mariadb:latest
+AutoUpdate=registry
+ContainerName=hedgedoc-mariadb
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=hedgedoc-data.volume:/config:Z
+
+# ==== Networks ====
+Network=hedgedoc.network
+NetworkAlias=mariadb
+
+# ==== Secrets ====
+Secret=hedgedoc_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD
+Secret=hedgedoc_mysql_password,type=env,target=MYSQL_PASSWORD
+
+# ==== Environment ====
+Environment=MYSQL_DATABASE=hedgedoc
+Environment=MYSQL_USER=hedgedoc
+Environment=PGID=1000
+Environment=PUID=1000
+Environment=TZ=Europe/Madrid
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,52 @@
+[Unit]
+Description=planka-postgresql
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:14-alpine
+ContainerName=planka-postgresql
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=planka-db-data.volume:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=planka.network
+NetworkAlias=postgres
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=POSTGRES_DB=planka
+Environment=POSTGRES_HOST_AUTH_METHOD=trust
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

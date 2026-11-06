@@ -1,0 +1,51 @@
+[Unit]
+Description=focalboard-postgresql
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:latest
+AutoUpdate=registry
+ContainerName=focalboard-postgresql
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=focalboard-focalboarddb.volume:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=focalboard.network
+NetworkAlias=focalboarddb
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

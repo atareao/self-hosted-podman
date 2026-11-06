@@ -1,0 +1,55 @@
+[Unit]
+Description=wger-postgresql
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:15-alpine
+ContainerName=wger-postgresql
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=wger-postgres-data.volume:/var/lib/postgresql/data/:Z
+
+# ==== Networks ====
+Network=wger.network
+NetworkAlias=db
+
+# ==== Secrets ====
+Secret=wger_postgres_password,type=env,target=POSTGRES_PASSWORD
+
+# ==== Environment ====
+Environment=POSTGRES_USER=wger
+Environment=POSTGRES_DB=wger
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+HealthCmd=pg_isready -U wger || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
