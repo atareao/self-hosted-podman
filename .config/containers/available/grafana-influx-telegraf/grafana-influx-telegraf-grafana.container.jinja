@@ -1,0 +1,58 @@
+[Unit]
+Description=grafana
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/grafana/grafana:latest
+AutoUpdate=registry
+ContainerName=grafana-influx-telegraf-grafana
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=grafana-influx-telegraf-data_grafana.volume:/var/lib/grafana:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=grafana
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=INFLUXDB_DATA_ENGINE=
+Environment=INFLUXDB_REPORTING_DISABLED=
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.grafana.loadbalancer.server.port=3000
+Label=traefik.http.routers.grafana.rule=Host(`grafana.{{ env.FQDN }}`)
+Label=traefik.http.routers.grafana.entrypoints=websecure
+Label=traefik.http.routers.grafana.tls.certresolver=letsencrypt
+Label=traefik.http.routers.grafana.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+User=0
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

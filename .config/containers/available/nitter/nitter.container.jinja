@@ -1,0 +1,58 @@
+[Unit]
+Description=nitter
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/zedeus/nitter:latest
+AutoUpdate=registry
+ContainerName=nitter
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/nitter/nitter.conf:/src/nitter.conf:ro
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.nitter.loadbalancer.server.port=8080
+Label=traefik.http.routers.nitter.rule=Host(`nitter.{{ env.FQDN }}`)
+Label=traefik.http.routers.nitter.entrypoints=websecure
+Label=traefik.http.routers.nitter.tls.certresolver=letsencrypt
+Label=traefik.http.routers.nitter.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=wget -nv --tries=1 --spider http://127.0.0.1:8080/Jack/status/20 || exit 1 || exit 1
+HealthInterval=30s
+HealthRetries=2
+HealthTimeout=5s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

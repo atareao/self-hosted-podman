@@ -1,0 +1,51 @@
+[Unit]
+Description=wakapi_db
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:17
+ContainerName=wakapi_db
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=wakapi-pg_data.volume:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=wakapi.network
+
+# ==== Secrets ====
+Secret=wakapi_postgres_password,type=env,target=POSTGRES_PASSWORD
+
+# ==== Environment ====
+Environment=POSTGRES_DB="{{ env.DB_NAME }}"
+Environment=POSTGRES_USER="{{ env.DB_USER }}"
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

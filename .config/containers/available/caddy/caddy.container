@@ -1,0 +1,53 @@
+[Unit]
+Description=caddy
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/lucaslorentz/caddy-docker-proxy:latest
+AutoUpdate=registry
+ContainerName=caddy
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+PublishPort=80:80
+PublishPort=443:443
+
+# ==== Volumes ====
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=caddy-caddy_data.volume:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=CADDY_INGRESS_NETWORKS=proxy
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

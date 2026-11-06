@@ -1,0 +1,55 @@
+[Unit]
+Description=radicale
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/radicale:v1.0
+ContainerName=radicale
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/radicale/.htpasswd-users:/app/.htpasswd-users:Z
+Volume=%h/.config/radicale/data:/app/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.expulsabot.loadbalancer.server.port=5232
+Label=traefik.http.routers.expulsabot.rule=Host(`radicale.{{ env.FQDN }}`)
+Label=traefik.http.routers.expulsabot.entrypoints=websecure
+Label=traefik.http.routers.expulsabot.tls.certresolver=letsencrypt
+Label=traefik.http.routers.expulsabot.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

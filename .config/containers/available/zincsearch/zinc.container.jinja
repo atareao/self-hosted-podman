@@ -1,0 +1,58 @@
+[Unit]
+Description=zinc
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=public.ecr.aws/h9e2j3o7/zinc:latest
+AutoUpdate=registry
+ContainerName=zinc
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=zincsearch-data.volume:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=DATA_PATH=
+Environment=ZINC_FIRST_ADMIN_USER=
+Environment=ZINC_FIRST_ADMIN_PASSWORD=
+Environment=TOKEN=
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.zinc.loadbalancer.server.port=4080
+Label=traefik.http.routers.zinc.rule=Host(`zinc.{{ env.FQDN }}`)
+Label=traefik.http.routers.zinc.entrypoints=websecure
+Label=traefik.http.routers.zinc.tls.certresolver=letsencrypt
+Label=traefik.http.routers.zinc.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

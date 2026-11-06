@@ -1,0 +1,63 @@
+[Unit]
+Description=wikijs
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/requarks/wiki:2
+ContainerName=wikijs
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=wikijs.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=POSTGRES_DB=
+Environment=POSTGRES_PASSWORD=
+Environment=POSTGRES_USER=
+Environment=DB_TYPE=
+Environment=DB_HOST=
+Environment=DB_PORT=
+Environment=DB_USER=
+Environment=DB_PASS=
+Environment=DB_NAME=
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.wikijs.loadbalancer.server.port=80
+Label=traefik.http.routers.wikijs.rule=Host(`wikijs.{{ env.FQDN }}`)
+Label=traefik.http.routers.wikijs.entrypoints=websecure
+Label=traefik.http.routers.wikijs.tls.certresolver=letsencrypt
+Label=traefik.http.routers.wikijs.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

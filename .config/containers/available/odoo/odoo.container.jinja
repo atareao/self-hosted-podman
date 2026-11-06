@@ -1,0 +1,60 @@
+[Unit]
+Description=odoo
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/odoo
+AutoUpdate=registry
+ContainerName=odoo
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=odoo-odoo.volume:/var/lib/odoo:Z
+Volume=%h/.config/odoo/odoo.conf:/etc/odoo/odoo.conf:Z
+Volume=%h/.config/odoo/addons:/mnt/extra-addons:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=odoo.network
+
+# ==== Secrets ====
+Secret=odoo_password,type=env,target=PASSWORD
+
+# ==== Environment ====
+Environment=HOST=db
+Environment=USER=$POSTGRES_USER
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.odoo.loadbalancer.server.port=8069
+Label=traefik.http.routers.odoo.rule=Host(`odoo.{{ env.FQDN }}`)
+Label=traefik.http.routers.odoo.entrypoints=websecure
+Label=traefik.http.routers.odoo.tls.certresolver=letsencrypt
+Label=traefik.http.routers.odoo.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

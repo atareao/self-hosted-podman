@@ -1,0 +1,54 @@
+[Unit]
+Description=telegraf
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/telegraf:latest
+AutoUpdate=registry
+ContainerName=grafana-influx-telegraf-telegraf
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/grafana-influx-telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=/usr/lib/sysstat:/usr/lib/sysstat
+
+# ==== Networks ====
+Network=grafana-influx-telegraf.network
+NetworkAlias=telegraf
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,62 @@
+[Unit]
+Description=wakapi
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/muety/wakapi:latest
+AutoUpdate=registry
+ContainerName=wakapi
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=wakapi-wakapi.volume:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=wakapi.network
+
+# ==== Secrets ====
+Secret=wakapi_db_password,type=env,target=WAKAPI_DB_PASSWORD
+
+# ==== Environment ====
+Environment=WAKAPI_DB_TYPE=postgres
+Environment=WAKAPI_DB_NAME="{{ env.DB_NAME }}"
+Environment=WAKAPI_DB_USER="{{ env.DB_USER }}"
+Environment=WAKAPI_DB_HOST=db
+Environment=WAKAPI_DB_PORT=5432
+Environment=WAKAPI_ALLOW_SIGNUP=False
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.wakapi.loadbalancer.server.port=3000
+Label=traefik.http.routers.wakapi.rule=Host(`wakapi.{{ env.FQDN }}`)
+Label=traefik.http.routers.wakapi.entrypoints=websecure
+Label=traefik.http.routers.wakapi.tls.certresolver=letsencrypt
+Label=traefik.http.routers.wakapi.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

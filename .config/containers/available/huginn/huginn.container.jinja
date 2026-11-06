@@ -1,0 +1,57 @@
+[Unit]
+Description=huginn
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/huginn/huginn-single-process
+AutoUpdate=registry
+ContainerName=huginn
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=huginn_database_password,type=env,target=DATABASE_PASSWORD
+
+# ==== Environment ====
+Environment=DATABASE_NAME=huginn
+Environment=DATABASE_USERNAME=huginn
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.huginn.loadbalancer.server.port=3000
+Label=traefik.http.routers.huginn.rule=Host(`huginn.{{ env.FQDN }}`)
+Label=traefik.http.routers.huginn.entrypoints=websecure
+Label=traefik.http.routers.huginn.tls.certresolver=letsencrypt
+Label=traefik.http.routers.huginn.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

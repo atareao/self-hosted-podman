@@ -1,0 +1,56 @@
+[Unit]
+Description=logseq
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/logseq/logseq-webapp:latest
+AutoUpdate=registry
+ContainerName=logseq
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.logseq.loadbalancer.server.port=80
+Label=traefik.http.routers.logseq.rule=Host(`logseq.{{ env.FQDN }}`)
+Label=traefik.http.routers.logseq.entrypoints=websecure
+Label=traefik.http.routers.logseq.tls.certresolver=letsencrypt
+Label=traefik.http.routers.logseq.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

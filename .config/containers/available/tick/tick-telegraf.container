@@ -1,0 +1,57 @@
+[Unit]
+Description=telegraf
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/telegraf:latest
+AutoUpdate=registry
+ContainerName=tick-telegraf
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/tick/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+Volume=/sys:/host/sys:ro
+Volume=/proc:/host/proc:ro
+Volume=/etc:/host/etc:ro
+
+# ==== Networks ====
+Network=tick.network
+NetworkAlias=telegraf
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=HOST_PROC=/host/proc
+Environment=HOST_SYS=/host/sys
+Environment=HOST_ETC=/host/etc
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

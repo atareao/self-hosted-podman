@@ -1,0 +1,57 @@
+[Unit]
+Description=focalboard
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/mattermost/focalboard
+AutoUpdate=registry
+ContainerName=focalboard
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/focalboard/config.json:/opt/focalboard/config.json:Z
+Volume=focalboard-focalboard.volume:/opt/focalboard/files:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=focalboard.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.focalboard.loadbalancer.server.port=8000
+Label=traefik.http.routers.focalboard.rule=Host(`focalboard.{{ env.FQDN }}`)
+Label=traefik.http.routers.focalboard.entrypoints=websecure
+Label=traefik.http.routers.focalboard.tls.certresolver=letsencrypt
+Label=traefik.http.routers.focalboard.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

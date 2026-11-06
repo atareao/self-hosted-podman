@@ -1,0 +1,54 @@
+[Unit]
+Description=codimd
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/hackmdio/hackmd:2.4.2-cjk
+ContainerName=codimd
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/codimd/codimd:/home/hackmd/app/public/uploads:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.codimd.loadbalancer.server.port=3000
+Label=traefik.http.routers.codimd.rule=Host(`codimd.{{ env.FQDN }}`)
+Label=traefik.http.routers.codimd.entrypoints=websecure
+Label=traefik.http.routers.codimd.tls.certresolver=letsencrypt
+Label=traefik.http.routers.codimd.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

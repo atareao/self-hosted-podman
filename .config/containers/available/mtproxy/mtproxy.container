@@ -1,0 +1,53 @@
+[Unit]
+Description=mtproxy
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/dofamin/mtproxy-docker:main
+ContainerName=mtproxy
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+PublishPort=8388:8889
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=MTPROTO_REPO_URL=
+Environment=SECRET=
+Environment=WORKERS=
+Environment=TZ=
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

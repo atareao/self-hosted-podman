@@ -1,0 +1,92 @@
+[Unit]
+Description=microbin
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/danielszabo99/microbin:latest
+AutoUpdate=registry
+ContainerName=microbin
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=microbin-microbin.volume:/app/data:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=microbin_basic_auth_password,type=env,target=MICROBIN_BASIC_AUTH_PASSWORD
+Secret=microbin_admin_password,type=env,target=MICROBIN_ADMIN_PASSWORD
+
+# ==== Environment ====
+Environment=MICROBIN_BASIC_AUTH_USERNAME="{{ env.MICROBIN_BASIC_AUTH_USERNAME }}"
+Environment=MICROBIN_ADMIN_USERNAME="{{ env.USERNAME }}"
+Environment=MICROBIN_EDITABLE=true
+Environment=MICROBIN_FOOTER_TEXT="{{ env.MICROBIN_FOOTER_TEXT }}"
+Environment=MICROBIN_HIDE_FOOTER=false
+Environment=MICROBIN_HIDE_HEADER=false
+Environment=MICROBIN_HIDE_LOGO=false
+Environment=MICROBIN_NO_LISTING=false
+Environment=MICROBIN_HIGHLIGHTSYNTAX=true
+Environment=MICROBIN_BIND=0.0.0.0
+Environment=MICROBIN_PRIVATE=true
+Environment=MICROBIN_PURE_HTML=false
+Environment=MICROBIN_DATA_DIR=microbin_data
+Environment=MICROBIN_JSON_DB=false
+Environment=MICROBIN_PUBLIC_PATH="https://microbin.{{ env.FQDN }}/"
+Environment=MICROBIN_SHORT_PATH="{{ env.MICROBIN_SHORT_PATH }}"
+Environment=MICROBIN_READONLY=true
+Environment=MICROBIN_SHOW_READ_STATS=true
+Environment=MICROBIN_TITLE=PasteBin
+Environment=MICROBIN_THREADS=1
+Environment=MICROBIN_GC_DAYS=90
+Environment=MICROBIN_ENABLE_BURN_AFTER=true
+Environment=MICROBIN_DEFAULT_BURN_AFTER=0
+Environment=MICROBIN_WIDE=false
+Environment=MICROBIN_QR=true
+Environment=MICROBIN_ETERNAL_PASTA=true
+Environment=MICROBIN_ENABLE_READONLY=true
+Environment=MICROBIN_DEFAULT_EXPIRY=never
+Environment=MICROBIN_NO_FILE_UPLOAD=false
+Environment=MICROBIN_CUSTOM_CSS="{{ env.MICROBIN_CUSTOM_CSS }}"
+Environment=MICROBIN_HASH_IDS=false
+Environment=MICROBIN_ENCRYPTION_CLIENT_SIDE=true
+Environment=MICROBIN_ENCRYPTION_SERVER_SIDE=true
+Environment=MICROBIN_MAX_FILE_SIZE_ENCRYPTED_MB=256
+Environment=MICROBIN_MAX_FILE_SIZE_UNENCRYPTED_MB=2048
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.microbin.loadbalancer.server.port=8080
+Label=traefik.http.routers.microbin.rule=Host(`microbin.{{ env.FQDN }}`)
+Label=traefik.http.routers.microbin.entrypoints=websecure
+Label=traefik.http.routers.microbin.tls.certresolver=letsencrypt
+Label=traefik.http.routers.microbin.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

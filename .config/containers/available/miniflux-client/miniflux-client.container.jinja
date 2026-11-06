@@ -1,0 +1,66 @@
+[Unit]
+Description=miniflux-client
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/miniflux-client:latest
+AutoUpdate=registry
+ContainerName=miniflux-client
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+Secret=miniflux_client_matrix_token,type=env,target=MATRIX_TOKEN
+Secret=miniflux_client_miniflux_token,type=env,target=MINIFLUX_TOKEN
+Secret=miniflux_client_model_api_key,type=env,target=MODEL_API_KEY
+Secret=miniflux_client_telegram_token,type=env,target=TELEGRAM_TOKEN
+
+# ==== Environment ====
+Environment=MATRIX_ROOM="{{ env.MATRIX_ROOM }}"
+Environment=MATRIX_URL="matrix.{{ env.FQDN }}"
+Environment=MAX_ENTRIES="{{ env.MAX_ENTRIES }}"
+Environment=MINIFLUX_CATEGORIES=Linux
+Environment=MINIFLUX_URL="miniflux.{{ env.FQDN }}"
+Environment=MODEL_NAME=gpt-4.1-nano
+Environment=MODEL_URL=https://api.openai.com
+Environment=SLEEP_TIME="{{ env.SLEEP_TIME }}"
+Environment=TELEGRAM_CHAT_ID="{{ env.TELEGRAM_CHAT_ID }}"
+Environment=TELEGRAM_THREAD_ID="{{ env.TELEGRAM_THREAD_ID }}"
+Environment=RUST_LOG=DEBUG
+Environment=MODEL_DESCRIPTION="Eres un asistente especializado en noticias internacionales"
+Environment=MODEL_PROMPT="Analiza todas las noticias proporcionadas y genera un JSON de la siguiente forma: `{\"news\": [{\"url\": \"<url>\", \"title\": \"<title>\", \"summary\": \"<summary>\"}]}`, reemplazando `<url>`, `<title>` y `<summary>` por la url, el título traducido al español y un resumen explicando la noticia en español. Tiene que ir todo en una única línea. No indiques que me devuelves un JSON, simplemente devuelve el JSON como te indiqué."
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

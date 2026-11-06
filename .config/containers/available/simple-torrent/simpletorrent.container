@@ -1,0 +1,54 @@
+[Unit]
+Description=simpletorrent
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/boypt/cloud-torrent
+AutoUpdate=registry
+ContainerName=simpletorrent
+PodmanArgs=--init
+
+# ==== Command ====
+Exec=-c /etc/cloud-torrent.yaml
+
+# ==== Ports ====
+PublishPort=50012:50012
+PublishPort=50012:50012/udp
+
+# ==== Volumes ====
+Volume=%h/.config/simple-torrent/downloads:/srv/downloads:Z
+Volume=%h/.config/simple-torrent/cloud-torrent.yaml:/etc/cloud-torrent.yaml:Z
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=AUTH=username:password
+Environment=TITLE=MySimpleTorrent
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

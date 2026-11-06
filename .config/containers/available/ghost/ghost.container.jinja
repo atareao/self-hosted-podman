@@ -1,0 +1,54 @@
+[Unit]
+Description=ghost
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/ghost:4-alpine
+ContainerName=ghost
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/ghost/blog:/var/lig/ghost/content:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=url="ghost.{{ env.FQDN }}"
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.ghost.loadbalancer.server.port=2368
+Label=traefik.http.routers.ghost.rule=Host(`ghost.{{ env.FQDN }}`)
+Label=traefik.http.routers.ghost.entrypoints=websecure
+Label=traefik.http.routers.ghost.tls.certresolver=letsencrypt
+Label=traefik.http.routers.ghost.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

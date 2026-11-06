@@ -1,0 +1,66 @@
+[Unit]
+Description=mumble
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/mumblevoip/mumble-server
+AutoUpdate=registry
+ContainerName=mumble
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=mumble-certs.volume:/certs:Z
+Volume=mumble-data.volume:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+Network=mumble.network
+
+# ==== Secrets ====
+Secret=mumble_superuser_password,type=env,target=MUMBLE_SUPERUSER_PASSWORD
+
+# ==== Environment ====
+Environment=MUMBLE_VERBOSE=True
+Environment=MUMBLE_CONFIG_WELCOME_TEXT=Bienvenido
+Environment=MUMBLE_CONFIG_OPUSTHRESHOLD=0
+Environment=MUMBLE_CONFIG_MESSAGEBURST=1
+Environment=MUMBLE_CONFIG_MESSAGELIMIT=1
+Environment=MUMBLE_CONFIG_USERS=10
+Environment=MUMBLE_CONFIG_BANDWIDTH=512000
+Environment=MUMBLE_CONFIG_SSLCERT="/certs/mumble.{{ env.FQDN }}/cert.pem"
+Environment=MUMBLE_CONFIG_SSLKEY="/certs/mumble.{{ env.FQDN }}/key.pem"
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.None.loadbalancer.server.port=80
+Label=traefik.http.routers.None.rule=Host(`mumble.{{ env.FQDN }}`)
+Label=traefik.http.routers.None.entrypoints=websecure
+Label=traefik.http.routers.None.tls.certresolver=letsencrypt
+Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

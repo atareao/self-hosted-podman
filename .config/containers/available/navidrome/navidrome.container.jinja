@@ -1,0 +1,56 @@
+[Unit]
+Description=navidrome
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/deluan/navidrome:latest
+AutoUpdate=registry
+ContainerName=navidrome
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/navidrome/music:/music:ro
+Volume=%h/.config/navidrome/data:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.navidrome.loadbalancer.server.port=4533
+Label=traefik.http.routers.navidrome.rule=Host(`navidrome.{{ env.FQDN }}`)
+Label=traefik.http.routers.navidrome.entrypoints=websecure
+Label=traefik.http.routers.navidrome.tls.certresolver=letsencrypt
+Label=traefik.http.routers.navidrome.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+User=1000:1000
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

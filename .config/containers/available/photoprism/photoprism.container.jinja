@@ -1,0 +1,60 @@
+[Unit]
+Description=photoprism
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/photoprism/photoprism:latest
+AutoUpdate=registry
+ContainerName=photoprism
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/photoprism/Pictures:/photoprism/originals:Z
+Volume=%h/.config/photoprism/Storage:/photoprism/storage:Z
+Volume=%h/.config/photoprism/Import:/photoprism/import:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.photoprism.loadbalancer.server.port=2342
+Label=traefik.http.routers.photoprism.rule=Host(`photoprism.{{ env.FQDN }}`)
+Label=traefik.http.routers.photoprism.entrypoints=websecure
+Label=traefik.http.routers.photoprism.tls.certresolver=letsencrypt
+Label=traefik.http.routers.photoprism.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=photoprism status || exit 1
+HealthInterval=60s
+HealthRetries=5
+HealthTimeout=15s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

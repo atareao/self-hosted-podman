@@ -1,0 +1,53 @@
+[Unit]
+Description=postgres_for_atuin
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/postgres:latest
+AutoUpdate=registry
+ContainerName=postgres_for_atuin
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=atuin-data.volume:/var/lib/postgresql/data:Z
+
+# ==== Networks ====
+Network=atuin.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=POSTGRES_USER=
+Environment=POSTGRES_PASSWORD=
+Environment=POSTGRES_DB=
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

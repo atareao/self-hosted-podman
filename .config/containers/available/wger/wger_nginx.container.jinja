@@ -1,0 +1,60 @@
+[Unit]
+Description=wger_nginx
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/nginx:stable
+ContainerName=wger_nginx
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/wger/config/nginx.conf:/etc/nginx/conf.d/default.conf:Z
+Volume=wger-static.volume:/wger/static:ro
+Volume=wger-media.volume:/wger/media:ro
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.None.loadbalancer.server.port=80
+Label=traefik.http.routers.None.rule=Host(`wger.{{ env.FQDN }}`)
+Label=traefik.http.routers.None.entrypoints=websecure
+Label=traefik.http.routers.None.tls.certresolver=letsencrypt
+Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=service nginx status || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

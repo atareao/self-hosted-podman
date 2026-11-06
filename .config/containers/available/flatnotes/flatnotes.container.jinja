@@ -1,0 +1,59 @@
+[Unit]
+Description=flatnotes
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/dullage/flatnotes:latest
+AutoUpdate=registry
+ContainerName=flatnotes
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=flatnotes-data.volume:/app/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=FLATNOTES_AUTH_TYPE=
+Environment=FLATNOTES_USERNAME=
+Environment=FLATNOTES_PASSWORD=
+Environment=FLATNOTES_SECRET_KEY=
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.flatnotes.loadbalancer.server.port=3000
+Label=traefik.http.routers.flatnotes.rule=Host(`dnote.{{ env.FQDN }}`)
+Label=traefik.http.routers.flatnotes.entrypoints=websecure
+Label=traefik.http.routers.flatnotes.tls.certresolver=letsencrypt
+Label=traefik.http.routers.flatnotes.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

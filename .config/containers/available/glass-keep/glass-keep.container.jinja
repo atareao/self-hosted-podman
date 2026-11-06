@@ -1,0 +1,58 @@
+[Unit]
+Description=glass-keep
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/nikunjsingh/glass-keep:latest
+AutoUpdate=registry
+ContainerName=glass-keep
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=glass-keep-data.volume:/app/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=glass_keep_jwt_secret,type=env,target=JWT_SECRET
+
+# ==== Environment ====
+Environment=NODE_ENV=production
+Environment=API_PORT=8080
+Environment=DB_FILE=/app/data/notes.db
+Environment=ADMIN_EMAILS="{{ env.ADMIN_EMAILS }}"
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.keep.loadbalancer.server.port=8080
+Label=traefik.http.routers.keep.rule=Host(`keep.{{ env.FQDN }}`)
+Label=traefik.http.routers.keep.entrypoints=websecure
+Label=traefik.http.routers.keep.tls.certresolver=letsencrypt
+Label=traefik.http.routers.keep.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

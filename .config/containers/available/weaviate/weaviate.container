@@ -1,0 +1,56 @@
+[Unit]
+Description=weaviate
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/semitechnologies/weaviate:1.23.0
+ContainerName=weaviate
+PodmanArgs=--init
+
+# ==== Command ====
+Exec=--host 0.0.0.0 --port 8080 --scheme http
+
+# ==== Ports ====
+PublishPort=8080:8080
+PublishPort=50051:50051
+
+# ==== Volumes ====
+Volume=weaviate-weaviate_data.volume:/var/lib/weaviate:Z
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=QUERY_DEFAULTS_LIMIT=25
+Environment=AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+Environment=PERSISTENCE_DATA_PATH=/var/lib/weaviate
+Environment=DEFAULT_VECTORIZER_MODULE=none
+Environment=ENABLE_MODULES=text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai
+Environment=CLUSTER_HOSTNAME=node1
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

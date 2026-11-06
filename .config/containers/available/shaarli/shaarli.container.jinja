@@ -1,0 +1,57 @@
+[Unit]
+Description=shaarli
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/shaarli/shaarli:latest
+AutoUpdate=registry
+ContainerName=shaarli
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=shaarli-cache.volume:/var/www/shaarli/cache:Z
+Volume=shaarli-data.volume:/var/www/shaarli/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.shaarli.loadbalancer.server.port=80
+Label=traefik.http.routers.shaarli.rule=Host(`shaarli.{{ env.FQDN }}`)
+Label=traefik.http.routers.shaarli.entrypoints=websecure
+Label=traefik.http.routers.shaarli.tls.certresolver=letsencrypt
+Label=traefik.http.routers.shaarli.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

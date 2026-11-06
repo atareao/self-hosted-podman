@@ -1,0 +1,55 @@
+[Unit]
+Description=couchdb
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/couchdb
+AutoUpdate=registry
+ContainerName=couchdb
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=couchdb-data.volume:/opt/couchdb/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=couchdb_password,type=env,target=COUCHDB_PASSWORD
+
+# ==== Environment ====
+Environment=COUCHDB_USER=usuario
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.couchdb.loadbalancer.server.port=5984
+Label=traefik.http.routers.couchdb.rule=Host(`couchdb.{{ env.FQDN }}`)
+Label=traefik.http.routers.couchdb.entrypoints=websecure
+Label=traefik.http.routers.couchdb.tls.certresolver=letsencrypt
+Label=traefik.http.routers.couchdb.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

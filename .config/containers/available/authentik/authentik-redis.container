@@ -1,0 +1,53 @@
+[Unit]
+Description=redis
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/redis:alpine
+ContainerName=authentik-redis
+
+# ==== Command ====
+Exec=--save 60 1 --loglevel warning
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=authentik-redis.volume:/data:Z
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+HealthCmd=redis-cli ping | grep PONG || exit 1
+HealthInterval=30s
+HealthRetries=5
+HealthTimeout=3s
+HealthStartPeriod=20s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

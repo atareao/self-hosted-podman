@@ -1,0 +1,56 @@
+[Unit]
+Description=dasherr
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/dasherr
+AutoUpdate=registry
+ContainerName=dasherr
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/dasherr/htpasswd:/opt/nginx/conf/.htpasswd:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.dasherr.loadbalancer.server.port=8080
+Label=traefik.http.routers.dasherr.rule=Host(`nginx.{{ env.FQDN }}`)
+Label=traefik.http.routers.dasherr.entrypoints=websecure
+Label=traefik.http.routers.dasherr.tls.certresolver=letsencrypt
+Label=traefik.http.routers.dasherr.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

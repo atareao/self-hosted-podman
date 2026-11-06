@@ -1,0 +1,66 @@
+[Unit]
+Description=conduit
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/matrixconduit/matrix-conduit:latest
+AutoUpdate=registry
+ContainerName=conduit
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=matrix-db.volume:/var/lib/matrix-conduit/:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=RUST_BACKTRACE=full
+Environment=CONDUIT_SERVER_NAME="matrix.{{ env.FQDN }}"
+Environment=CONDUIT_DATABASE_PATH=/var/lib/matrix-conduit/
+Environment=CONDUIT_DATABASE_BACKEND=rocksdb
+Environment=CONDUIT_PORT=6167
+Environment=CONDUIT_MAX_REQUEST_SIZE=20000000
+Environment=CONDUIT_ALLOW_REGISTRATION=False
+Environment=CONDUIT_ALLOW_FEDERATION=True
+Environment=CONDUIT_ALLOW_CHECK_FOR_UPDATES=True
+Environment=CONDUIT_TRUSTED_SERVERS=["matrix.org"]
+Environment=CONDUIT_ADDRESS=0.0.0.0
+Environment=CONDUIT_CONFIG=
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.conduit.loadbalancer.server.port=6167
+Label=traefik.http.routers.conduit.rule=Host(`matrix.{{ env.FQDN }}`)
+Label=traefik.http.routers.conduit.entrypoints=websecure
+Label=traefik.http.routers.conduit.tls.certresolver=letsencrypt
+Label=traefik.http.routers.conduit.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

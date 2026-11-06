@@ -1,0 +1,67 @@
+[Unit]
+Description=dnote
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/dnote/dnote:latest
+AutoUpdate=registry
+ContainerName=dnote
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=dnote_dbpassword,type=env,target=DBPassword
+
+# ==== Environment ====
+Environment=GO_ENV=PRODUCTION
+Environment=DBSkipSSL=true
+Environment=DBHost=postgres
+Environment=DBPort=5432
+Environment=DBName=dnote
+Environment=DBUser=dnote
+Environment=WebURL="https://dnote.{{ env.FQDN }}"
+Environment=OnPremise=true
+Environment=SmtpHost=
+Environment=SmtpPort=
+Environment=SmtpUsername=
+Environment=SmtpPassword=
+Environment=DisableRegistration=false
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.dnote.loadbalancer.server.port=3000
+Label=traefik.http.routers.dnote.rule=Host(`dnote.{{ env.FQDN }}`)
+Label=traefik.http.routers.dnote.entrypoints=websecure
+Label=traefik.http.routers.dnote.tls.certresolver=letsencrypt
+Label=traefik.http.routers.dnote.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

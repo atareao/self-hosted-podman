@@ -1,0 +1,54 @@
+[Unit]
+Description=publirs
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/publirs:latest
+AutoUpdate=registry
+ContainerName=publirs
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=publirs-db.volume:/app/db:Z
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+Secret=publirs_token,type=env,target=TOKEN
+
+# ==== Environment ====
+Environment=LOG_LEVEL=debug
+Environment=DB_URL=sqlite:/app/db/publirs.db
+Environment=PORT=8080
+Environment=ENVIRONMENT=PRODUCTION
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

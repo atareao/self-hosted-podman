@@ -1,0 +1,53 @@
+[Unit]
+Description=socks5
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/serjs/go-socks5-proxy
+AutoUpdate=registry
+ContainerName=socks5
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+PublishPort=8388:8388
+
+# ==== Volumes ====
+Volume=%h/.config/socks5/config.json:/etc/shadowsocks-rust/config.json:Z
+
+# ==== Networks ====
+
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=PROXY_USER=
+Environment=PROXY_PASSWORD=
+Environment=PROXY_PORT=
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

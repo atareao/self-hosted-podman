@@ -1,0 +1,62 @@
+[Unit]
+Description=podmixer
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/podmixer:v0.2.0
+ContainerName=podmixer
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=podmixer-db.volume:/app/db:Z
+Volume=podmixer-rss.volume:/app/rss:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=podmixer_secret,type=env,target=SECRET
+
+# ==== Environment ====
+Environment=RUST_LOG=info
+Environment=RUST_BACKTRACE=full
+Environment=RUST_ENV=production
+Environment=DB_URL=/app/db/podmixer.db
+Environment=PORT=3000
+Environment=SLEEP_TIME=900
+Environment=OLDER_THAN=30
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.podmixer2.loadbalancer.server.port=3000
+Label=traefik.http.routers.podmixer2.rule=Host(`podmixer.{{ env.FQDN }}`)
+Label=traefik.http.routers.podmixer2.entrypoints=websecure
+Label=traefik.http.routers.podmixer2.tls.certresolver=letsencrypt
+Label=traefik.http.routers.podmixer2.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

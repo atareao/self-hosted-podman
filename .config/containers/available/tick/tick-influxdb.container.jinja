@@ -1,0 +1,57 @@
+[Unit]
+Description=influxdb
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/influxdb:latest
+AutoUpdate=registry
+ContainerName=tick-influxdb
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=tick-influxdb_data.volume:/var/lib/influxdb:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=influxdb
+Network=tick.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.None.loadbalancer.server.port=8086
+Label=traefik.http.routers.None.rule=Host(`tick.{{ env.FQDN }}`)
+Label=traefik.http.routers.None.entrypoints=websecure
+Label=traefik.http.routers.None.tls.certresolver=letsencrypt
+Label=traefik.http.routers.None.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

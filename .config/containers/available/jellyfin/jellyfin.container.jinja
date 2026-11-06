@@ -1,0 +1,58 @@
+[Unit]
+Description=jellyfin
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/jellyfin/jellyfin
+AutoUpdate=registry
+ContainerName=jellyfin
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=%h/.config/jellyfin/config:/config:Z
+Volume=%h/.config/jellyfin/cache:/cache:Z
+Volume=%h/.config/jellyfin/media:/media:Z
+Volume=%h/.config/jellyfin/media2:/media2:ro
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=JELLYFIN_PublishedServerUrl="jellyfin.{{ env.FQDN }}"
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.jellyfin.loadbalancer.server.port=8096
+Label=traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ env.FQDN }}`)
+Label=traefik.http.routers.jellyfin.entrypoints=websecure
+Label=traefik.http.routers.jellyfin.tls.certresolver=letsencrypt
+Label=traefik.http.routers.jellyfin.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+User=1000:1000
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

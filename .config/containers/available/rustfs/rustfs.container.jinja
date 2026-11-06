@@ -1,0 +1,61 @@
+[Unit]
+Description=rustfs
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/rustfs/rustfs
+AutoUpdate=registry
+ContainerName=rustfs
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=rustfs-data.volume:/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+Secret=rustfs_access_key,type=env,target=RUSTFS_ACCESS_KEY
+Secret=rustfs_secret_key,type=env,target=RUSTFS_SECRET_KEY
+
+# ==== Environment ====
+Environment=RUSTFS_CONSOLE_ENABLE=true
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.rustfs-console.loadbalancer.server.port=9001
+Label=traefik.http.routers.rustfs-console.rule=Host(`rustfs.{{ env.FQDN }}`)
+Label=traefik.http.routers.rustfs-console.entrypoints=websecure
+Label=traefik.http.routers.rustfs-console.tls.certresolver=letsencrypt
+Label=traefik.http.routers.rustfs-console.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=sh -c curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=10s
+HealthStartPeriod=40s
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,54 @@
+[Unit]
+Description=influxdb
+After=network-online.target
+
+[Container]
+# ==== Image ====
+Image=docker.io/library/influxdb:1.8
+ContainerName=grafana-influx-telegraf-influxdb
+PodmanArgs=--init
+
+# ==== Command ====
+
+
+# ==== Ports ====
+
+
+# ==== Volumes ====
+Volume=grafana-influx-telegraf-data_influxdb.volume:/var/lib/influxdb:Z
+
+# ==== Networks ====
+Network=grafana-influx-telegraf.network
+NetworkAlias=influxdb
+
+# ==== Secrets ====
+
+
+# ==== Environment ====
+Environment=GF_INSTALL_PLUGINS=
+Environment=GF_SECURITY_ADMIN_USER=
+Environment=GF_SECURITY_ADMIN_PASSWORD=
+Environment=GF_USERS_ALLOW_SIGN_UP=
+
+# ==== Labels ====
+
+
+# ==== Healthcheck ====
+
+
+# ==== Hardening ====
+
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
