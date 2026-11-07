@@ -1,0 +1,61 @@
+[Unit]
+Description=watchbeat — monitor de uptime self-hosted
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/watchbeat:latest
+ContainerName=watchbeat
+AutoUpdate=registry
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=watchbeat-data.volume:/app/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=watchbeat
+
+# ==== Secrets ====
+Secret=watchbeat_oidc_client_secret,type=env,target=OIDC_CLIENT_SECRET
+
+# ==== Environment ====
+EnvironmentFile=%h/.config/watchbeat/watchbeat.env
+EnvironmentFile=%h/.config/watchbeat/watchbeat.env.local
+Environment=OIDC_REDIRECT_URL=https://${FQDN}/auth/callback
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.watchbeat.loadbalancer.server.port=3055
+Label=traefik.http.routers.watchbeat.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.watchbeat.entrypoints=websecure
+Label=traefik.http.routers.watchbeat.tls.certresolver=letsencrypt
+Label=traefik.http.routers.watchbeat.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=wget --no-verbose --tries=1 --spider http://localhost:3055/health || exit 1
+HealthInterval=300s
+HealthRetries=3
+HealthTimeout=10s
+HealthStartPeriod=15s
+
+# ==== Hardening ====
+NoNewPrivileges=true
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
