@@ -1,5 +1,31 @@
 #!/bin/bash
-
+#
+# =============================================================================
+# setup_apps.sh — bootstrap ONE-SHOT del usuario de aplicaciones de producción.
+#
+# NO es parte del flujo de dotfiles (yadm) ni del flujo qctl: es una preparación
+# puntual de la máquina. Ejecútalo UNA sola vez. No se re-ejecuta para "instalar"
+# el repo.
+#
+# Usuario objetivo: `runner` (uid 1002; antes se llamaba `podman`, y en docs
+# antiguas `apps`). Este script se lanza COMO ESE usuario (nunca como root),
+# en su $HOME, tras crearlo con setup.sh y entrar con `sudo -u runner -H`.
+#
+# Lo que hace:
+#   * podman.socket + linger del usuario
+#   * secretos para los stacks (podman secret create — NUNCA crypta store)
+#   * herramientas en ~/.local/bin (sops, jinrender, crypta, yq, starship, qctl, nevi)
+#   * permisos/hardening + yadm + fqdn.conf
+#
+# REGLAS:
+#   * Binario descargado de GitHub → ~/.local/bin (nunca rutas de sistema, nunca sudo).
+#   * Los secretos de Podman se crean con `podman secret create`; jamás `crypta store`
+#     (el driver shell resuelve por el ID del secreto — ver AGENTS.md).
+#   * El FQDN NO es un secreto: ~/.config/environment.d/fqdn.conf.
+#
+# Tras ejecutarlo, la producción se opera con `rr "<cmd>"` (ver README/AGENTS.md).
+# =============================================================================
+#
 # --- CONFIGURACIÓN ---
 DOMINIO="tudominio.es"
 echo "--------------------------------------------------------"

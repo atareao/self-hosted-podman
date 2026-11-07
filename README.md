@@ -17,7 +17,7 @@ Este repositorio es la **única fuente de verdad**. En el servidor **no se edita
 ## 🧭 Cómo funciona (arquitectura)
 
 ```
-    DEV (este repo)                     PROD (usuario apps/podman)
+    DEV (este repo)                     PROD (usuario runner · antes podman)
  ┌───────────────────┐   git push    ┌──────────────────────────────┐
  │  dotfiles + units │ ────────────► │  yadm pull  ──► post_pull    │
  │  (quadlets, .env) │               │   ├─ unjinja (secretos+FQDN) │
@@ -107,7 +107,7 @@ La renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERCA
 ├── vector/vector.yaml            # config de Vector (PLANA; ${VAR} nativo) + vector.env (no secreto)
 └── yadm/hooks/post_pull          # hook de despliegue (render + scaffold + daemon-reload)
 setup.sh                          # bootstrap del host (root): usuarios, SSH, nftables
-setup_apps.sh                     # bootstrap del usuario apps: podman.socket, crypta, secretos, herramientas
+setup_apps.sh                     # bootstrap ONE-SHOT del usuario apps (runner): podman.socket, crypta, secretos, herramientas
 ```
 
 ---
@@ -141,7 +141,7 @@ setup_apps.sh                     # bootstrap del usuario apps: podman.socket, c
 | **nevi**      | Editor de terminal (Vim moderno)     | `cargo install`    |
 | **rust/cargo**| Toolchain de Rust (para `nevi`)      | `rustup`           |
 
-> ⚠️ **Regla de oro**: cualquier **binario descargado de GitHub** va a **`~/.local/bin` del usuario de aplicaciones** (`podman`/`apps`). Nunca a rutas de sistema, nunca con `sudo`. `~/.local/bin` ya está en el `PATH` vía `.config/fish/config.fish`.
+> ⚠️ **Regla de oro**: cualquier **binario descargado de GitHub** va a **`~/.local/bin` del usuario de aplicaciones** (`runner`, uid 1002; se llamaba `podman`/`apps` antes del rename de PLAN-008). Nunca a rutas de sistema, nunca con `sudo`. `~/.local/bin` ya está en el `PATH` vía `.config/fish/config.fish`.
 
 ---
 
@@ -405,6 +405,37 @@ $EDITOR ~/.config/<stack>/<stack>.env.local
 
 ---
 
+## 🔑 Acceso a producción (`rr`)
+
+La infraestructura corre en `new_atareao` bajo el usuario **`runner`** (uid 1002, podman
+rootless). No se accede a ese usuario por SSH directo: se entra como **`lorenzo`** (admin, grupo
+`sudo`, sin password a runner) y se eleva con `sudo -u runner`.
+
+Para operar producción existe el wrapper **`rr`**, en dos copias que cooperan:
+
+- **En el servidor** (`~/bin/rr` de `lorenzo`): ejecuta `sudo -n -u runner -H env
+  XDG_RUNTIME_DIR=/run/user/1002 PATH=… SOPS_AGE_KEY_FILE=… bash -lc "cd && <cmd>"`. Aporta el
+  entorno completo de systemd user + crypta/sops + `~/.local/bin`, y fuerza bash (el login shell
+  de `runner` es fish).
+- **En tu máquina** (`~/bin/rr` de tu login): envía el comando al remoto por **base64** (evita
+  que fish —local y el login shell del servidor— rompa las comillas/pipes) y lo ejecuta a través
+  del `rr` remoto.
+
+Uso:
+
+```bash
+rr                          # shell interactivo de runner (pide TTY)
+rr "podman ps"              # ejecuta un comando como runner, sin TTY
+rr 'journalctl --user -u errserve.service -n 20'
+rr "crypta lookup oidc_client_id"   # secretos SOPS+age (SOPS_AGE_KEY_FILE ya exportado)
+```
+
+Reglas:
+
+- **Nunca** SSH directo como `runner`; siempre vía `lorenzo` → `rr` (mantiene la separación:
+  `runner` es cuenta de servicio sin sudo; `lorenzo` es el humano con sudo).
+- El shell de `runner` es **fish**; `rr` fuerza `bash` explícitamente.
+
 ## 🔄 Actualización
 
 ### A. Desplegar cambios del repo en producción
@@ -415,7 +446,9 @@ Este repo es la **única fuente de verdad**. El flujo es siempre el mismo:
 2. **En el servidor**:
 
    ```bash
-   sudo -u podman bash -c 'cd "$HOME" && yadm pull'
+   rr "yadm pull"        # vía el wrapper rr (operar como runner, env completo)
+   # equivalente sin wrapper:
+   sudo -u runner bash -c 'cd "$HOME" && yadm pull'
    ```
 
 3. El hook **`post_pull`** hace automáticamente:

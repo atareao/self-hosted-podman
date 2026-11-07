@@ -16,6 +16,32 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 - Enabling/disabling is done with `qctl`, run from inside the stack dir: `cd .config/containers/available/<stack> && qctl install` / `qctl uninstall`; `qctl status` shows state. `qctl install` refuses to overwrite a real file or a symlink owned by another stack (collision guard).
 - Files that contain template variables are `.jinja`; files without them are plain `.container`/`.volume`/... (e.g. `available/umami/umamidb.container`).
 
+## Acceso a producción (usuario `runner`)
+
+Este repo se despliega como dotfiles (yadm) en el home del **usuario de apps** del servidor de
+producción `new_atareao`: **`runner`** (uid 1002; se llamaba `podman` antes del rename de
+PLAN-008; en docs/planes antiguas puede aparecer como `apps`). Rootless podman, `systemctl --user`,
+bus `/run/user/1002`. El usuario **no tiene sudo** y no se accede por SSH directo.
+
+El SSH a `new_atareao` entra como **`lorenzo`** (uid 1001, grupo `sudo`, NOPASSWD a runner). Para
+operar como `runner` se usa el wrapper **`rr`** — dos copias cooperantes:
+
+- `~/bin/rr` en `lorenzo` (servidor): `sudo -n -u runner -H env XDG_RUNTIME_DIR=/run/user/1002 \
+  PATH=/usr/local/bin:/usr/bin:%h/.local/bin SOPS_AGE_KEY_FILE=… bash -lc "cd && cmd"`.
+- `~/bin/rr` en la máquina que inicia la sesión: envía el comando al remoto por **base64** (el
+  login shell del servidor es fish; no confíes en quoting por SSH).
+
+Si pasas un comando a `rr "<cmd>"` se ejecuta como runner con el entorno completo (systemd user
+bus + crypta + `SOPS_AGE_KEY_FILE`). Cero argumentos → shell interactivo de runner.
+
+Reglas invariantes:
+
+- Operar el servidor **solo** como `runner` (vía `lorenzo` + `rr`), nunca como `lorenzo` directo
+  para tocar el stack, y nunca SSH directo como `runner`.
+- El hook `post_pull` de yadm requiere `unjinja` y el FQDN; se ejecuta en el `yadm pull` hecho
+  como runner.
+- Este repo trabaja directo en `main` (ver sección Git), no imposes gitflow/PR en él.
+
 ## qctl
 
 - `qctl` (source at `/data/rust/qctl`) discovers quadlets **non-recursively** in `./quadlets/` or the current directory only.
