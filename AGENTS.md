@@ -166,3 +166,16 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
 
 - `systemctl --user daemon-reload` then `qlist` (or `qctl status` from a stack dir) to confirm link + run state.
 - Logs: `journalctl --user -u <unit>`; helpers `jcu <unit>` (once) and `jcf <unit>` (follow), both piped through `ansifilter` + `batcat`.
+
+## Plans y documentación
+
+Organización de planes y documentación de features (obligatorio):
+
+- **`plans/`** — todos los planes del proyecto, numerados secuencialmente: `PLAN-001.md`, `PLAN-002.md`, … Cada plan nuevo toma el siguiente número libre. Cuando un plan se completa o archiva **no se borra**: se renombra a `plans/PLAN-<NNN>-ARCHIVED.md`.
+  - El siguiente número libre es el menor entero positivo no usado en `plans/` (se ignora el sufijo `-ARCHIVED`).
+- **`docs/`** — documentación de cada feature/stack creada, un fichero por feature: `docs/<feature>.md`. Debe cubrir: qué es, ficheros implicados, cómo funciona, variables/config, cómo habilitar y desplegar, decisiones de migración (compose→quadlet) y follow-ups.
+- **Flujo al crear una feature/stack:**
+  1. Crear `plans/PLAN-<NNN>.md` (siguiente número libre).
+  2. Implementar y validar.
+  3. Crear `docs/<feature>.md`.
+  4. Al cerrar: marcar las tareas del plan y renombrarlo a `plans/PLAN-<NNN>-ARCHIVED.md`.
