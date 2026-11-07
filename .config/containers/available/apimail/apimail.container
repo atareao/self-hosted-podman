@@ -1,0 +1,63 @@
+[Unit]
+Description=apimail — puente IMAP/SMTP → webhook
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/atareao/apimail:latest
+ContainerName=apimail
+AutoUpdate=registry
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=apimail-data.volume:/app/data:Z
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=apimail
+
+# ==== Secrets ====
+Secret=apimail_api_key,type=env,target=APIMAIL_API_KEY
+Secret=apimail_imap_password,type=env,target=APIMAIL_IMAP_PASSWORD
+Secret=apimail_smtp_password,type=env,target=APIMAIL_SMTP_PASSWORD
+
+# ==== Environment ====
+EnvironmentFile=%h/.config/apimail/apimail.env
+EnvironmentFile=%h/.config/apimail/apimail.env.local
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.apimail.loadbalancer.server.port=3000
+Label=traefik.http.routers.apimail.rule=Host(`apimail.${FQDN}`)
+Label=traefik.http.routers.apimail.entrypoints=websecure
+Label=traefik.http.routers.apimail.tls.certresolver=letsencrypt
+Label=traefik.http.routers.apimail.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=wget -qO- http://127.0.0.1:3000/api/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=5s
+
+# ==== Hardening ====
+NoNewPrivileges=true
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" apimail)" != "healthy" ]; do sleep 2; done'
+
+[Install]
+WantedBy=default.target
