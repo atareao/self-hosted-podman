@@ -37,11 +37,11 @@ Spec OpenSpec: `openspec/changes/consolidate-stack-management/`.
 
 ## Tareas
 1. [x] `qctl`: crear el change OpenSpec `consolidate-stack-management` y validar `--strict`.
-2. [ ] `qctl`: TDD (`install` guard + `check` auditoría), `cargo test` verde, fmt/clippy.
-3. [ ] `qctl`: auditoría `@rust-reviewer` + PR a `develop` + merge + `openspec archive`.
-4. [ ] `qctl`: release (bump `.vampus.yml`) y binario en prod.
-5. [ ] dotfiles: borrar los 4 helpers fish.
-6. [ ] dotfiles: actualizar AGENTS.md, README.md, `docs/errserve.md`.
+2. [x] `qctl`: TDD (`install` guard + `check` auditoría), `cargo test` verde, fmt/clippy.
+3. [x] `qctl`: auditoría `@rust-reviewer` + PR a `develop` + merge + `openspec archive`.
+4. [x] `qctl`: release (bump `.vampus.yml`) y binario en prod.
+5. [x] dotfiles: borrar los 4 helpers fish.
+6. [x] dotfiles: actualizar AGENTS.md, README.md, `docs/errserve.md`.
 7. [ ] Cerrar este plan → `plans/PLAN-003-ARCHIVED.md`.
 
 ## Follow-ups

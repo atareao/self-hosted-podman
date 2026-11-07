@@ -13,14 +13,14 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 - `.config/containers/available/<stack>/` is the **source of truth**. Each stack is a directory holding quadlet units: `*.container`, `*.volume`, `*.network`, `*.pod`, `*.kube` (some as `*.jinja` templates).
 - `.config/containers/systemd/` is the **target dir** Podman/systemd actually reads. It only contains `.gitkeep`; files arrive as **symlinks** from `available/<stack>/`.
 - `available/` is inert. A stack does nothing until its files are linked into `systemd/` and `systemctl --user daemon-reload` runs.
-- Enabling/disabling is done with the fish functions `qenable <stack>` / `qdisable <stack>` / `qlist` (in `.config/fish/functions/`). `qenable` refuses to overwrite a real file or a symlink owned by another stack (collision guard).
+- Enabling/disabling is done with `qctl`, run from inside the stack dir: `cd .config/containers/available/<stack> && qctl install` / `qctl uninstall`; `qctl status` shows state. `qctl install` refuses to overwrite a real file or a symlink owned by another stack (collision guard).
 - Files that contain template variables are `.jinja`; files without them are plain `.container`/`.volume`/... (e.g. `available/umami/umamidb.container`).
 
 ## qctl
 
 - `qctl` (source at `/data/rust/qctl`) discovers quadlets **non-recursively** in `./quadlets/` or the current directory only.
 - Run it **from inside a stack dir**, e.g. `cd .config/containers/available/traefik && qctl status`. Run from the repo root it finds nothing.
-- It targets the same `~/.config/containers/systemd` symlink dir as `qenable`.
+- It targets the same `~/.config/containers/systemd` symlink dir as `qctl install`.
 - Binario en `~/.local/bin/qctl` del usuario de apps (estatico x86_64 + checksum, de la ultima release `atareao/qctl`).
 
 ## Quadlet validation
@@ -43,7 +43,7 @@ Dotfiles repository (`yadm`) for a rootless Podman + Traefik self-hosted stack. 
 
 - El **nombre del fichero del unit** debe ser único en TODO el repo: los units se enlazan a un directorio plano (`~/.config/containers/systemd/`). Igual para `ContainerName=` (Podman lo exige único global). `NetworkAlias=` NO es global (vive en su red) y no colisiona.
 - Convención: el unit **principal** se llama como el directorio del stack (`<stack>.container`); los demás son apéndices `<stack>-<rol>.container` (p.ej. `miniflux`, `miniflux-postgresql`, `miniflux-redis`).
-- Herramienta: `qcheck` detecta colisiones duras de basename/`ContainerName=` y avisa de units que no siguen la convención; `qenable` aborta si detecta colisión de nombre global (pre-scan atómico: no enlaza nada si algún unit colisiona).
+- Herramienta: `qctl check` detecta colisiones duras de basename/`ContainerName=` y avisa de units que no siguen la convención; `qctl install` aborta si detecta colisión de nombre global (pre-scan atómico: no enlaza nada si algún unit colisiona).
 
 ## Canonical quadlet skeleton
 
@@ -155,7 +155,7 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
 
 - `.config/systemd/user/http.socket` / `https.socket` provide rootless socket-activated ports 80/443 for Traefik.
 - `proxy.network` (Traefik edge network) lives in the `traefik` stack; other stacks join it via `Network=proxy.network`.
-- `qenable` only links rendered units: run `unjinja` first so `*.jinja` exist as `.container`/`.volume`/`.network` before enabling a stack.
+- `qctl install` only links rendered units: run `unjinja` first so `*.jinja` exist as `.container`/`.volume`/`.network` before enabling a stack.
 
 ## Git
 
@@ -164,7 +164,7 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
 
 ## Verification (no test suite)
 
-- `systemctl --user daemon-reload` then `qlist` (or `qctl status` from a stack dir) to confirm link + run state.
+- `systemctl --user daemon-reload` then `qctl status` from a stack dir to confirm link + run state.
 - Logs: `journalctl --user -u <unit>`; helpers `jcu <unit>` (once) and `jcf <unit>` (follow), both piped through `ansifilter` + `batcat`.
 
 ## Plans y documentación

@@ -31,7 +31,7 @@ Este repositorio es la **única fuente de verdad**. En el servidor **no se edita
 
 - `.config/containers/available/<stack>/` contiene las unidades (`*.container`, `*.volume`, `*.network`, `*.pod`, `*.kube`) de cada stack. **Es inerte**: nada arranca hasta enlazarlo.
 - `.config/containers/systemd/` es el **directorio destino** que systemd/Podman leen de verdad. Solo contiene `.gitkeep`; los ficheros llegan como **symlinks** desde `available/<stack>/`.
-- Habilitar/deshabilitar se hace con las funciones fish **`qenable <stack>`** / **`qdisable <stack>`** (o con `qctl`), nunca copiando ficheros a mano.
+- Habilitar/deshabilitar se hace con **`qctl`**, desde el directorio del stack (`cd .config/containers/available/<stack> && qctl install` / `qctl uninstall`), nunca copiando ficheros a mano.
 - Todo es **rootless** (`systemctl --user`). Los servicios usan `WantedBy=default.target`.
 
 ### Convención de nombres de unidad
@@ -44,7 +44,7 @@ El directorio destino es **plano**, así que el **basename de cada unidad debe s
 | **Apéndices**           | `<stack>-<rol>.container` (`miniflux-postgresql`, `miniflux-redis`, `mumble-recorder`) |
 
 - `NetworkAlias=` **no** es global (vive dentro de su red) y **no** debe cambiarse a la ligera: es el host por el que las apps conectan a sus bases de datos.
-- Guardas: **`qcheck`** detecta colisiones duras (basename y `ContainerName`) y `qenable` hace un *pre-scan atómico* (si algún unidad colisiona, no enlaza ninguna).
+- Guardas: **`qctl check`** detecta colisiones duras (basename y `ContainerName`) y `qctl install` hace un *pre-scan atómico* (si algún unidad colisiona, no enlaza ninguna).
 
 ### Configuración: `.env` versionado + `.env.local` por máquina
 
@@ -86,7 +86,7 @@ La renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERCA
 - ✅ **Autenticación OIDC centralizada** con PocketID.
 - ✅ **Secretos cifrados** con SOPS + age, inyectados vía Podman secrets (`crypta`).
 - ✅ **Configuración declarativa** con dotfiles yaml (yadm) + plantillas jinja.
-- ✅ **Guardas de integridad**: `qcheck`, `qenable` atómico, `qctl`.
+- ✅ **Guardas de integridad**: `qctl check`, `qctl install` atómico.
 - ✅ **Relevo de sesión** en `HANDOFF.md`.
 
 ---
@@ -102,7 +102,7 @@ La renderiza **`unjinja`** (exporta los secretos de SOPS como variables `UPPERCA
 ├── environment.d/fqdn.conf       # FQDN del host (no secreto, gitignored) + .example
 ├── fish/
 │   ├── config.fish               # añade ~/.local/bin al PATH, zoxide, starship
-│   └── functions/                # qenable, qdisable, qlist, qcheck, unjinja, jcu, jcf, scupdate, genpass, yadmalt
+│   └── functions/                # unjinja, jcu, jcf, scupdate, genpass, yadmalt
 ├── traefik/dynamic/*.jinja       # plantilla de auth del dashboard (la única)
 ├── vector/vector.yaml            # config de Vector (PLANA; ${VAR} nativo) + vector.env (no secreto)
 └── yadm/hooks/post_pull          # hook de despliegue (render + scaffold + daemon-reload)
@@ -277,9 +277,9 @@ systemctl --user daemon-reload
 ### 4. Arrancar los servicios base
 
 ```bash
-qenable traefik
-qenable pocketid
-qlist                              # ver estado de todos los stacks
+cd .config/containers/available/traefik && qctl install
+cd ../pocketid && qctl install     # qctl se ejecuta desde el dir del stack
+qctl status                        # ver estado de todos los stacks
 ```
 
 ### 5. Autenticación (PocketID)
@@ -351,18 +351,21 @@ Notas:
 - La primera vez que se publica un subdominio, Traefik emite el certificado Let's Encrypt por HTTP-01 automáticamente; compruébalo con `curl -I https://<stack>.servidorlinux.es`.
 - Verificación visual: abre la URL en el navegador; el DNS comodín `*.servidorlinux.es` ya apunta al servidor.
 
-### Funciones fish
+### Gestión de stacks (`qctl`) y funciones fish
 
-| Función | Descripción |
+| Comando | Descripción |
 | ------- | ----------- |
-| `qlist` | Estado (link + run) de **todos** los stacks |
-| `qenable <stack>` | Enlaza las unidades del stack (pre-scan atómico anti-colisión) + `daemon-reload` |
-| `qdisable <stack>` | Para los servicios y desenlaza el stack |
-| `qcheck` | Detecta colisiones duras de basename/`ContainerName` y avisa de nombres fuera de convención |
+| `qctl install` | Enlaza las unidades del stack (pre-scan atómico anti-colisión) + `daemon-reload` |
+| `qctl uninstall` | Para los servicios y desenlaza el stack |
+| `qctl status` | Estado (link + run) de las unidades; por defecto, todo el target dir |
+| `qctl status --compact` | Igual, en TSV sin formato: `<unit>`, `<linked\|missing>`, `<running\|stopped\|->` por línea |
+| `qctl check` | Detecta colisiones duras de basename/`ContainerName` y avisa de nombres fuera de convención |
 | `unjinja` | Renderiza los `*.jinja` (secretos + FQDN) |
 | `scupdate <unit>` | `daemon-reload` + `restart` de las unidades indicadas |
 | `jcu <unit>` / `jcf <unit>` | Logs limpios (`ansifilter` + `batcat`); `jcf` sigue en vivo |
 | `genpass [len]` | Genera una contraseña aleatoria (OpenSSL) |
+
+> `qctl` descubre quadlets en el directorio actual: ejecútalo desde el directorio del stack (`cd .config/containers/available/<stack> && qctl install`). Desde la raíz del repo no encuentra nada.
 
 ### Añadir un stack nuevo
 
@@ -371,8 +374,8 @@ Notas:
 3. Config no secreta → `.config/<stack>/<stack>.env` (versionado) + `EnvironmentFile=%h/...`.
 4. Credenciales → **`podman secret create <nombre> -`** (a fuego: nunca `crypta store`) y `Secret=<nombre>,type=env,target=<VAR>`.
 5. Labels de Traefik con `Host(` <stack>.${FQDN} `)`.
-6. **`qcheck`** (0 colisiones) y valida con el generador real (ver *Verificación*).
-7. `qenable <stack>` (o `cd <stack> && qctl install`).
+6. **`qctl check`** (0 colisiones) y valida con el generador real (ver *Verificación*).
+7. `cd .config/containers/available/<stack> && qctl install`.
 8. **Commit con gitmoji** y `push` a `main`; en producción, `yadm pull`.
 
 ---
@@ -463,9 +466,8 @@ cargo install --git https://github.com/anthonyamaro15/nevi --root "$HOME/.local"
 
 ```bash
 systemctl --user daemon-reload            # recarga unidades tras tocar quadlets
-qlist                                     # estado link+run de todos los stacks
-qcheck                                    # colisiones de nombres (debe salir "Sin colisiones duras")
 qctl status                               # desde dentro del directorio del stack
+qctl check                                # colisiones de nombres (debe salir "Sin colisiones duras")
 systemctl --user status <unit>            # detalle de una unidad
 jcu <unit>        # logs limpios         #  jcf <unit>  -> en vivo
 ```

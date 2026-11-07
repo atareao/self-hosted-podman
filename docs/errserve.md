@@ -38,7 +38,7 @@ contenedor en la red `proxy`.
 ```fish
 cd .config/containers/available/errserve
 qctl status        # estado (desde el dir del stack)
-qenable errserve   # enlaza en ~/.config/containers/systemd + daemon-reload
+qctl install       # enlaza en ~/.config/containers/systemd + daemon-reload
 ```
 
 No requiere secretos (`podman secret create`) ni volúmenes. Verificar con
