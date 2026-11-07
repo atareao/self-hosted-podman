@@ -1,0 +1,29 @@
+# metube — Metube es un servidor de vídeo.
+
+## Qué es
+Metube, Imagen=docker.io/alexta69/metube, 1 contenedor, red proxy.network, dominio metube.${FQDN}, puerto interno 8081
+
+## Ficheros
+- Quadlet(s): /data/self-hosted-podman/.config/containers/available/metube/metube.container
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/metube/metube-metube.volume
+- Config no secreta: (ninguno)
+- Secretos: (ninguno)
+
+## Cómo funciona
+Red: proxy.network. Volumen: metube-metube.volume montado en /downloads.
+Sin Secrets.
+Sin EnvironmentFile.
+Sin socket de daemon.
+Ningún healthcheck.
+
+## Variables / configuración
+| Var | Dónde | Valor | Descripción |
+|---|---|---|---|
+
+## Cómo habilitar / desplegar
+1. Secretos: (ninguno)
+2. cd .config/containers/available/metube && qctl install
+3. systemctl --user daemon-reload
+
+## Follow-ups
+- (ninguno)
