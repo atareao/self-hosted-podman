@@ -42,8 +42,10 @@ Spec OpenSpec: `openspec/changes/consolidate-stack-management/`.
 4. [x] `qctl`: release (bump `.vampus.yml`) y binario en prod.
 5. [x] dotfiles: borrar los 4 helpers fish.
 6. [x] dotfiles: actualizar AGENTS.md, README.md, `docs/errserve.md`.
-7. [ ] Cerrar este plan → `plans/PLAN-003-ARCHIVED.md`.
+7. [x] Cerrar este plan → `plans/PLAN-003-ARCHIVED.md`.
 
 ## Follow-ups
-- `docs/` (dotfiles): doc de la consolidación.
+- `docs/` (dotfiles): doc de la consolidación (`docs/gestion-stacks-qctl.md`).
+- Falso positivo de `qctl check` con redes compartidas: avisa (WARN) de `proxy.network` (stack `traefik`) y `security.network` (stack `vector`) al ser redes compartidas, no units de stack.
 - Valorar hacer configurable la regla de convención de nombres de `check` (hoy fija a `<stack>.<ext>`/`<stack>-<rol>`).
+- `errserve`: añadir un volumen para `CONTENT_DIR` si se quieren páginas de error propias.
