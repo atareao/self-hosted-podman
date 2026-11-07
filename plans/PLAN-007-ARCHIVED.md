@@ -32,12 +32,12 @@ Migrar el `docker-compose.yml` de `watchbeat` a quadlets en este repo, respetand
 | healthcheck `wget … --spider /health` | `HealthCmd=wget --no-verbose --tries=1 --spider http://localhost:3055/health || exit 1` (interval 300s) |
 
 ## Tareas
-- [ ] Crear `watchbeat.container` con las 11 secciones canónicas (secret OIDC, EnvironmentFile, labels normalizadas).
-- [ ] Crear `watchbeat-data.volume` (`VolumeName=watchbeat-data`).
-- [ ] Crear `.config/watchbeat/watchbeat.env`.
-- [ ] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
-- [ ] Crear `docs/watchbeat.md`.
-- [ ] Cerrar: renombrar a `plans/PLAN-007-ARCHIVED.md`.
+- [x] Crear `watchbeat.container` con las 11 secciones canónicas (secret OIDC, EnvironmentFile, labels normalizadas).
+- [x] Crear `watchbeat-data.volume` (`VolumeName=watchbeat-data`).
+- [x] Crear `.config/watchbeat/watchbeat.env`.
+- [x] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
+- [x] Crear `docs/watchbeat.md`.
+- [x] Cerrar: renombrar a `plans/PLAN-007-ARCHIVED.md`.
 
 ## Follow-ups
 - Crear el secreto ANTES de arrancar (NUNCA `crypta store`): `printf '%s' '<client-secret>' | podman secret create watchbeat_oidc_client_secret -`.

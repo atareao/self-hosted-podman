@@ -35,12 +35,12 @@ Migrar el `docker-compose.yml` de `alloy` a quadlets en este repo, respetando la
 | healthcheck (nuevo) | `wget -q --spider http://localhost:3066/api/health || exit 1` (busybox) |
 
 ## Tareas
-- [ ] Crear `alloy.container` con las 11 secciones canónicas (`UserNS=keep-id`, socket podman, secret OIDC, labels normalizadas).
-- [ ] Crear `alloy-data.volume` (`VolumeName=alloy-data`).
-- [ ] Crear `.config/alloy/alloy.env` con config no secreta (TIMEZONE, DOCKER_HOST, OIDC_ISSUER_URL, OIDC_CLIENT_ID).
-- [ ] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
-- [ ] Crear `docs/alloy.md`.
-- [ ] Cerrar: renombrar a `plans/PLAN-004-ARCHIVED.md`.
+- [x] Crear `alloy.container` con las 11 secciones canónicas (`UserNS=keep-id`, socket podman, secret OIDC, labels normalizadas).
+- [x] Crear `alloy-data.volume` (`VolumeName=alloy-data`).
+- [x] Crear `.config/alloy/alloy.env` con config no secreta (TIMEZONE, DOCKER_HOST, OIDC_ISSUER_URL, OIDC_CLIENT_ID).
+- [x] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
+- [x] Crear `docs/alloy.md`.
+- [x] Cerrar: renombrar a `plans/PLAN-004-ARCHIVED.md`.
 
 ## Follow-ups
 - Crear el secreto ANTES de arrancar: `printf '%s' '<client-secret>' | podman secret create alloy_oidc_client_secret -` (NUNCA `crypta store`).

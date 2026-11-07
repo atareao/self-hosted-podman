@@ -34,12 +34,12 @@ Migrar el `docker-compose.yml` de `zennotes` a quadlets en este repo, respetando
 | healthcheck (la imagen no publica) | `HealthCmd=["/zennotes-server","healthcheck"]` (exec-form) |
 
 ## Tareas
-- [ ] Crear `zennotes.container` con las 11 secciones canónicas (secret, EnvironmentFile, labels normalizadas, `User=1000:1000`).
-- [ ] Crear `zennotes-vault.volume` y `zennotes-data.volume`.
-- [ ] Crear `.config/zennotes/zennotes.env`.
-- [ ] Validar render con `/usr/lib/podman/quadlet -user -dryrun `.
-- [ ] Crear `docs/zennotes.md`.
-- [ ] Cerrar: renombrar a `plans/PLAN-006-ARCHIVED.md `.
+- [x] Crear `zennotes.container` con las 11 secciones canónicas (secret, EnvironmentFile, labels normalizadas, `User=1000:1000`).
+- [x] Crear `zennotes-vault.volume` y `zennotes-data.volume`.
+- [x] Crear `.config/zennotes/zennotes.env`.
+- [x] Validar render con `/usr/lib/podman/quadlet -user -dryrun `.
+- [x] Crear `docs/zennotes.md`.
+- [x] Cerrar: renombrar a `plans/PLAN-006-ARCHIVED.md `.
 
 ## Follow-ups
 - Crear el secreto ANTES de arrancar (NUNCA `crypta store`): `printf '%s' "$(openssl rand -hex 32)" | podman secret create zennotes_auth_token - `.

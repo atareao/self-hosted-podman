@@ -33,12 +33,12 @@ Migrar el `docker-compose.yml` de `apimail` a quadlets en este repo, respetando 
 | healthcheck `wget -qO- …/api/health` | `HealthCmd=wget -qO- http://127.0.0.1:3000/api/health || exit 1` |
 
 ## Tareas
-- [ ] Crear `apimail.container` con las 11 secciones canónicas (3 secretos, EnvironmentFile, labels normalizadas).
-- [ ] Crear `apimail-data.volume` (`VolumeName=apimail-data`).
-- [ ] Crear `.config/apimail/apimail.env` con la config no secreta.
-- [ ] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
-- [ ] Crear `docs/apimail.md`.
-- [ ] Cerrar: renombrar a `plans/PLAN-005-ARCHIVED.md`.
+- [x] Crear `apimail.container` con las 11 secciones canónicas (3 secretos, EnvironmentFile, labels normalizadas).
+- [x] Crear `apimail-data.volume` (`VolumeName=apimail-data`).
+- [x] Crear `.config/apimail/apimail.env` con la config no secreta.
+- [x] Validar render con `/usr/lib/podman/quadlet -user -dryrun`.
+- [x] Crear `docs/apimail.md`.
+- [x] Cerrar: renombrar a `plans/PLAN-005-ARCHIVED.md`.
 
 ## Follow-ups
 - Crear los 3 secretos ANTES de arrancar (NUNCA `crypta store`): `printf '%s' '<valor>' | podman secret create apimail_api_key -` (idem `apimail_imap_password`, `apimail_sm9_password`).
