@@ -1,0 +1,64 @@
+[Unit]
+Description=Alloy — Docker management dashboard
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/atareao/alloy:latest
+ContainerName=alloy
+AutoUpdate=registry
+PodmanArgs=--init
+UserNS=keep-id
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=alloy-data.volume:/app/data:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=alloy
+
+# ==== Secrets ====
+Secret=alloy_oidc_client_secret,type=env,target=OIDC_CLIENT_SECRET
+
+# ==== Environment ====
+EnvironmentFile=%h/.config/alloy/alloy.env
+EnvironmentFile=%h/.config/alloy/alloy.env.local
+Environment=OIDC_REDIRECT_URL=https://${FQDN}/api/auth/callback
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.alloy.loadbalancer.server.port=3066
+Label=traefik.http.routers.alloy.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.alloy.entrypoints=websecure
+Label=traefik.http.routers.alloy.tls.certresolver=letsencrypt
+Label=traefik.http.routers.alloy.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=wget -q --spider http://localhost:3066/api/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
+
+# ==== Hardening ====
+NoNewPrivileges=true
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" alloy)" != "healthy" ]; do sleep 2; done'
+
+[Install]
+WantedBy=default.target
