@@ -1,0 +1,59 @@
+[Unit]
+Description=errserve (catch-all error pages)
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/atareao/errserve:latest
+AutoUpdate=registry
+ContainerName=errserve
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=errserve
+
+# ==== Secrets ====
+
+# ==== Environment ====
+EnvironmentFile=%h/.config/errserve/errserve.env
+EnvironmentFile=%h/.config/errserve/errserve.env.local
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.errserve.loadbalancer.server.port=8080
+Label=traefik.http.middlewares.errpages.errors.status=400-599
+Label=traefik.http.middlewares.errpages.errors.service=errserve
+Label=traefik.http.middlewares.errpages.errors.query=/{status}
+Label=traefik.http.routers.errserve-catchall.rule=HostRegexp(`.+`) && !Path(`/metrics`)
+Label=traefik.http.routers.errserve-catchall.entrypoints=websecure
+Label=traefik.http.routers.errserve-catchall.service=errserve
+Label=traefik.http.routers.errserve-catchall.middlewares=errpages
+Label=traefik.http.routers.errserve-catchall.priority=1
+Label=traefik.http.middlewares.errfixed.errors.status=400-599
+Label=traefik.http.middlewares.errfixed.errors.service=errserve
+Label=traefik.http.middlewares.errfixed.errors.query=/404
+
+# ==== Healthcheck ====
+
+# ==== Hardening ====
+
+# ==== Resources ====
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target
