@@ -35,7 +35,7 @@ Environment=SEMAPHORE_ADMIN=admin
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.semaphore.loadbalancer.server.port=5005
+Label=traefik.http.services.semaphore.loadbalancer.server.port=3000
 Label=traefik.http.routers.semaphore.rule=Host(`semaphore.${FQDN}`)
 Label=traefik.http.routers.semaphore.entrypoints=websecure
 Label=traefik.http.routers.semaphore.tls.certresolver=letsencrypt
