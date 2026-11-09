@@ -32,7 +32,7 @@ Environment=GOKAPI_EXTERNAL_URL="https://gokapi.${FQDN}"
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.gokapi.loadbalancer.server.port=80
+Label=traefik.http.services.gokapi.loadbalancer.server.port=8080
 Label=traefik.http.routers.gokapi.rule=Host(`gokapi.${FQDN}`)
 Label=traefik.http.routers.gokapi.entrypoints=websecure
 Label=traefik.http.routers.gokapi.tls.certresolver=letsencrypt

@@ -6,7 +6,7 @@
 - nº contenedores: 1
 - red: proxy.network
 - dominio: raíz ${FQDN}, subdominio gokapi.${FQDN}
-- puerto interno: 80
+- puerto interno: 8080
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/gokapi/gokapi.container
