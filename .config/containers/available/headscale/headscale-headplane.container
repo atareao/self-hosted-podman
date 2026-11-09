@@ -35,7 +35,7 @@ EnvironmentFile=%h/.config/headplane/headplane.env.local
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.headplane.loadbalancer.server.port=3000
-Label=traefik.http.routers.headplane.rule=Host(`headscale.${FQDN}`) && PathPrefix(`/admin`)
+Label=traefik.http.routers.headplane.rule=Host(`headscale.${FQDN}`)&&PathPrefix(`/admin`)
 Label=traefik.http.routers.headplane.entrypoints=websecure
 Label=traefik.http.routers.headplane.tls.certresolver=letsencrypt
 Label=traefik.http.routers.headplane.tls.options=headscale-http1@file
