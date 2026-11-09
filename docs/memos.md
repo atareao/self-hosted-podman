@@ -1,7 +1,7 @@
 # memos — Memos es un servicio de anotaciones.
 
 ## Qué es
-Memos, Imagen=docker.io/neosmemo/memos:latest, 1 contenedor, red proxy.network, dominio memos.${FQDN}, puerto interno 5230
+Memos, Imagen=docker.io/neosmemo/memos:stable, 1 contenedor, red proxy.network, dominio memos.${FQDN}, puerto interno 5230
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/memos/memos.container

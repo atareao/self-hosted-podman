@@ -4,7 +4,7 @@ After=network-online.target traefik.service
 
 [Container]
 # ==== Image ====
-Image=docker.io/neosmemo/memos:latest
+Image=docker.io/neosmemo/memos:stable
 AutoUpdate=registry
 ContainerName=memos
 PodmanArgs=--init
