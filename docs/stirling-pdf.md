@@ -64,5 +64,6 @@ No hay `.env` de stack para este servicio.
 
 ## Estado de despliegue
 
-Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
-URL: https://stirling-pdf.servidorlinux.es — cert LE válido, router Traefik activo.
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5), y
+**desinstalado ese mismo día**: units desenlazados (`qctl uninstall`), volúmenes, secretos y datos
+eliminados. Estado actual: **no desplegado**.

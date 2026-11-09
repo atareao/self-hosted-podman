@@ -52,6 +52,6 @@ No hay `.env` de stack ni variables propias.
 
 ## Estado de despliegue
 
-Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
-URL: https://memos.servidorlinux.es — cert LE válido, router Traefik activo.
-Imagen `docker.io/neosmemo/memos:stable` (el tag `latest` no existe).
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5), y
+**desinstalado ese mismo día**: units desenlazados (`qctl uninstall`), volúmenes, secretos y datos
+eliminados. Estado actual: **no desplegado**.

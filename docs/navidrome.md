@@ -58,6 +58,6 @@ No hay `.env` de stack ni variables propias; Navidrome usa sus defaults (`/music
 
 ## Estado de despliegue
 
-Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
-URL: https://navidrome.servidorlinux.es — cert LE válido, router Traefik activo.
-Los binds `~/.config/navidrome/{data,music}` deben chownearse a uid 1000 (`podman unshare chown -R 1000:1000`).
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5), y
+**desinstalado ese mismo día**: units desenlazados (`qctl uninstall`), volúmenes, secretos y datos
+eliminados. Estado actual: **no desplegado**.
