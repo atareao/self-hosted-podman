@@ -38,3 +38,11 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-013, issue #7): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP OK) y **purgado ese mismo día** (units desenlazados,
+volúmenes/binds e imágenes eliminados). Estado actual: **no desplegado**.
+
+El dominio es `wiki.${FQDN}` (no `otterwiki.${FQDN}`).

@@ -2,7 +2,7 @@
 
 - **Issue GitHub:** #7
 - **Fecha:** 2026-11-09
-- **Estado:** en curso
+- **Estado:** completado
 
 ## Objetivo
 
@@ -47,8 +47,8 @@ verificarlos end-to-end y **volver a desinstalarlos y purgarlos** al terminar.
 - `docs/<stack>.md` con «Estado de despliegue»; `HANDOFF.md` actualizado.
 
 ## Tareas
-- [ ] Crear issue GitHub.
-- [ ] Fase B: binds + `qctl install` + start (+ permisos si hacen falta).
-- [ ] Fase C: verificación end-to-end.
-- [ ] Fase D: purga total (units + volúmenes + binds + imágenes).
-- [ ] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.
+- [x] Crear issue GitHub.
+- [x] Fase B: binds + `qctl install` + start (+ permisos si hacen falta).
+- [x] Fase C: verificación end-to-end.
+- [x] Fase D: purga total (units + volúmenes + binds + imágenes).
+- [x] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.
