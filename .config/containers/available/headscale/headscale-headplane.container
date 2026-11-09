@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=%h/.config/headplane/config.yaml:/etc/headplane/config.yaml:ro,Z
-Volume=headplane-data.volume:/var/lib/headplane:U
+Volume=headscale-headplane-data.volume:/var/lib/headplane:U
 Volume=%h/.config/headscale/config.yaml:/etc/headscale/config.yaml:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
@@ -43,7 +43,7 @@ Label=traefik.http.routers.headplane.priority=100
 Label=traefik.http.routers.headplane.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=["/bin/hp_healthcheck"]
+HealthCmd=["/bin/hp_healthcheck","health"]
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
