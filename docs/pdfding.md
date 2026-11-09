@@ -33,3 +33,14 @@ Usa la red proxy.network. Persiste datos en pdfding-sqlite_data.volume y pdfding
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-019, issue #14): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+Requiere el secreto `pdfding_secret_key` (crear con `podman secret create`).
+
+**Follow-up**: existe un stack **duplicado** `dingpdf` (mismo `docker.io/mrmn/pdfding`, mismos volúmenes y
+mismo service `pdfding`; su router apunta a `dingpdf.${FQDN}` pero su `HOST_NAME` a `pdfding.${FQDN}`).
+Conviene eliminar `dingpdf` del repo.

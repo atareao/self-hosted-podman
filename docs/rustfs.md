@@ -36,3 +36,18 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-019, issue #14): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bugs / notas**:
+- El `HealthCmd` en forma CMD-SHELL (`curl ... && curl ... || exit 1`) fallaba con **exit 125** en conmon
+  (el healthcheck no se ejecutaba), dejando el contenedor `unhealthy` y haciendo que Traefik dejara de
+  enrutarlo (404). Se corrigió usando la **forma exec** (array JSON):
+  `HealthCmd=["/usr/bin/curl","-f","http://127.0.0.1:9000/health"]`.
+- El **console** se sirve bajo `/rustfs/console` (el root `/` devuelve 403 — API S3). La URL correcta es
+  `https://rustfs.${FQDN}/rustfs/console`. El base path del console es de compilación
+  (`RUSTFS_CONSOLE_BASE_PATH`), no configurable en runtime.
+- Requiere los secretos `rustfs_access_key` y `rustfs_secret_key` (crear con `podman secret create`).

@@ -55,3 +55,11 @@ printf '%s' '<valor>' | podman secret create storyteller_secret_key -
 - Es el único quadlet del grupo sin `PodmanArgs=--init`; el resto de stacks lo usan para reapear hijos. Valorar añadirlo por consistencia.
 - Sin healthcheck ni hardening (`User`, `NoNewPrivileges`, `ReadOnly`).
 - Imagen `latest` con `AutoUpdate=registry`: las actualizaciones pueden introducir cambios de comportamiento sin aviso.
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-019, issue #14): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bug corregido**: el volumen usaba `storyteller-data.volume:/data:rw:Z` (dos opciones separadas por `:`,
+formato inválido en podman) → corregido a `:Z`.

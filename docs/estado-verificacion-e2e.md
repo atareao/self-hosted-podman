@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 38 |
+| Verificados E2E (probados y purgados) | 44 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **87** |
+| **Sin verificar E2E** | **81** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -73,6 +73,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | picoshare | `docs/picoshare.md` | PLAN-018 / #13 | 200 | secreto ps_shared_secret |
 | podmixer | `docs/podmixer.md` | PLAN-018 / #13 | 200 | 2 volúmenes nombrados |
 | glass-keep | `docs/glass-keep.md` | PLAN-018 / #13 | 200 | dominio `keep.*`; INITIAL_ADMIN_USERNAME/PASSWORD |
+| dagu | `docs/dagu.md` | PLAN-019 / #14 | 200 | corregido: imagen dagucloud + base path |
+| semaphore | `docs/semaphore.md` | PLAN-019 / #14 | 200 | corregido: dialecto sqlite + service port 3000 |
+| rustfs | `docs/rustfs.md` | PLAN-019 / #14 | 200 | corregido: healthcheck exec; console en /rustfs/console |
+| storyteller | `docs/storyteller.md` | PLAN-019 / #14 | 200 | corregido: volumen :rw:Z→:Z |
+| pdfding | `docs/pdfding.md` | PLAN-019 / #14 | 200 | 2 volúmenes; duplicado dingpdf |
+| openobserve | `docs/openobserve.md` | PLAN-019 / #14 | 200 | requiere security.network (stack vector) |
 
 ## En producción (desplegados y corriendo)
 
@@ -83,20 +89,20 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (87)
+## Sin verificar E2E (81)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
-chevereto, codimd, couchdb, crowdsec, dagu, dasherr, dev, dim,
+chevereto, codimd, couchdb, crowdsec, dasherr, dev, dim,
 dingpdf, dnote, dockge, facturascripts, filebrowser, firefly,
 focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, homer, huginn,
 immich, invidious, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, ntfy,
-odoo, opengist, openobserve, open-webui, pastebin, pdfding, photoprism,
+odoo, opengist, open-webui, pastebin, photoprism,
 pinepods, planka, plausible, postgres, publirs, rabbitmq, radicale,
-registry, rustfs, semaphore, silverbullet, simple-torrent, snibox, socks5,
-storyteller, tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
+registry, silverbullet, simple-torrent, snibox, socks5,
+tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,
 yacht, zennotes, zincsearch.
 

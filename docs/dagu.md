@@ -40,3 +40,15 @@ Gestor de tareas cron basado en DAGs.
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-019, issue #14): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bugs corregidos**:
+- La imagen era `ghcr.io/dagu-org/dagu:latest` y devolvía **403 Forbidden** (el proyecto se renombró de
+  `dagu-org` a `dagucloud`). Corregido a `ghcr.io/dagucloud/dagu:latest`.
+- Se eliminó `DAGU_BASE_PATH=/dagu`: con base path la UI se sirve bajo `/dagu` pero el router Traefik es
+  `Host(dagu.${FQDN})` sin `PathPrefix`, así que `/` daba 404. Sirviendo en raíz coincide con el router.
+- Requiere el secreto `dagu_basicauth_password` (crear con `podman secret create`).

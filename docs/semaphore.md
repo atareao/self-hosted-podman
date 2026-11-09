@@ -42,3 +42,16 @@
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-019, issue #14): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bugs corregidos**:
+- `SEMAPHORE_DB_DIALECT=bolt` → `Unknown database dialect: bolt`. BoltDB fue **retirado en Semaphore 2.19**
+  (solo `sqlite`/`mysql`/`postgres`). Corregido a `sqlite` + `SEMAPHORE_DB=/var/lib/semaphore/semaphore.db`
+  (el volumen `semaphore-data.volume:/var/lib/semaphore` ya existía).
+- El service de Traefik usaba `port=5005`, pero Semaphore escucha por defecto en **3000** (`Port :3000`) → 502.
+  Corregido a 3000.
+- Requiere el secreto `semaphore_admin_password` (crear con `podman secret create`).
