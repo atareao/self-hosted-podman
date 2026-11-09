@@ -27,7 +27,8 @@ NetworkAlias=semaphore
 Secret=semaphore_admin_password,type=env,target=SEMAPHORE_ADMIN_PASSWORD
 
 # ==== Environment ====
-Environment=SEMAPHORE_DB_DIALECT=bolt
+Environment=SEMAPHORE_DB_DIALECT=sqlite
+Environment=SEMAPHORE_DB=/var/lib/semaphore/semaphore.db
 Environment=SEMAPHORE_ADMIN_NAME=admin
 Environment=SEMAPHORE_ADMIN_EMAIL=admin@localhost
 Environment=SEMAPHORE_ADMIN=admin

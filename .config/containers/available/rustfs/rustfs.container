@@ -38,7 +38,7 @@ Label=traefik.http.routers.rustfs-console.tls.certresolver=letsencrypt
 Label=traefik.http.routers.rustfs-console.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=sh -c curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health || exit 1
+HealthCmd=curl -f http://localhost:9000/health && curl -f http://localhost:9001/rustfs/console/health || exit 1
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=10s
