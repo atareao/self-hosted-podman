@@ -121,9 +121,46 @@ qctl check             # auditoría global: colisiones duras + avisos de convenc
 - El catch-all de Traefik se prueba desde fuera: una ruta o subdominio inexistentes deben devolver la
   página de error servida por `errserve` (404 real, no el 404 por defecto de Traefik).
 
+## Desinstalar y purgar un stack
+
+`qctl uninstall` sólo **para y desenlaza** (nunca borra los quadlets de `available/`). Todo lo que el
+stack dejó al ejecutarse —secretos, volúmenes, datos en binds e imágenes— sobrevive y hay que
+retirarlo a mano si se quiere una limpieza total. Procedimiento completo, desde el directorio del stack:
+
+```sh
+cd .config/containers/available/<stack>
+
+# 1. Parar y desenlazar (no borra los quadlets de available/)
+qctl uninstall
+
+# 2. Volúmenes declarados por el stack (*.volume)
+qctl clean-volumes                  # o: podman volume rm <v1> <v2> ...
+
+# 3. Secretos del stack (los nombres van en las líneas Secret= del quadlet)
+podman secret rm <secreto> ...
+
+# 4. Datos en bind mounts de la app
+rm -rf ~/.config/<stack>
+# Si el contenedor corría con User=<uid> y los ficheros quedaron con uid mapeado
+# (p. ej. navidrome, User=1000:1000), el rm falla con «Permission denied»: usar
+podman unshare rm -rf ~/.config/<stack>
+
+# 5. Imágenes (opcional)
+podman rmi <imagen>:<tag> ...
+```
+
+Notas:
+- **No hay `qctl` para secretos, binds ni imágenes**: se limpian con `podman`.
+- Los volúmenes nombrados se listan con `podman volume ls`; los del stack se declaran en sus `*.volume` (`VolumeName=`).
+- **Binds con uid mapeado**: si el contenedor define `User=<uid>` (p. ej. `User=1000:1000`), los
+  ficheros del bind quedan propiedad del subuid y `rm -rf` desde el host falla con «Permission denied»;
+  hay que borrarlos dentro del namespace con `podman unshare rm -rf <ruta>`.
+- Tras purgar, verificar que no quedan restos: `podman ps -a`, `podman volume ls`, `podman secret ls`,
+  `podman images`, y que no haya symlinks en `~/.config/containers/systemd/`.
+
 ## Resultado del despliegue de `errserve` en prod
 
-Host `new_atareao` (usuario `podman`), 2026-11-07:
+Host `new_atareao` (usuario `runner`), 2026-11-07:
 
 1. `yadm pull` hasta `ffb8b00`; el hook `post_pull` renderizó la plantilla y scaffoldó
    `.config/errserve/errserve.env` + `.config/errserve/errserve.env.local` (vacío; el stack no
