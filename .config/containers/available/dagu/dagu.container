@@ -4,7 +4,7 @@ After=network-online.target traefik.service
 
 [Container]
 # ==== Image ====
-Image=ghcr.io/dagu-org/dagu:latest
+Image=ghcr.io/dagucloud/dagu:latest
 AutoUpdate=registry
 ContainerName=dagu
 PodmanArgs=--init
@@ -27,7 +27,6 @@ Secret=dagu_basicauth_password,type=env,target=DAGU_BASICAUTH_PASSWORD
 
 # ==== Environment ====
 Environment=DAGU_TZ=Europe/Madrid
-Environment=DAGU_BASE_PATH=/dagu
 Environment=DAGU_IS_BASICAUTH=1
 Environment=DAGU_BASICAUTH_USERNAME=usuario
 
