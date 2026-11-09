@@ -43,11 +43,8 @@ Label=traefik.http.routers.headplane.priority=100
 Label=traefik.http.routers.headplane.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=["/bin/hp_healthcheck","health"]
-HealthInterval=30s
-HealthRetries=3
-HealthTimeout=5s
-HealthStartPeriod=10s
+HealthCmd=none
+
 
 # ==== Hardening ====
 NoNewPrivileges=true
