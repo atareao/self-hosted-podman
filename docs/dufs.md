@@ -1,46 +1,65 @@
-# dufs — File system explorer simple
+# dufs — Servidor de ficheros web
 
 ## Qué es
-**Aplicación**: dufs (image: `docker.io/sigoden/dufs`)
-**Número de contenedores**: 1
-**Red**: `proxy.network`
-**Dominio**: `dufs.${FQDN}`
-**Puerto interno**: `5000`
+
+dufs (`docker.io/sigoden/dufs`) es un servidor de ficheros (Rust) con subida/descarga, búsqueda,
+control de acceso y WebDAV.
+
+- **App / imagen (`Image=`):** `docker.io/sigoden/dufs` (sin tag -> `latest`), contenedor `dufs`.
+- **Nº contenedores:** 1.
+- **Red:** `proxy.network`, alias `dufs`.
+- **Dominio:** `dufs.${FQDN}` (router Traefik `dufs`).
+- **Puerto interno (Traefik):** `5000`.
+- No hay `PublishPort`: el acceso es solo vía Traefik.
 
 ## Ficheros
-- Quadlet(s):
-  - `/data/self-hosted-podman/.config/containers/available/dufs/dufs.container`
-- Volumen(es):
-  - `/data/self-hosted-podman/.config/containers/available/dufs/dufs-data.volume`  *(bind: `dufs-data.volume:/data:Z`)*
-- Config no secreta: —
-- Secretos: —
+
+- Quadlet: `.config/containers/available/dufs/dufs.container`
+- Volumen: `.config/containers/available/dufs/dufs-data.volume` (`VolumeName=dufs-data`) → `/data`.
+- Config no secreta: `.config/dufs/dufs.env` (+ `dufs.env.local` por máquina, gitignored).
+- Secretos: `dufs_auth` (env target `DUFS_AUTH`).
 
 ## Cómo funciona
-- Red `proxy.network`
-- Volumen: `dufs-data.volume` para `/data`
-- Secretos: ninguno
-- Healthcheck: no
-- Enrutado Traefik: reglas en las Labels
-- User/UserNS/NoNewPrivileges: no especificado
-- Volumen con permiso de escritura y enlace simbólico: `Z` para compatibilidad con Podman
+
+- **Red:** `proxy.network`.
+- **Volumen:** `dufs-data` en `/data` (lo que se sirve).
+- **Autenticación:** reglas en `DUFS_AUTH`, con formato de dufs `user:pass@/:rw`
+  (varias reglas separadas por `|`). Si no se define regla anónima (`@/`), el acceso exige credenciales.
+- **Permisos de operación:** `DUFS_ALLOW_ALL=true` habilita todas las operaciones (upload, delete,
+  search, symlink, archive); en la práctica `:rw` sobre `/` ya concede todo lo permitido.
+- **Enrutado Traefik:** servicio `dufs` puerto `5000`, router con `Host(`dufs.${FQDN}`)`, `websecure`,
+  `certresolver=letsencrypt`, middlewares `seguridadHeaders@file,compresionHeaders@file`.
+- **Healthcheck:** no define `Health*`. dufs expone `GET /__dufs__/health`.
+- **Hardening:** sección vacía.
+- **AutoUpdate:** `AutoUpdate=registry`; `PodmanArgs=--init`.
 
 ## Variables / configuración
+
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
-| `DUFS_SERVE_PATH` | Environment | `/data` | directorio a servir |
-| `DUFS_HIDDEN` | Environment | `tmp,*.log,*.lock` | Archivos ocultos |
-| `DUFS_AUTH` | Environment | `$DUFS_AUTH` | Variable dinámica de autenticación |
-| `DUFS_ALLOW_ALL` | Environment | `True` | Permite todo |
-| `DUFS_ALLOW_UPLOAD` | Environment | `True` | Permite subir |
-| `DUFS_ALLOW_DELETE` | Environment | `True` | Permite eliminar |
-| `DUFS_ALLOW_SEARCH` | Environment | `True` | Permite buscar |
-| `DUFS_ALLOW_SYMLINK` | Environment | `True` | Permite enlaces simbólicos |
-| `DUFS_ALLOW_ARCHIVE` | Environment | `True` | Permite archivar |
+| `DUFS_SERVE_PATH` | `dufs.env` | `/data` | directorio servido |
+| `DUFS_HIDDEN` | `dufs.env` | `tmp,*.log,*.lock` | rutas ocultas en los listados |
+| `DUFS_ALLOW_ALL` | `dufs.env` | `true` | permite todas las operaciones |
+| `DUFS_ALLOW_UPLOAD` | `dufs.env` | `true` | permite subir |
+| `DUFS_ALLOW_DELETE` | `dufs.env` | `true` | permite eliminar |
+| `DUFS_ALLOW_SEARCH` | `dufs.env` | `true` | permite buscar |
+| `DUFS_ALLOW_SYMLINK` | `dufs.env` | `true` | permite enlaces simbólicos |
+| `DUFS_ALLOW_ARCHIVE` | `dufs.env` | `true` | permite descargar carpetas como archivo |
+| `DUFS_AUTH` | `Secret=dufs_auth,type=env` | *secreto* | reglas de acceso, p. ej. `admin:pass@/:rw` |
+| `FQDN` | label del router | *(inyectada por systemd)* | dominio raíz |
 
 ## Cómo habilitar / desplegar
-1. Secretos (solo si existen; NUNCA crypta store): —
+
+1. Crear el secreto de autenticación (NUNCA `crypta store`):
+   - `printf '%s' 'admin:<password>@/:rw' | podman secret create dufs_auth -`
 2. `cd .config/containers/available/dufs && qctl install`
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+
+- Sin healthcheck ni hardening.
+- Verificado que `DUFS_AUTH` llega por `Secret=` (antes el quadlet usaba `Environment=DUFS_AUTH=$DUFS_AUTH`, que systemd dejaba literal).
+
+## Notas
+
+- Histórico: hasta 2026-11-09 el quadlet usaba `Environment=DUFS_AUTH=$DUFS_AUTH` sin fuente; corregido a `Secret=` + `.env` de stack.

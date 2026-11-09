@@ -23,18 +23,11 @@ Network=proxy.network
 NetworkAlias=dufs
 
 # ==== Secrets ====
-
+Secret=dufs_auth,type=env,target=DUFS_AUTH
 
 # ==== Environment ====
-Environment=DUFS_SERVE_PATH=/data
-Environment=DUFS_HIDDEN=tmp,*.log,*.lock
-Environment=DUFS_AUTH=$DUFS_AUTH
-Environment=DUFS_ALLOW_ALL=True
-Environment=DUFS_ALLOW_UPLOAD=True
-Environment=DUFS_ALLOW_DELETE=True
-Environment=DUFS_ALLOW_SEARCH=True
-Environment=DUFS_ALLOW_SYMLINK=True
-Environment=DUFS_ALLOW_ARCHIVE=True
+EnvironmentFile=%h/.config/dufs/dufs.env
+EnvironmentFile=%h/.config/dufs/dufs.env.local
 
 # ==== Labels ====
 Label=traefik.enable=true
