@@ -33,3 +33,12 @@ Red: proxy.network y yopass.network. No volúmenes, secretos ni variables de ent
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-017, issue #12): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bug corregido**: yopass escuchaba en el puerto **80**, imposible en podman rootless
+(`listen tcp :80: bind: permission denied`). Se cambió `Exec=... --port 1337` y el
+`loadbalancer.server.port` de Traefik a `1337`.

@@ -38,3 +38,13 @@
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-017, issue #12): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bug corregido**: el volumen usaba `searxng-data.volume:/etc/searxng:rw:Z` (dos opciones separadas por `:`,
+formato inválido para podman → `incorrect volume format`). Corregido a `:Z`.
+Follow-up: `SEARXNG_BASE_URL=https://localhost/` es un valor placeholder; convendría fijarlo a
+`https://searxng.${FQDN}` para enlaces y redirecciones correctos.

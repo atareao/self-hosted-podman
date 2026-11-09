@@ -26,3 +26,8 @@ Utiliza la red `proxy.network` para la exposición a Traefik y monta el socket d
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-017, issue #12): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.

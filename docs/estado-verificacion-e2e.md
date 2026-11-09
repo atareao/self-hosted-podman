@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 26 |
+| Verificados E2E (probados y purgados) | 32 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **99** |
+| **Sin verificar E2E** | **93** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -61,6 +61,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | sftpgo | `docs/sftpgo.md` | PLAN-015 / #10 | 200 | 2 volúmenes nombrados |
 | nginx | `docs/nginx.md` | PLAN-015 / #10 | 200 | sin almacenamiento |
 | ferrishare | docs/ferrishare.md | #11 | 200 | requiere provisioning previo del volumen (ferrishare-init.py) |
+| homepage | `docs/homepage.md` | PLAN-017 / #12 | 200 | bind podman.sock (ro) |
+| portainer | `docs/portainer.md` | PLAN-017 / #12 | 200 | bind podman.sock (ro) |
+| jellyfin | `docs/jellyfin.md` | PLAN-017 / #12 | 302→200 | 3 volúmenes nombrados |
+| zincobserve | `docs/zincobserve.md` | PLAN-017 / #12 | 307→200 | corregido: ZO_ROOT_USER_EMAIL/PASSWORD |
+| yopass | `docs/yopass.md` | PLAN-017 / #12 | 200 | corregido: puerto 80→1337 (rootless) |
+| searxng | `docs/searxng.md` | PLAN-017 / #12 | 200 | corregido: volumen :rw:Z→:Z |
 
 ## En producción (desplegados y corriendo)
 
@@ -71,22 +77,22 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (99)
+## Sin verificar E2E (93)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, couchdb, crowdsec, dagu, dasherr, dev, dim,
 dingpdf, dnote, dockge, facturascripts, filebrowser, firefly, flame, flatnotes,
-focalboard, ghost, gitea, glass-keep, grafana-influx-telegraf, hedgedoc, homepage, homer, huginn,
-immich, invidious, jellyfin, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
+focalboard, ghost, gitea, glass-keep, grafana-influx-telegraf, hedgedoc, homer, huginn,
+immich, invidious, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, notemark, ntfy,
 odoo, opengist, openobserve, open-webui, pastebin, pdfding, photoprism,
-picoshare, pinepods, planka, plausible, podmixer, portainer, postgres, publirs, rabbitmq, radicale,
-registry, rustfs, searxng, semaphore, silverbullet, simple-torrent, snibox, socks5,
+picoshare, pinepods, planka, plausible, podmixer, postgres, publirs, rabbitmq, radicale,
+registry, rustfs, semaphore, silverbullet, simple-torrent, snibox, socks5,
 storyteller, tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,
-yacht, yopass, zennotes, zincobserve, zincsearch.
+yacht, zennotes, zincsearch.
 
 ## Notas
 
