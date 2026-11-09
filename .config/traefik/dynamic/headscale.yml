@@ -1,0 +1,9 @@
+# Fuerza HTTP/1.1 en el router de headscale: Traefik NO reenvia el upgrade
+# custom 'tailscale-control-protocol' sobre HTTP/2, por lo que el handshake
+# TS2021 falla. Con alpnProtocols http/1.1 el cliente y el proxy negocian 1.1.
+tls:
+  options:
+    headscale-http1:
+      minVersion: VersionTLS12
+      alpnProtocols:
+        - http/1.1

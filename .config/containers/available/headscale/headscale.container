@@ -1,0 +1,64 @@
+[Unit]
+Description=Headscale (Tailscale control server, rootless)
+After=network-online.target traefik.service
+
+[Container]
+# ==== Image ====
+Image=docker.io/headscale/headscale:latest
+ContainerName=headscale
+AutoUpdate=registry
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+# STUN del DERP embebido. El resto del trafico entra por Traefik.
+PublishPort=3478:3478/udp
+
+# ==== Volumes ====
+Volume=%h/.config/headscale/config.yaml:/etc/headscale/config.yaml:ro,Z
+Volume=headscale-data.volume:/var/lib/headscale:Z
+
+# ==== Networks ====
+Network=proxy.network
+
+# ==== Secrets ====
+
+# ==== Environment ====
+EnvironmentFile=%h/.config/headscale/headscale.env
+EnvironmentFile=%h/.config/headscale/headscale.env.local
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.headscale.loadbalancer.server.port=8080
+Label=traefik.http.routers.headscale.rule=Host(`headscale.${FQDN}`)
+Label=traefik.http.routers.headscale.entrypoints=websecure
+Label=traefik.http.routers.headscale.tls.certresolver=letsencrypt
+Label=traefik.http.routers.headscale.tls.options=headscale-http1@file
+Label=traefik.http.routers.headscale.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=/ko-app/headscale health
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
+
+# ==== Hardening ====
+NoNewPrivileges=true
+SecurityLabelDisable=true
+
+# ==== Resources ====
+Memory=256M
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=180
+
+[Install]
+WantedBy=default.target
