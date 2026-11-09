@@ -10,6 +10,7 @@ AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
+Exec=serve
 
 # ==== Ports ====
 # STUN del DERP embebido. El resto del trafico entra por Traefik.
