@@ -39,7 +39,7 @@ Label=traefik.http.routers.headscale.tls.options=headscale-http1@file
 Label=traefik.http.routers.headscale.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=/ko-app/headscale health
+HealthCmd=["/ko-app/headscale","health"]
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
