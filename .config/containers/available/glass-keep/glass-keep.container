@@ -23,6 +23,7 @@ NetworkAlias=keep
 
 # ==== Secrets ====
 Secret=glass_keep_jwt_secret,type=env,target=JWT_SECRET
+Secret=glass_keep_initial_admin_password,type=env,target=INITIAL_ADMIN_PASSWORD
 
 # ==== Environment ====
 EnvironmentFile=%h/.config/glass-keep/glass-keep.env
