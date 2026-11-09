@@ -22,6 +22,7 @@ Volume=headscale-data.volume:/var/lib/headscale:Z
 
 # ==== Networks ====
 Network=proxy.network
+NetworkAlias=headscale
 
 # ==== Secrets ====
 
@@ -36,7 +37,13 @@ Label=traefik.http.routers.headscale.rule=Host(`headscale.${FQDN}`)
 Label=traefik.http.routers.headscale.entrypoints=websecure
 Label=traefik.http.routers.headscale.tls.certresolver=letsencrypt
 Label=traefik.http.routers.headscale.tls.options=headscale-http1@file
-Label=traefik.http.routers.headscale.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.routers.headscale.middlewares=seguridadHeaders@file,compresionHeaders@file,headplane-cors
+Label=me.tale.headplane.target=headscale
+Label=traefik.http.middlewares.headplane-cors.headers.accesscontrolallowheaders=*
+Label=traefik.http.middlewares.headplane-cors.headers.accesscontrolallowmethods=GET,POST,PUT
+Label=traefik.http.middlewares.headplane-cors.headers.accesscontrolalloworiginlist=https://headscale.${FQDN}
+Label=traefik.http.middlewares.headplane-cors.headers.accesscontrolmaxage=100
+Label=traefik.http.middlewares.headplane-cors.headers.addvaryheader=true
 
 # ==== Healthcheck ====
 HealthCmd=["/ko-app/headscale","health"]

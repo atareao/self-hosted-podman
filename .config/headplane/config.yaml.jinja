@@ -1,0 +1,24 @@
+---
+# Headplane — UI web para Headscale. Se renderiza a config.yaml con
+# unjinja/jinrender (via yadm); por eso el FQDN va como {{ env.FQDN }}.
+# El cookie_secret NO vive aqui: se inyecta por entorno desde un secreto de
+# Podman (HEADPLANE_SERVER__COOKIE_SECRET + HEADPLANE_LOAD_ENV_OVERRIDES=true).
+
+server:
+  host: "0.0.0.0"
+  port: 3000
+  base_path: "/admin"
+  base_url: "https://headscale.{{ env.FQDN }}"
+  cookie_secure: true
+  cookie_max_age: 86400
+  data_path: "/var/lib/headplane"
+
+headscale:
+  url: "http://headscale:8080"
+  config_path: "/etc/headscale/config.yaml"
+
+integration:
+  docker:
+    enabled: true
+    container_label: "me.tale.headplane.target=headscale"
+    socket: "unix:///var/run/docker.sock"

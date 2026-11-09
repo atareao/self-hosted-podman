@@ -1,0 +1,69 @@
+[Unit]
+Description=Headplane (UI web para Headscale)
+After=network-online.target headscale.service traefik.service
+Requires=headscale.service
+
+[Container]
+# ==== Image ====
+Image=ghcr.io/tale/headplane:latest
+AutoUpdate=registry
+ContainerName=headscale-headplane
+PodmanArgs=--init
+
+# ==== Command ====
+
+# ==== Ports ====
+
+# ==== Volumes ====
+Volume=%h/.config/headplane/config.yaml:/etc/headplane/config.yaml:ro,Z
+Volume=headplane-data.volume:/var/lib/headplane:U
+Volume=%h/.config/headscale/config.yaml:/etc/headscale/config.yaml:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
+
+# ==== Networks ====
+Network=proxy.network
+NetworkAlias=headplane
+
+# ==== Secrets ====
+Secret=headplane_cookie_secret,type=env,target=HEADPLANE_SERVER__COOKIE_SECRET
+
+# ==== Environment ====
+Environment=HEADPLANE_LOAD_ENV_OVERRIDES=true
+EnvironmentFile=%h/.config/headplane/headplane.env
+EnvironmentFile=%h/.config/headplane/headplane.env.local
+
+# ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.headplane.loadbalancer.server.port=3000
+Label=traefik.http.routers.headplane.rule=Host(`headscale.${FQDN}`) && PathPrefix(`/admin`)
+Label=traefik.http.routers.headplane.entrypoints=websecure
+Label=traefik.http.routers.headplane.tls.certresolver=letsencrypt
+Label=traefik.http.routers.headplane.tls.options=headscale-http1@file
+Label=traefik.http.routers.headplane.priority=100
+Label=traefik.http.routers.headplane.middlewares=seguridadHeaders@file,compresionHeaders@file
+
+# ==== Healthcheck ====
+HealthCmd=["/bin/hp_healthcheck"]
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=10s
+
+# ==== Hardening ====
+NoNewPrivileges=true
+SecurityLabelDisable=true
+
+# ==== Resources ====
+Memory=256M
+
+[Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
+Restart=always
+RestartSec=10s
+StartLimitIntervalSec=300
+StartLimitBurst=3
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target
