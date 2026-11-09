@@ -32,3 +32,9 @@ Se une a `proxy.network` con `NetworkAlias=uptime_kuma`, de modo que Traefik lo 
 
 - No define `HealthCmd`; añadir uno permitiría a systemd/podman reflejar el estado real.
 - No aplica hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`Group`); evaluar añadirlo.
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-014, issue #9): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP OK) y **purgado ese mismo día** (unit desenlazado,
+volumen/binds e imagen eliminados). Estado actual: **no desplegado**.

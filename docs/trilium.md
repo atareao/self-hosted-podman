@@ -33,3 +33,9 @@ Contenedor sin privilegios propios de red: se une a `proxy.network` con `Network
 
 - No define `HealthCmd`; si se quiere que `qctl status`/systemd refleje el estado real, añadir un healthcheck HTTP sobre `http://localhost:8080`.
 - No aplica hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`Group`); evaluar añadirlo.
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-014, issue #9): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP OK) y **purgado ese mismo día** (unit desenlazado,
+volumen/binds e imagen eliminados). Estado actual: **no desplegado**.

@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 13 |
+| Verificados E2E (probados y purgados) | 19 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **112** |
+| **Sin verificar E2E** | **106** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -48,6 +48,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | kavita | `docs/kavita.md` | PLAN-013 / #7 | 200 | tarda ~40 s en migrar (502 temporal) |
 | otterwiki | `docs/otterwiki.md` | PLAN-013 / #7 | 200 | dominio `wiki.${FQDN}` |
 | dufs | `docs/dufs.md` | #8 | 401/200 | fix: `DUFS_AUTH` por `Secret=` + booleanos `true` |
+| uptime-kuma | `docs/uptime-kuma.md` | PLAN-014 / #9 | 200 | volumen nombrado |
+| trilium | `docs/trilium.md` | PLAN-014 / #9 | 200 | volumen nombrado |
+| audiobookshelf | `docs/audiobookshelf.md` | PLAN-014 / #9 | 200 | 3 volúmenes nombrados |
+| pairdrop | `docs/pairdrop.md` | PLAN-014 / #9 | 200 | sin almacenamiento |
+| readeck | `docs/readeck.md` | PLAN-014 / #9 | 200 | volumen nombrado |
+| bentopdf | `docs/bentopdf.md` | PLAN-014 / #9 | 200 | sin almacenamiento |
 
 ## En producción (desplegados y corriendo)
 
@@ -58,20 +64,20 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (112)
+## Sin verificar E2E (106)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-alloy, apimail, atuin, audiobookshelf, authentik, bentopdf, beszel, bookstack, caddy, cells,
+alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, cloudbeaver, codimd, couchdb, crowdsec, custom-code-server, dagu, dasherr, dev, dim,
 dingpdf, dnote, dockge, facturascripts, ferrishare, filebrowser, firefly, flame, flatnotes,
 focalboard, ghost, gitea, glass-keep, grafana-influx-telegraf, hedgedoc, homepage, homer, huginn,
 immich, invidious, jellyfin, jellystat, kanboard, laverna, logseq, matrix, matrixmail, microbin,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nginx, nitter, notemark, ntfy,
-odoo, opengist, openobserve, open-webui, pairdrop, pastebin, pdfding, photoprism, phpmyadmin,
+odoo, opengist, openobserve, open-webui, pastebin, pdfding, photoprism, phpmyadmin,
 picoshare, pinepods, planka, plausible, podmixer, portainer, postgres, publirs, rabbitmq, radicale,
-readeck, registry, rustfs, searxng, semaphore, sftpgo, silverbullet, simple-torrent, snibox, socks5,
-storyteller, tick, trilium, umami, unbound, uptime-kuma, vaultwarden, vector, vscode, wakapi,
+registry, rustfs, searxng, semaphore, sftpgo, silverbullet, simple-torrent, snibox, socks5,
+storyteller, tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,
 yacht, yopass, zennotes, zincobserve, zincsearch.
 

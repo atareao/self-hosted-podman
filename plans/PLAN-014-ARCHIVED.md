@@ -2,7 +2,7 @@
 
 - **Issue GitHub:** #9
 - **Fecha:** 2026-11-09
-- **Estado:** en curso
+- **Estado:** completado
 
 ## Objetivo
 
@@ -51,8 +51,8 @@ necesarias sobre los stacks sin verificar E2E (ver `docs/estado-verificacion-e2e
 - `docs/<stack>.md` con «Estado de despliegue»; `docs/estado-verificacion-e2e.md` actualizado (mover los 6 de «sin verificar» a «verificados»); `HANDOFF.md` actualizado.
 
 ## Tareas
-- [ ] Crear issue GitHub.
-- [ ] Fase B: `yadm pull` + `qctl install` + start de los seis.
-- [ ] Fase C: verificación end-to-end de cada stack.
-- [ ] Fase D: purga total (units + volúmenes + imágenes).
-- [ ] Actualizar docs, `docs/estado-verificacion-e2e.md` y `HANDOFF.md`; archivar este plan.
+- [x] Crear issue GitHub.
+- [x] Fase B: `yadm pull` + `qctl install` + start de los seis.
+- [x] Fase C: verificación end-to-end de cada stack.
+- [x] Fase D: purga total (units + volúmenes + imágenes).
+- [x] Actualizar docs, `docs/estado-verificacion-e2e.md` y `HANDOFF.md`; archivar este plan.
