@@ -32,7 +32,7 @@ Environment=FLATNOTES_USERNAME=user
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.flatnotes.loadbalancer.server.port=3000
+Label=traefik.http.services.flatnotes.loadbalancer.server.port=8080
 Label=traefik.http.routers.flatnotes.rule=Host(`flatnotes.${FQDN}`)
 Label=traefik.http.routers.flatnotes.entrypoints=websecure
 Label=traefik.http.routers.flatnotes.tls.certresolver=letsencrypt
