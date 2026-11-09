@@ -78,3 +78,34 @@ En el host de apps, como `runner`:
   ```bash
   tailscale up --login-server https://headscale.<FQDN> --authkey <key>
   ```
+
+## Desplegado en producción
+
+Estado: **activo y healthy** en el host `new_atareao` (usuario `runner`), proxy Traefik correcto.
+
+Verificado:
+- `https://headscale.<FQDN>/health` → `{"status":"pass"}` con certificado Let's Encrypt válido.
+- Router Traefik `headscale@docker` activo; **HTTP/1.1 negociado** (gracias al `TLSOption`).
+- El endpoint `POST /ts2021` con `Upgrade: tailscale-control-protocol` entra en la ruta Noise de headscale (el upgrade custom se reenvía).
+
+## Gotchas (aprendidos al desplegar)
+
+1. **El comando `serve` es obligatorio.** El entrypoint de la imagen (`/ko-app/headscale`) no añade subcomando; sin `Exec=serve` el contenedor imprime la ayuda y sale en bucle.
+2. **Healthcheck en forma exec (JSON), no shell.** La imagen headscale es `ko`/scratch: **no tiene `/bin/sh`**. Con `HealthCmd=/ko-app/headscale health` podman lo ejecuta vía `sh` y falla → contenedor `unhealthy`. **Traefik NO registra el router de un contenedor `unhealthy`** (verificado: un contenedor unhealthy queda sin router y cae al catch-all). Por eso se usa:
+   ```
+   HealthCmd=["/ko-app/headscale","health"]
+   ```
+   Regla general para este repo: cualquier imagen sin shell debe declarar el healthcheck en forma exec.
+3. **`trusted_proxies`** debe coincidir con la subred de `proxy.network`.
+
+## Conectar un cliente Tailscale
+
+En el cliente (con el binario `tailscale`):
+```
+tailscale up --login-server https://headscale.<FQDN> --authkey <PREAUTHKEY>
+```
+Generar una preauthkey en el servidor:
+```
+podman exec headscale headscale preauthkeys create --user <ID_NUMERICO> --reusable --expiration 24h
+```
+(`--user` exige el **ID numérico**, no el nombre; se obtiene con `headscale users list`.)
