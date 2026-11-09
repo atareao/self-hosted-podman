@@ -2,7 +2,7 @@
 
 - **Issue GitHub:** #5
 - **Fecha:** 2026-11-09
-- **Estado:** en curso
+- **Estado:** completado
 
 ## Objetivo
 
@@ -63,8 +63,8 @@ subdominio `servidorlinux.es`.
 
 ## Tareas
 
-- [ ] Crear issue GitHub de la feature.
-- [ ] Fase B: `yadm pull` en prod + crear directorios de navidrome.
-- [ ] Fase C: `qctl install` de los cuatro + `daemon-reload`.
-- [ ] Fase C: verificación end-to-end (up + router + cert + HTTP) de cada stack.
-- [ ] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.
+- [x] Crear issue GitHub de la feature.
+- [x] Fase B: `yadm pull` en prod + crear directorios de navidrome.
+- [x] Fase C: `qctl install` de los cuatro + `daemon-reload`.
+- [x] Fase C: verificación end-to-end (up + router + cert + HTTP) de cada stack.
+- [x] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.

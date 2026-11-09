@@ -27,3 +27,9 @@ Ningún healthcheck.
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
+URL: https://memos.servidorlinux.es — cert LE válido, router Traefik activo.
+Imagen `docker.io/neosmemo/memos:stable` (el tag `latest` no existe).

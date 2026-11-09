@@ -35,3 +35,9 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
+URL: https://navidrome.servidorlinux.es — cert LE válido, router Traefik activo.
+Los binds `~/.config/navidrome/{data,music}` deben chownearse a uid 1000 (`podman unshare chown -R 1000:1000`).

@@ -61,3 +61,8 @@ No hay `.env` de stack para este servicio.
 - `DOCKER_ENABLE_SECURITY=False` deja la app sin autenticación propia; el servicio queda protegido únicamente por Traefik (`websecure` + middlewares). Valorar activarla si se quiere login propio.
 - Sin healthcheck ni hardening (`User`, `NoNewPrivileges`, `ReadOnly`).
 - Imagen `latest` con `AutoUpdate=registry`: las actualizaciones pueden introducir cambios de comportamiento sin aviso.
+
+## Estado de despliegue
+
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
+URL: https://stirling-pdf.servidorlinux.es — cert LE válido, router Traefik activo.

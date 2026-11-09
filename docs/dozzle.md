@@ -41,3 +41,9 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Desplegado y verificado en producción (`new_atareao`) el 2026-11-09 (PLAN-011, issue #5).
+URL: https://dozzle.servidorlinux.es — cert LE válido, router Traefik activo.
+Requiere los secretos `dozzle_username`/`dozzle_password` (usuario `admin`).
