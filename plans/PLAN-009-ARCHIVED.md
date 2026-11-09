@@ -23,14 +23,14 @@ El protocolo de control de Tailscale (TS2021) usa un HTTP Upgrade cuyo valor es 
 
 ## Entregables
 
-- [ ] `.config/containers/available/headscale/headscale.container` — quadlet principal (11 secciones).
-- [ ] `.config/containers/available/headscale/headscale-data.volume` — volumen nombrado para datos.
-- [ ] `.config/headscale/config.yaml.jinja` — plantilla de config (renderiza a `config.yaml`).
-- [ ] `.config/headscale/.gitignore` — ignora el `config.yaml` renderizado.
-- [ ] `.config/headscale/headscale.env` — config no secreta del stack.
-- [ ] `.config/traefik/dynamic/headscale.yml` — `TLSOption` `headscale-http1` (ALPN `http/1.1`).
-- [ ] `docs/headscale.md` — documentación de la feature.
-- [ ] `plans/PLAN-009-ARCHIVED.md` al cerrar (renombrar + marcar tareas).
+- [x] `.config/containers/available/headscale/headscale.container` — quadlet principal (11 secciones).
+- [x] `.config/containers/available/headscale/headscale-data.volume` — volumen nombrado para datos.
+- [x] `.config/headscale/config.yaml.jinja` — plantilla de config (renderiza a `config.yaml`).
+- [x] `.config/headscale/.gitignore` — ignora el `config.yaml` renderizado.
+- [x] `.config/headscale/headscale.env` — config no secreta del stack.
+- [x] `.config/traefik/dynamic/headscale.yml` — `TLSOption` `headscale-http1` (ALPN `http/1.1`).
+- [x] `docs/headscale.md` — documentación de la feature.
+- [x] `plans/PLAN-009-ARCHIVED.md` al cerrar (renombrar + marcar tareas).
 
 ## Detalle de diseño
 
@@ -72,10 +72,10 @@ El protocolo de control de Tailscale (TS2021) usa un HTTP Upgrade cuyo valor es 
 
 ## Validación
 
-- [ ] `QUADLET_UNIT_DIRS=<tmp> /usr/lib/podman/quadlet -user -dryrun` rc=0 con unidades + red `proxy`.
-- [ ] `qctl check` sin colisiones de nombre.
-- [ ] Render de `config.yaml` correcto (`jinrender`).
-- [ ] `headscale configtest -c config.yaml` OK.
+- [x] `QUADLET_UNIT_DIRS=<tmp> /usr/lib/podman/quadlet -user -dryrun` rc=0 con unidades + red `proxy`.
+- [x] `qctl check` sin colisiones de nombre.
+- [x] Render de `config.yaml` correcto (`jinrender`).
+- [x] `headscale configtest -c config.yaml` OK.
 
 ## Post-despliegue (no en este plan)
 
