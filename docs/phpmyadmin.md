@@ -28,3 +28,9 @@ Usa la red proxy.network y phpmyadmin.network. No necesita secretos ni sockets d
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-015, issue #10): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día** (unit desenlazado,
+volumenes/binds e imagen eliminados). Estado actual: **no desplegado**.

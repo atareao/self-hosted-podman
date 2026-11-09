@@ -29,3 +29,12 @@ Red proxy.network, volumen ferrishare-data.volume, socket del daemon (none), hea
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+**No desplegable tal cual** (2026-11-09, PLAN-015, issue #10). El contenedor muere al arrancar con
+`Failed to open configuration file at "./data/config.toml"`: ferrishare exige crear su `config.toml`
+con un setup **interactivo** (`ferrishare --init`, que pide la contraseña de administrador y genera su
+hash argon2id) antes del primer arranque. El quadlet no lo genera. Estado actual: **no desplegado**.
+Follow-up: documentar/automatizar el `--init` (p. ej. `podman run --rm -it -v <volumen>:/app/data <img> --init`)
+antes de poder desplegar ferrishare.
