@@ -39,3 +39,11 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-012, issue #6): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP OK) y **purgado ese mismo día** (units desenlazados,
+volúmenes e imágenes eliminados). Estado actual: **no desplegado**.
+
+Corrección aplicada: el `loadbalancer.server.port` de Traefik pasa de 80 a **8080** (la imagen `f0rc3/gokapi` v2 escucha en 8080).

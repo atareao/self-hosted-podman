@@ -2,7 +2,7 @@
 
 - **Issue GitHub:** #6
 - **Fecha:** 2026-11-09
-- **Estado:** en curso
+- **Estado:** completado
 
 ## Objetivo
 
@@ -54,8 +54,8 @@ Todos: red `proxy.network`, dominio `Host(`<stack>.${FQDN}`)`, `websecure` + `ce
 
 ## Tareas
 
-- [ ] Crear issue GitHub.
-- [ ] Fase B: `yadm pull` + `qctl install` + start de los cuatro.
-- [ ] Fase C: verificación end-to-end de cada stack.
-- [ ] Fase D: `qctl uninstall` + volúmenes + imágenes (purga total).
-- [ ] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.
+- [x] Crear issue GitHub.
+- [x] Fase B: `yadm pull` + `qctl install` + start de los cuatro.
+- [x] Fase C: verificación end-to-end de cada stack.
+- [x] Fase D: `qctl uninstall` + volúmenes + imágenes (purga total).
+- [x] Actualizar `docs/` y `HANDOFF.md`; archivar este plan.
