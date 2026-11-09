@@ -15,7 +15,7 @@ ContainerName=storyteller
 
 
 # ==== Volumes ====
-Volume=storyteller-data.volume:/data:rw:Z
+Volume=storyteller-data.volume:/data:Z
 
 # ==== Networks ====
 Network=proxy.network
