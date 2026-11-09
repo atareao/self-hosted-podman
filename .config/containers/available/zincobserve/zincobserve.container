@@ -23,10 +23,11 @@ Network=proxy.network
 NetworkAlias=zincobserve
 
 # ==== Secrets ====
-
+Secret=zincobserve_root_password,type=env,target=ZO_ROOT_USER_PASSWORD
 
 # ==== Environment ====
-
+EnvironmentFile=%h/.config/zincobserve/zincobserve.env
+EnvironmentFile=%h/.config/zincobserve/zincobserve.env.local
 
 # ==== Labels ====
 Label=traefik.enable=true

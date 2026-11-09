@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=searxng-data.volume:/etc/searxng:rw:Z
+Volume=searxng-data.volume:/etc/searxng:Z
 
 # ==== Networks ====
 Network=proxy.network

@@ -10,7 +10,7 @@ ContainerName=yopass
 PodmanArgs=--init
 
 # ==== Command ====
-Exec=--memcached=memcached:11211 --port 80
+Exec=--memcached=memcached:11211 --port 1337
 
 # ==== Ports ====
 
@@ -31,7 +31,7 @@ NetworkAlias=yopass
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.yopass.loadbalancer.server.port=80
+Label=traefik.http.services.yopass.loadbalancer.server.port=1337
 Label=traefik.http.routers.yopass.rule=Host(`yopass.${FQDN}`)
 Label=traefik.http.routers.yopass.entrypoints=websecure
 Label=traefik.http.routers.yopass.tls.certresolver=letsencrypt
