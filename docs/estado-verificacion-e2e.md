@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 32 |
+| Verificados E2E (probados y purgados) | 38 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **93** |
+| **Sin verificar E2E** | **87** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -67,6 +67,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | zincobserve | `docs/zincobserve.md` | PLAN-017 / #12 | 307→200 | corregido: ZO_ROOT_USER_EMAIL/PASSWORD |
 | yopass | `docs/yopass.md` | PLAN-017 / #12 | 200 | corregido: puerto 80→1337 (rootless) |
 | searxng | `docs/searxng.md` | PLAN-017 / #12 | 200 | corregido: volumen :rw:Z→:Z |
+| flame | `docs/flame.md` | PLAN-018 / #13 | 200 | secreto flame_password |
+| flatnotes | `docs/flatnotes.md` | PLAN-018 / #13 | 200 | corregido: dominio + service port 8080 |
+| notemark | `docs/notemark.md` | PLAN-018 / #13 | 200 | JWT_SECRET debe ser largo (≥64) |
+| picoshare | `docs/picoshare.md` | PLAN-018 / #13 | 200 | secreto ps_shared_secret |
+| podmixer | `docs/podmixer.md` | PLAN-018 / #13 | 200 | 2 volúmenes nombrados |
+| glass-keep | `docs/glass-keep.md` | PLAN-018 / #13 | 200 | dominio `keep.*`; INITIAL_ADMIN_USERNAME/PASSWORD |
 
 ## En producción (desplegados y corriendo)
 
@@ -77,18 +83,18 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (93)
+## Sin verificar E2E (87)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, couchdb, crowdsec, dagu, dasherr, dev, dim,
-dingpdf, dnote, dockge, facturascripts, filebrowser, firefly, flame, flatnotes,
-focalboard, ghost, gitea, glass-keep, grafana-influx-telegraf, hedgedoc, homer, huginn,
+dingpdf, dnote, dockge, facturascripts, filebrowser, firefly,
+focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, homer, huginn,
 immich, invidious, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
-miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, notemark, ntfy,
+miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, ntfy,
 odoo, opengist, openobserve, open-webui, pastebin, pdfding, photoprism,
-picoshare, pinepods, planka, plausible, podmixer, postgres, publirs, rabbitmq, radicale,
+pinepods, planka, plausible, postgres, publirs, rabbitmq, radicale,
 registry, rustfs, semaphore, silverbullet, simple-torrent, snibox, socks5,
 storyteller, tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,

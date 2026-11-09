@@ -40,3 +40,15 @@
 
 ## Follow-ups
 - (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-018, issue #13): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+El dominio es `keep.${FQDN}` (no `glass-keep.${FQDN}`).
+
+**Bug corregido**: en la primera instalación glass-keep aborta con
+`Fresh installation: set INITIAL_ADMIN_USERNAME and INITIAL_ADMIN_PASSWORD (12+ characters, at most 72 UTF-8 bytes)`.
+Se añadió `INITIAL_ADMIN_USERNAME=admin` en `.config/glass-keep/glass-keep.env` y el secreto
+`glass_keep_initial_admin_password` (`Secret=...,type=env,target=INITIAL_ADMIN_PASSWORD`, ≥12 caracteres),
+que debe crearse con `podman secret create` antes de arrancar.

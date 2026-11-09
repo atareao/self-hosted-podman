@@ -35,3 +35,12 @@ Red proxy.network, volumen flatnotes-data.volume, socket del daemon (none), heal
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-018, issue #13): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
+
+**Bugs corregidos**:
+- El router apuntaba a `Host(`dnote.${FQDN}`)` (copia-pega), colisionando con el stack `dnote`. Corregido a `flatnotes.${FQDN}`.
+- El service de Traefik usaba `port=3000`, pero flatnotes (uvicorn) escucha en **8080** (`FLATNOTES_PORT=8080`) → daba 502. Corregido a 8080.

@@ -29,3 +29,8 @@ Conecta a la red proxy.network. Persiste datos en picoshare-picoshare.volume. In
 
 ## Follow-ups
 (ninguno)
+
+## Estado de despliegue
+
+Probado en producción (`new_atareao`) el 2026-11-09 (PLAN-018, issue #13): desplegado, verificado
+end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. Estado actual: **no desplegado**.
