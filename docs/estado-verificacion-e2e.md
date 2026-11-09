@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 25 |
+| Verificados E2E (probados y purgados) | 26 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **100** |
+| **Sin verificar E2E** | **99** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -60,6 +60,7 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | phpmyadmin | `docs/phpmyadmin.md` | PLAN-015 / #10 | 200 | sin almacenamiento |
 | sftpgo | `docs/sftpgo.md` | PLAN-015 / #10 | 200 | 2 volúmenes nombrados |
 | nginx | `docs/nginx.md` | PLAN-015 / #10 | 200 | sin almacenamiento |
+| ferrishare | docs/ferrishare.md | #11 | 200 | requiere provisioning previo del volumen (ferrishare-init.py) |
 
 ## En producción (desplegados y corriendo)
 
@@ -70,13 +71,13 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (100)
+## Sin verificar E2E (99)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, couchdb, crowdsec, dagu, dasherr, dev, dim,
-dingpdf, dnote, dockge, facturascripts, ferrishare, filebrowser, firefly, flame, flatnotes,
+dingpdf, dnote, dockge, facturascripts, filebrowser, firefly, flame, flatnotes,
 focalboard, ghost, gitea, glass-keep, grafana-influx-telegraf, hedgedoc, homepage, homer, huginn,
 immich, invidious, jellyfin, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, notemark, ntfy,
@@ -93,4 +94,4 @@ yacht, yopass, zennotes, zincobserve, zincsearch.
   E2E» y quitarlo de «Sin verificar»).
 - Referencia del flujo de despliegue/purga: `docs/gestion-stacks-qctl.md`.
 - Infraestructura de producción: usuario `runner` (uid 1002) en `new_atareao`, FQDN `servidorlinux.es`.
-- «No desplegable tal cual»: ferrishare (issue #10) exige un setup interactivo previo (`--init`).
+- ferrishare: el `--init` interactivo se automatizó con `ferrishare-init.py` (issue #11); ya no bloquea el despliegue.

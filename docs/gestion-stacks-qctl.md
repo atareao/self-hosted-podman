@@ -204,3 +204,27 @@ Host `new_atareao` (usuario `runner`), 2026-11-07:
 - **Volumen `CONTENT_DIR` para `errserve`** si se quieren páginas de error propias.
 - Si se quiere certificado propio para el catch-all TLS, añadir `tls.certresolver` al router de
   `errserve` (hoy usa el certificado por defecto de Traefik).
+
+## Purgar un stack (`qctl purge`)
+
+`qctl purge` (qctl ≥ 0.7.0; issue atareao/qctl#29, cerrado) desinstala el stack actual **y** elimina, con
+opt-in explícito, sus recursos. Se ejecuta **desde dentro del directorio del stack**.
+
+Qué elimina:
+- **Base (siempre)**: enlaces simbólicos en `~/.config/containers/systemd/` + volúmenes nombrados declarados en `*.volume`.
+- `--secrets`: secretos declarados en los `.container` (`podman secret rm`).
+- `--images`: imágenes declaradas (`podman rmi`).
+- `--data`: directorios de bind host bajo `$HOME` (usa `podman unshare rm -rf` cuando el uid está mapeado).
+
+Opciones: `--dry-run` (no cambia nada), `--force` (ignora la guarda cross-stack), `-y/--yes` (sin confirmación).
+
+Guarda cross-stack: si otro stack declara el mismo secreto o imagen, se **salta**. Ejemplos reales:
+`openobserve_root_password` (compartido con `vector`) y la imagen `mrmn/pdfding` (compartida con `dingpdf`);
+`--force` permite saltarse la guarda.
+
+⚠️ Caveats:
+- Solo toca recursos **declarados en los quadlets**. Un secreto o imagen creado a mano y no referenciado por
+  ningún quadlet **no se elimina**: bórralo a mano (`podman secret rm <name>`).
+- `--data` solo borra binds bajo `$HOME`; los sockets (`%t/...`) y rutas fuera de `$HOME` se ignoran.
+
+Verificado end-to-end en producción el 2026-11-09 (issue #11).
