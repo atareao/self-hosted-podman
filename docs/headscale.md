@@ -109,3 +109,18 @@ Generar una preauthkey en el servidor:
 podman exec headscale headscale preauthkeys create --user <ID_NUMERICO> --reusable --expiration 24h
 ```
 (`--user` exige el **ID numérico**, no el nombre; se obtiene con `headscale users list`.)
+
+## Headplane (UI web)
+
+El stack incluye **Headplane**, una UI web para gestionar el tailnet, en el **mismo dominio bajo
+`/admin`**: `https://headscale.<FQDN>/admin`. Es un componente del propio stack (unit
+`headscale-headplane.container`), con integración completa con Podman.
+
+- Login con una **API key** de Headscale: `podman exec headscale headscale apikeys create --expiration 90d`.
+- El healthcheck del contenedor está **desactivado** (`HealthCmd=none`): la imagen es distroless y su
+  healthcheck heredado (`CMD-SHELL`) falla con exit 125, lo que dejaba el contenedor no-healthy y
+  **Traefik no registraba el router**.
+- La regla Traefik usa `Host(...)&&PathPrefix(`/admin`)` **sin espacios** (systemd parte el valor del
+  label por espacios).
+
+Detalle completo en [`docs/headplane.md`](headplane.md).

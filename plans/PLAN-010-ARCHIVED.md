@@ -1,7 +1,7 @@
 # PLAN-010 — Headplane (UI web de Headscale) integrada en el stack `headscale`
 
 - Issue: #4
-- Estado: en curso
+- Estado: completado
 - Stack: `headscale`
 
 ## Objetivo
@@ -22,7 +22,7 @@ Dotar al stack `headscale` de una interfaz web (**Headplane**) para gestionar el
 
 Nuevos:
 - `.config/containers/available/headscale/headscale-headplane.container`
-- `.config/containers/available/headscale/headplane-data.volume`
+- `.config/containers/available/headscale/headscale-headplane-data.volume`
 - `.config/headplane/config.yaml.jinja`
 - `.config/headplane/.gitignore`
 - `.config/headplane/headplane.env`
@@ -34,18 +34,18 @@ Modificados:
 
 ## Tareas
 
-- [ ] Crear el unit `headscale-headplane.container` (11 secciones canónicas).
-- [ ] Crear el volumen `headplane-data.volume`.
-- [ ] Crear la plantilla `config.yaml.jinja` (base_path /admin, base_url con FQDN, docker integration).
-- [ ] Crear `.config/headplane/.gitignore` y `headplane.env`.
-- [ ] Modificar `headscale.container`: `NetworkAlias=headscale`, label `me.tale.headplane.target=headscale`, middleware CORS.
-- [ ] Validar con `quadlet -user -dryrun` (rc=0) y `qctl check`.
-- [ ] Crear el secreto `headplane_cookie_secret` en prod (`podman secret create`).
-- [ ] `yadm pull` + `qctl install` + arrancar headplane.
-- [ ] Verificar `https://headscale.<FQDN>/admin` (200, cert válido, HTTP/1.1) y que TS2021 sigue OK.
-- [ ] Crear API key de headscale y documentar el login.
-- [ ] `docs/headplane.md` + sección en `docs/headscale.md`.
-- [ ] Archivar el plan.
+- [x] Crear el unit `headscale-headplane.container` (11 secciones canónicas).
+- [x] Crear el volumen `headplane-data.volume`.
+- [x] Crear la plantilla `config.yaml.jinja` (base_path /admin, base_url con FQDN, docker integration).
+- [x] Crear `.config/headplane/.gitignore` y `headplane.env`.
+- [x] Modificar `headscale.container`: `NetworkAlias=headscale`, label `me.tale.headplane.target=headscale`, middleware CORS.
+- [x] Validar con `quadlet -user -dryrun` (rc=0) y `qctl check`.
+- [x] Crear el secreto `headplane_cookie_secret` en prod (`podman secret create`).
+- [x] `yadm pull` + `qctl install` + arrancar headplane.
+- [x] Verificar `https://headscale.<FQDN>/admin` (200, cert válido, HTTP/1.1) y que TS2021 sigue OK.
+- [x] Crear API key de headscale y documentar el login.
+- [x] `docs/headplane.md` + sección en `docs/headscale.md`.
+- [x] Archivar el plan.
 
 ## Verificación (criterios de aceptación)
 
@@ -59,3 +59,12 @@ Modificados:
 
 - Reiniciar el contenedor headscale desde la UI usa la API Docker de Podman sobre un unit gestionado por systemd; puede provocar drift del estado del servicio. Documentado.
 - `cookie_secret` debe tener exactamente 32 caracteres.
+
+## Resultado
+
+- Desplegado y verificado en `new_atareao` (usuario `runner`).
+- `https://headscale.<FQDN>/admin/` → 302 → `/admin/login` → 200 («Headplane»); `/admin/healthz` → 200.
+- `https://headscale.<FQDN>/health` → `{"status":"pass"}`; `POST /ts2021` alcanza la ruta Noise.
+- API key de Headscale creada para el login del UI.
+- Healthcheck desactivado (`HealthCmd=none`) por imagen distroless sin shell (exit 125).
+- Regla Traefik sin espacios (`Host(...)&&PathPrefix(/admin)`) por el particionado de systemd.
