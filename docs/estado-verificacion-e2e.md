@@ -1,6 +1,6 @@
 # Estado de verificación E2E de los stacks
 
-Última actualización: 2026-11-09.
+Última actualización: 2026-11-10.
 
 Inventario de fiabilidad del repo: distingue lo que ya se ha **probado end-to-end en producción**
 de lo que sólo existe como quadlet + doc sin validar en el host real.
@@ -24,13 +24,13 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 44 |
+| Verificados E2E (probados y purgados) | 50 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **81** |
+| **Sin verificar E2E** | **75** |
 
 ## Verificados E2E (probados y purgados)
 
-Todos el **2026-11-09**: desplegados, verificados end-to-end y **purgados** el mismo día (unit
+Todos entre el **2026-11-09** y el **2026-11-10**: desplegados, verificados end-to-end y **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
 
 | Stack | Doc | Plan / Issue | HTTP | Notas |
@@ -79,6 +79,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | storyteller | `docs/storyteller.md` | PLAN-019 / #14 | 200 | corregido: volumen :rw:Z→:Z |
 | pdfding | `docs/pdfding.md` | PLAN-019 / #14 | 200 | 2 volúmenes; duplicado dingpdf |
 | openobserve | `docs/openobserve.md` | PLAN-019 / #14 | 200 | requiere security.network (stack vector) |
+| ntfy | `docs/ntfy.md` | PLAN-021 / #16 | 200 | corregido: imagen oficial + `Exec=serve` |
+| opengist | `docs/opengist.md` | PLAN-021 / #16 | 302 | router/servicio `gist`; secretos Gitea obligatorios |
+| filebrowser | `docs/filebrowser.md` | PLAN-021 / #16 | 200 | layout v2.63 (`/config`,`/database`); puerto 8080 |
+| silverbullet | `docs/silverbullet.md` | PLAN-021 / #16 | 200 | secreto `silverbullet_sb_user`; imagen no oficial |
+| yacht | `docs/yacht.md` | PLAN-021 / #16 | 200 | corregido: service port 3000→8000 |
+| dasherr | `docs/dasherr.md` | PLAN-021 / #16 | 401 | dominio `nginx.${FQDN}` (no colisiona: `nginx` sirve `web.${FQDN}`) |
 
 ## En producción (desplegados y corriendo)
 
@@ -89,22 +95,22 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (81)
+## Sin verificar E2E (75)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
-chevereto, codimd, couchdb, crowdsec, dasherr, dev, dim,
-dingpdf, dnote, dockge, facturascripts, filebrowser, firefly,
+chevereto, codimd, couchdb, crowdsec, dev, dim,
+dingpdf, dnote, dockge, facturascripts, firefly,
 focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, homer, huginn,
 immich, invidious, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
-miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter, ntfy,
-odoo, opengist, open-webui, pastebin, photoprism,
+miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
+odoo, open-webui, pastebin, photoprism,
 pinepods, planka, plausible, postgres, publirs, rabbitmq, radicale,
-registry, silverbullet, simple-torrent, snibox, socks5,
+registry, simple-torrent, snibox, socks5,
 tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,
-yacht, zennotes, zincsearch.
+zennotes, zincsearch.
 
 ## Notas
 
