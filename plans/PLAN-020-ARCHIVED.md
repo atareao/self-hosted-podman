@@ -2,7 +2,7 @@
 
 - **Issue GitHub:** #15
 - **Fecha:** 2026-11-10
-- **Estado:** en curso
+- **Estado:** completado
 
 ## Objetivo
 
@@ -21,16 +21,25 @@ Que las apps detrás de Traefik registren la **IP real del cliente** (la del pro
 
 ## Tareas
 
-- [ ] T1. `pocketid.container`: `Environment=TRUST_PROXY=true` (con comentario explicativo).
-- [ ] T2. Crear `docs/trusted-proxy.md`: qué es, cómo verificar, tabla app→variable→valor, nota de seguridad (solo Traefik alcanza la red `proxy`, así que confiar en XFF es seguro).
-- [ ] T3. `AGENTS.md`: nueva sección "IP real del cliente / proxy de confianza" con la regla y el patrón.
-- [ ] T4. Deploy en `new_atareao` (usuario `runner`, wrapper `rr`): push → `yadm pull` → `systemctl --user daemon-reload` → `systemctl --user restart pocketid` → verificar IP real en logs.
-- [ ] T5. Commit gitmoji en `main` (el repo trabaja directo en `main`).
+- [x] T1. `pocketid.container`: `Environment=TRUST_PROXY=true` (con comentario explicativo).
+- [x] T2. Crear `docs/trusted-proxy.md`: qué es, cómo verificar, tabla app→variable→valor, nota de seguridad (solo Traefik alcanza la red `proxy`, así que confiar en XFF es seguro).
+- [x] T3. `AGENTS.md`: nueva sección "IP real del cliente / proxy de confianza" con la regla y el patrón.
+- [x] T4. Deploy en `new_atareao` (usuario `runner`, wrapper `rr`): push → `yadm pull` → `systemctl --user daemon-reload` → `systemctl --user restart pocketid` → verificar IP real en logs.
+- [x] T5. Commit gitmoji en `main` (el repo trabaja directo en `main`).
 
 ## Verificación
 
 - `podman logs pocketid` muestra una IP pública real, no `10.89.0.85`.
 - Solicitud desde fuera (navegador/curl) → la app registra esa IP.
+
+## Resultado (verificado en `new_atareao`)
+
+- pocketid: `TRUST_PROXY=true` desplegado; en sus logs aparece `ip=139.47.26.33` (IP pública real)
+  y ya no `10.89.0.x`.
+- Desplegado con: commit en `main` → `yadm pull` (como `runner`) → `daemon-reload` → `restart pocketid`.
+- Hallazgo: al **recrear** un contenedor (`systemctl --user restart <stack>`), Traefik puede no
+  re-registrar su router (el tráfico cae al catch-all de `errserve`, router `errserve-catchall@docker`);
+  se resolvió con `systemctl --user restart traefik`. Documentado como gotcha en `AGENTS.md`.
 
 ## Follow-ups
 
