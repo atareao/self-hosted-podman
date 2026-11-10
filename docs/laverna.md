@@ -1,7 +1,7 @@
 # laverna — Laverna es una aplicación web de toma de notas.
 
 ## Qué es
-Laverna, Imagen=docker.io/atareao/laverna:v1.0, 1 contenedor, red proxy.network, dominio laverna.${FQDN}, puerto interno 8080
+Laverna, Imagen=docker.io/olegfiksel/laverna:0.7.54, 1 contenedor, red proxy.network, dominio laverna.${FQDN}, puerto interno 80
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/laverna/laverna.container
@@ -10,10 +10,10 @@ Laverna, Imagen=docker.io/atareao/laverna:v1.0, 1 contenedor, red proxy.network,
 - Secretos: (ninguno)
 
 ## Cómo funciona
-Red: proxy.network. Volumenes: (ninguno).
-Sin Secrets.
-Sin EnvironmentFile.
-Sin socket de daemon.
+Red: proxy.network. No volumenes.
+Autenticación gestionada por Traefik mediante middleware `laverna-auth` (definido en `.config/traefik/dynamic/laverna-auth.yml`).
+No Secrets ni EnvironmentFile.
+No socket de daemon.
 Ningún healthcheck.
 
 ## Variables / configuración
@@ -21,9 +21,9 @@ Ningún healthcheck.
 |---|---|---|---|
 
 ## Cómo habilitar / desplegar
-1. Secretos: (ninguno)
+1. Crear ~/.config/traefik/dynamic/laverna.htpasswd (usando `htpasswd -nB usuario`) y reiniciar Traefik: `systemctl --user restart traefik`.
 2. cd .config/containers/available/laverna && qctl install
 3. systemctl --user daemon-reload
 
 ## Follow-ups
-(ninguno)
+- Laverna está abandonada (última release ~2018); valorar migración a otra app de notas.

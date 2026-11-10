@@ -13,3 +13,4 @@
 
 # relevo de sesion (local, no se despliega)
 HANDOFF.md
+.config/traefik/dynamic/*.htpasswd
