@@ -27,4 +27,4 @@ Ningún healthcheck.
 3. systemctl --user daemon-reload
 
 ## Follow-ups
-- (ninguno)
+- **Sin enrutado por diseño**: el stack no declara labels de Traefik (igual que en el repo origen `atareao/self-hosted`); si hay que exponerlo, se añaden labels `Host(`<subdominio>.${FQDN}`)` propias. Ver los invariantes de enrutado en `docs/traefik.md`.

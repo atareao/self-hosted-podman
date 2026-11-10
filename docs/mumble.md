@@ -46,4 +46,4 @@
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- **Exposición**: publica `64738/tcp` y `64738/udp` directamente con `PublishPort` (no vía Traefik), por ser un protocolo no HTTP. Ver los invariantes de enrutado en `docs/traefik.md`.

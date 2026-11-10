@@ -77,3 +77,40 @@ En `.config/traefik/traefik.yml` hay **dos** `certificatesResolvers`:
 - **Cómo usar staging en un stack de prueba:** en su quadlet, `Label=traefik.http.routers.<x>.tls.certresolver=letsencrypt-staging` (en reposo, todos los quadlets versionados apuntan al resolver de producción `letsencrypt`).
 - Los certificados emitidos por la CA staging **no son de confianza** para los navegadores; sirven para validar que el reto ACME y el enrutado funcionan.
 - **Nota:** el dominio `servidorlinux.es` tiene los NS en `dondominio` (no Cloudflare), así que el `cf_dns_api_token` presente no sirve para un reto DNS-01/wildcard del apex; por eso el reto es HTTP-01 por subdominio y la cuota se consume rápido en rondas grandes.
+
+## Invariantes de enrutado
+
+Reglas que debe cumplir cualquier stack para convivir con Traefik en este repo. Salen de las
+colisiones detectadas al auditar los quadlets (PLAN-023 y PLAN-024).
+
+1. **Una regla `Host(...)` = un router.** Dos routers con la misma regla y sin `PathPrefix` de distinto
+   tamaño se pisan: gana uno y el otro queda inaccesible. Por eso cada stack usa `<stack>.${FQDN}`;
+   nunca el apex `${FQDN}`.
+   - **Excepción intencional:** `headscale` (`Host(headscale.${FQDN})`) y `headplane`
+     (`Host(headscale.${FQDN}) && PathPrefix(/admin)`): la regla más larga gana para `/admin`.
+2. **Los nombres de router y de service son globales en Traefik.** Dos stacks con el mismo nombre se
+   sobrescriben entre sí. Prefijar siempre con el nombre del stack (`tick-grafana`, no `grafana`).
+3. **El apex `${FQDN}` no tiene dueño.** Ningún stack lo declara; lo atiende el router catch-all
+   `errserve-catchall` (`HostRegexp(.+)` con `priority=1`), que sirve las páginas de error. Decisión
+   revisable si algún día se quiere una landing o un redirect en la raíz.
+4. **En stacks multi-contenedor solo se enruta la cara web.** BBDD, Redis y workers no llevan labels de
+   Traefik. Protocolos no HTTP (p. ej. `mumble`, 64738 tcp/udp) se publican con `PublishPort` en vez de
+   por Traefik.
+5. **Stacks sin router por diseño** (coincide con el repo origen; se exponen manualmente si hace falta):
+   `open-webui`, `authentik`, `publirs`, `miniflux-client`, `matrixmail` (además de los internos
+   `caddy`, `crowdsec`, `unbound`, `vector`, `weaviate`, `whisper`, `mtproxy`, `socks5`,
+   `simple-torrent`, `dev`).
+
+### Auditoría rápida
+
+Antes de dar por bueno un cambio de enrutado, comprobar que no hay duplicados globales:
+
+```bash
+cd /data/self-hosted-podman
+grep -rh '^ContainerName=' .config/containers/available/*/*.container | sort | uniq -d
+grep -rho 'traefik.http.routers\.[a-zA-Z0-9_.-]*\.rule' .config/containers/available/*/*.container | sed 's/.*routers\.//;s/\.rule//' | sort | uniq -d
+grep -rho 'traefik.http.services\.[a-zA-Z0-9_-]*\.loadbalancer' .config/containers/available/*/*.container | sed 's/.*services\.//;s/\.loadbalancer//' | sort | uniq -d
+grep -rho 'Host(`[^`]*`)' .config/containers/available/*/*.container | sort | uniq -d
+```
+
+Salida esperada: vacío en los tres primeros y solo `Host(\`headscale.${FQDN}\`)` en el último.
