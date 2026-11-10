@@ -79,6 +79,8 @@ En el host de apps, como `runner`:
   tailscale up --login-server https://headscale.<FQDN> --authkey <key>
   ```
 
+- Dispositivos **Android**: guía paso a paso en `docs/android.md`.
+
 ## Desplegado en producción
 
 Estado: **activo y healthy** en el host `new_atareao` (usuario `runner`), proxy Traefik correcto.
