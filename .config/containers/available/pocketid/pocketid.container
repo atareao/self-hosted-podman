@@ -24,7 +24,8 @@ Secret=pocketid_encryption_key
 # ==== Environment ====
 Environment=APP_URL=https://auth.${FQDN}
 Environment=ENCRYPTION_KEY_FILE=/run/secrets/pocketid_encryption_key
-Environment=TRUST_PROXY=false
+# Traefik termina la conexión: confiar en X-Forwarded-For para registrar la IP real del cliente
+Environment=TRUST_PROXY=true
 Environment=PUID=1000
 Environment=PGID=1000
 

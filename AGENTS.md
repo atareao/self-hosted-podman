@@ -177,6 +177,19 @@ Rules applied when migrating a stack from the compose origin repo (`atareao/self
 - **Drop**: `version:`, `x-dockge`, `depends_on` (replaced by `After=`/`Requires=`), `restart: unless-stopped` → `Restart=always`/`on-failure`.
 - **Podman secrets**: any `Secret=` name must be created with **`podman secret create <name> -`** before the unit starts (a fuego: NEVER `crypta store`, Podman cannot resolve it); list them per stack.
 
+## IP real del cliente (proxy de confianza)
+
+Traefik termina la conexión, así que las apps de la red `proxy` ven la IP de Traefik (`10.89.0.85`),
+no la del cliente. Traefik **ya** envía `X-Forwarded-For`/`X-Real-Ip`; cada app debe confiar en ellos.
+
+- **Regla:** toda app que use/registre la IP del cliente (auth, seguridad, analytics, rate-limit)
+  debe declarar su variable de trusted-proxy apuntando a la subred de `proxy.network` (`10.89.0.0/24`).
+- **Patrón:** booleano (`TRUST_PROXY=true`) o lista CIDR (`TRUSTED_PROXIES=10.89.0.0/24`).
+- Es **por app**; no hay ajuste global en Traefik.
+- Tabla y verificación: `docs/trusted-proxy.md`.
+- En el log de Traefik, `ServiceAddr`/`ServiceURL` (`10.89.0.x`) es el backend **destino**, NO el
+  cliente; el cliente es `ClientHost`.
+
 ## Other gotchas
 
 - `.config/systemd/user/http.socket` / `https.socket` provide rootless socket-activated ports 80/443 for Traefik.
