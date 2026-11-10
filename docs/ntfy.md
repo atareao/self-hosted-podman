@@ -2,7 +2,7 @@
 
 ## Qué es
 - App: ntfy
-  Image: docker.io/atareao/ntfy:v1.0
+  Image: docker.io/binwiederhier/ntfy
   Contenedores: 1
   Red principal: proxy.network
   Dominio: ntfy.${FQDN}
@@ -16,6 +16,8 @@
 - Secretos: none
 
 ## Cómo funciona
+- Ejecuta `serve` como comando principal
+
 - Proxy.network: sí (expuesto a traefik)
 - Volúmenes: bind mount de configuración
 - Secretos: ninguno

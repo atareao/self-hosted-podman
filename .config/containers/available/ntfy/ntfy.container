@@ -9,7 +9,7 @@ ContainerName=ntfy
 AutoUpdate=registry
 
 # ==== Command ====
-
+Exec=serve
 
 # ==== Ports ====
 
