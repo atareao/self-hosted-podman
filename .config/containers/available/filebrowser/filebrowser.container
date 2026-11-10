@@ -17,8 +17,8 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=%h/.config/filebrowser/srv:/srv:Z
-Volume=%h/.config/filebrowser/filebrowser.db:/database.db:Z
-Volume=%h/.config/filebrowser/filebrowser.json:/.filebrowser.json:Z
+Volume=%h/.config/filebrowser/config:/config:Z
+Volume=%h/.config/filebrowser/database:/database:Z
 
 # ==== Networks ====
 Network=proxy.network
@@ -28,11 +28,12 @@ NetworkAlias=filebrowser
 
 
 # ==== Environment ====
+Environment=FB_PORT=8080
 
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.filebrowser.loadbalancer.server.port=80
+Label=traefik.http.services.filebrowser.loadbalancer.server.port=8080
 Label=traefik.http.routers.filebrowser.rule=Host(`filebrowser.${FQDN}`)
 Label=traefik.http.routers.filebrowser.entrypoints=websecure
 Label=traefik.http.routers.filebrowser.tls.certresolver=letsencrypt

@@ -4,8 +4,9 @@ After=network-online.target traefik.service
 
 [Container]
 # ==== Image ====
-Image=docker.io/atareao/ntfy:v1.0
+Image=docker.io/binwiederhier/ntfy
 ContainerName=ntfy
+AutoUpdate=registry
 
 # ==== Command ====
 

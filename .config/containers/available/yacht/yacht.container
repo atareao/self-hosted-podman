@@ -30,7 +30,7 @@ NetworkAlias=yacht
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.yacht.loadbalancer.server.port=3000
+Label=traefik.http.services.yacht.loadbalancer.server.port=8000
 Label=traefik.http.routers.yacht.rule=Host(`yacht.${FQDN}`)
 Label=traefik.http.routers.yacht.entrypoints=websecure
 Label=traefik.http.routers.yacht.tls.certresolver=letsencrypt
