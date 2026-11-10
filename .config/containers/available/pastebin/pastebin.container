@@ -4,13 +4,14 @@ After=network-online.target traefik.service
 
 [Container]
 # ==== Image ====
-Image=docker.io/atareao/pastebin:v1.0
+Image=docker.io/mkaczanowski/pastebin:latest
 ContainerName=pastebin
 PodmanArgs=--init
 
 # ==== Command ====
 
 
+Exec=--address 0.0.0.0 --port 8081 --db=/rs/db/pastebin.db
 # ==== Ports ====
 
 
