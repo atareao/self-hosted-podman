@@ -71,6 +71,14 @@ certificatesResolvers:
       httpChallenge:
         entryPoint: web
 
+  letsencrypt-staging:
+    acme:
+      email: tu-email@atareao.es
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      storage: /etc/traefik/certs/acme-staging.json
+      httpChallenge:
+        entryPoint: web
+
 experimental:
   plugins:
     traefik-oidc-auth:
