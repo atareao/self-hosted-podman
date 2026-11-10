@@ -2,7 +2,7 @@
 
 ## Qué es
 
-`zennotes` (`docker.io/adibhanna/zennotes`) es una aplicación self‑hosted de notas Markdown orientada a teclado/Vim. Cada nota se almacena como un fichero `.md` dentro de un *vault* en disco; no utiliza base de datos. La imagen es de tipo *scratch* y se ejecuta como un contenedor único, detrás de Traefik, en la red `proxy`, servido en el **dominio raíz `${FQDN}`** y escuchando en el puerto `7878`.
+`zennotes` (`docker.io/adibhanna/zennotes`) es una aplicación self‑hosted de notas Markdown orientada a teclado/Vim. Cada nota se almacena como un fichero `.md` dentro de un *vault* en disco; no utiliza base de datos. La imagen es de tipo *scratch* y se ejecuta como un contenedor único, detrás de Traefik, en la red `proxy`, servido en el subdominio **`zennotes.${FQDN}`** y escuchando en el puerto `7878`.
 
 ## Ficheros
 
@@ -18,7 +18,7 @@
 - **Vault**: monta el volumen `zennotes-vault` en `/workspace:Z`.
 - **Configuración**: llega por dos `EnvironmentFile` (`.env` versionado y `.env.local` por máquina). El secreto se injecta con `Secret=`.
 - **Healthcheck**: `HealthCmd=["/zennotes-server","healthcheck"]` (imagen scratch no tiene shell). 
-- **Enrutado**: router `zennotes` con `Host(`${FQDN}`)`, `entrypoints=websecure`, `tls.certresolver=letsencrypt`, middlewares `seguridadHeaders` y `compresionHeaders`.
+- **Enrutado**: router `zennotes` con `Host(`zennotes.${FQDN}`)`, `entrypoints=websecure`, `tls.certresolver=letsencrypt`, middlewares `seguridadHeaders` y `compresionHeaders`.
 - **Hardening**: `NoNewPrivileges=true` y usuario no‑root.
 
 ## Variables / configuración
@@ -67,3 +67,4 @@ Para comprobar el estado: `systemctl --user status zennotes` o `journalctl --use
 - El token es obligatorio; sin él el contenedor no arrancará.
 - Si en el futuro la imagen publica su propio `HEALTHCHECK`, se puede eliminar el `HealthCmd` del quadlet.
 - No hay persistencia de volúmenes a menos que el volume `zennotes-data` exista; debe crearse con `podman volume create` o será creado automáticamente por quadlet.
+- Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).

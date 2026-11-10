@@ -1,7 +1,7 @@
 # matrix — Matrix Conduit y Element Web
 
 ## Qué es
-Matrix Conduit y Element Web, Imágenes=docker.io/matrixconduit/matrix-conduit:latest y docker.io/vectorim/element-web, 2 contenedores, red proxy.network, dominio matrix.${FQDN}, puertos internos 6167 y 80
+Matrix Conduit y Element Web, Imágenes=docker.io/matrixconduit/matrix-conduit:latest y docker.io/vectorim/element-web, 2 contenedores, red proxy.network, Conduit en `matrix.${FQDN}` (router `conduit`) y Element Web en `element.${FQDN}` (router `element`), puertos internos 6167 y 80
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/matrix/matrix.container
@@ -39,4 +39,4 @@ Ningún healthcheck.
 3. systemctl --user daemon-reload
 
 ## Follow-ups
-- (ninguno)
+- Element Web en subdominio propio desde PLAN-023 (antes colisionaba con Conduit en `matrix.${FQDN}`).

@@ -31,7 +31,7 @@ Environment=OIDC_REDIRECT_URL=https://${FQDN}/auth/callback
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.watchbeat.loadbalancer.server.port=3055
-Label=traefik.http.routers.watchbeat.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.watchbeat.rule=Host(`watchbeat.${FQDN}`)
 Label=traefik.http.routers.watchbeat.entrypoints=websecure
 Label=traefik.http.routers.watchbeat.tls.certresolver=letsencrypt
 Label=traefik.http.routers.watchbeat.middlewares=seguridadHeaders@file,compresionHeaders@file

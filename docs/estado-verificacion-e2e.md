@@ -23,10 +23,10 @@ sólo aparecieron al ejecutarlo de verdad.
 
 | Categoría | Nº |
 |---|---|
-| Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 56 |
+| Stacks en `.config/containers/available/` | 127 |
+| Verificados E2E (probados y purgados) | 55 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **69** |
+| **Sin verificar E2E** | **68** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -77,7 +77,7 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | semaphore | `docs/semaphore.md` | PLAN-019 / #14 | 200 | corregido: dialecto sqlite + service port 3000 |
 | rustfs | `docs/rustfs.md` | PLAN-019 / #14 | 200 | corregido: healthcheck exec; console en /rustfs/console |
 | storyteller | `docs/storyteller.md` | PLAN-019 / #14 | 200 | corregido: volumen :rw:Z→:Z |
-| pdfding | `docs/pdfding.md` | PLAN-019 / #14 | 200 | 2 volúmenes; duplicado dingpdf |
+| pdfding | `docs/pdfding.md` | PLAN-019 / #14 | 200 | 2 volúmenes |
 | openobserve | `docs/openobserve.md` | PLAN-019 / #14 | 200 | requiere security.network (stack vector) |
 | ntfy | `docs/ntfy.md` | PLAN-021 / #16 | 200 | corregido: imagen oficial + `Exec=serve` |
 | opengist | `docs/opengist.md` | PLAN-021 / #16 | 302 | router/servicio `gist`; secretos Gitea obligatorios |
@@ -90,7 +90,6 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | vaultwarden | `docs/vaultwarden.md` | PLAN-022 / #17 | 200 | secreto `vaultwarden_admin_token` |
 | microbin | `docs/microbin.md` | PLAN-022 / #17 | 401 | 2 secretos; volumen nombrado `microbin-microbin` |
 | pastebin | `docs/pastebin.md` | PLAN-022 / #17 | 303→200 | imagen `atareao/pastebin` desaparecida → upstream `mkaczanowski/pastebin` |
-| laverna | `docs/laverna.md` | PLAN-022 / #17 | 401/200 | imagen `atareao/laverna` desaparecida → `olegfiksel/laverna` + basicAuth en Traefik |
 
 ## En producción (desplegados y corriendo)
 
@@ -101,13 +100,13 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (69)
+## Sin verificar E2E (68)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, couchdb, crowdsec, dev, dim,
-dingpdf, dnote, facturascripts, firefly,
+dnote, facturascripts, firefly,
 focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, huginn,
 immich, invidious, jellystat, kanboard, matrix, matrixmail,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
@@ -126,3 +125,4 @@ zennotes, zincsearch.
 - Infraestructura de producción: usuario `runner` (uid 1002) en `new_atareao`, FQDN `servidorlinux.es`.
 - ferrishare: el `--init` interactivo se automatizó con `ferrishare-init.py` (issue #11); ya no bloquea el despliegue.
 - Certificados de las rondas E2E: desde PLAN-022 se usa el resolver `letsencrypt-staging` (CA staging de Let's Encrypt) para no consumir la cuota de producción (50 certs/dominio/168 h). Ver `docs/traefik.md`.
+- PLAN-023 (issue #18): limpieza de follow-ups. Eliminados `dingpdf` (duplicado de `pdfding`) y `laverna` (abandonado); resueltas las colisiones de enrutado del apex `${FQDN}` (zennotes, umami, watchbeat, alloy → subdominio propio), del nombre global `grafana` (tick) y de host sin path (tick, matrix, miniflux).

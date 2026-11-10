@@ -31,7 +31,7 @@ EnvironmentFile=%h/.config/zennotes/zennotes.env.local
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.zennotes.loadbalancer.server.port=7878
-Label=traefik.http.routers.zennotes.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.zennotes.rule=Host(`zennotes.${FQDN}`)
 Label=traefik.http.routers.zennotes.entrypoints=websecure
 Label=traefik.http.routers.zennotes.tls.certresolver=letsencrypt
 Label=traefik.http.routers.zennotes.middlewares=seguridadHeaders@file,compresionHeaders@file

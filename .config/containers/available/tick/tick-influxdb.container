@@ -30,11 +30,11 @@ NetworkAlias=influxdb
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.influxdb.loadbalancer.server.port=8086
-Label=traefik.http.routers.influxdb.rule=Host(`tick.${FQDN}`)
-Label=traefik.http.routers.influxdb.entrypoints=websecure
-Label=traefik.http.routers.influxdb.tls.certresolver=letsencrypt
-Label=traefik.http.routers.influxdb.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.tick-influxdb.loadbalancer.server.port=8086
+Label=traefik.http.routers.tick-influxdb.rule=Host(`influxdb.${FQDN}`)
+Label=traefik.http.routers.tick-influxdb.entrypoints=websecure
+Label=traefik.http.routers.tick-influxdb.tls.certresolver=letsencrypt
+Label=traefik.http.routers.tick-influxdb.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 

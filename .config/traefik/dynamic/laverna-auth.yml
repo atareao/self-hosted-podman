@@ -1,5 +1,0 @@
-http:
-  middlewares:
-    laverna-auth:
-      basicAuth:
-        usersFile: /etc/traefik/dynamic/laverna.htpasswd

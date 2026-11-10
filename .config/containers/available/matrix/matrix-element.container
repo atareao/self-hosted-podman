@@ -30,7 +30,7 @@ NetworkAlias=element
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.element.loadbalancer.server.port=80
-Label=traefik.http.routers.element.rule=Host(`matrix.${FQDN}`)
+Label=traefik.http.routers.element.rule=Host(`element.${FQDN}`)
 Label=traefik.http.routers.element.entrypoints=websecure
 Label=traefik.http.routers.element.tls.certresolver=letsencrypt
 Label=traefik.http.routers.element.middlewares=seguridadHeaders@file,compresionHeaders@file

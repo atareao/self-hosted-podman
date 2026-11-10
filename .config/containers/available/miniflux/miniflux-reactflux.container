@@ -31,7 +31,7 @@ NetworkAlias=reactflux
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.reactflux.loadbalancer.server.port=2000
-Label=traefik.http.routers.reactflux.rule=Host(`miniflux.${FQDN}`)
+Label=traefik.http.routers.reactflux.rule=Host(`reactflux.${FQDN}`)
 Label=traefik.http.routers.reactflux.entrypoints=websecure
 Label=traefik.http.routers.reactflux.tls.certresolver=letsencrypt
 Label=traefik.http.routers.reactflux.middlewares=seguridadHeaders@file,compresionHeaders@file

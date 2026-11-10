@@ -41,6 +41,4 @@ end-to-end (router Traefik + cert LE + HTTP 200) y **purgado ese mismo día**. E
 
 Requiere el secreto `pdfding_secret_key` (crear con `podman secret create`).
 
-**Follow-up**: existe un stack **duplicado** `dingpdf` (mismo `docker.io/mrmn/pdfding`, mismos volúmenes y
-mismo service `pdfding`; su router apunta a `dingpdf.${FQDN}` pero su `HOST_NAME` a `pdfding.${FQDN}`).
-Conviene eliminar `dingpdf` del repo.
+**Nota**: el stack duplicado `dingpdf` se eliminó del repo en PLAN-023 (issue #18) junto con su doc.

@@ -2,7 +2,7 @@
 
 ## Qué es
 
-Umami Analytics: plataforma de analítica web ligera y respetuosa con la privacidad. Dos contenedores: `umami` (imagen `ghcr.io/umami-software/umami:postgresql-latest`) y `umami-postgresql` (imagen `docker.io/library/postgres:18-alpine`). Red: `umami.network` (interna) + `proxy.network` para el front. Dominio: raíz `${FQDN}` (no subdominio). Puerto interno expuesto a Traefik: `3000`.
+Umami Analytics: plataforma de analítica web ligera y respetuosa con la privacidad. Dos contenedores: `umami` (imagen `ghcr.io/umami-software/umami:postgresql-latest`) y `umami-postgresql` (imagen `docker.io/library/postgres:18-alpine`). Red: `umami.network` (interna) + `proxy.network` para el front. Dominio: `umami.${FQDN}` (subdominio). Puerto interno expuesto a Traefik: `3000`.
 
 ## Ficheros
 
@@ -27,7 +27,7 @@ Umami Analytics: plataforma de analítica web ligera y respetuosa con la privaci
 | `APP_SECRET` | `umami.container` (`Secret=umami_app_secret`) | *(secreto)* | Secreto de sesión/firma de Umami |
 | `DATABASE_URL` | `umami.container` (`Secret=umami_database_url`) | *(secreto)* | Cadena de conexión completa a PostgreSQL |
 | `POSTGRES_PASSWORD` | `umami-postgresql.container` (`Secret=umamidb_password`) | *(secreto)* | Contraseña del usuario `umami` |
-| `FQDN` | entorno systemd (`~/.config/environment.d/fqdn.conf`) | `<tu-dominio>` | Dominio raíz usado en la label Traefik |
+| `FQDN` | entorno systemd (`~/.config/environment.d/fqdn.conf`) | `<tu-dominio>` | Dominio base; el router usa `umami.${FQDN}` |
 
 ## Cómo habilitar / desplegar
 
@@ -42,3 +42,4 @@ Umami Analytics: plataforma de analítica web ligera y respetuosa con la privaci
 
 - `umamidb_password` y `umami_database_url` deben coincidir (misma contraseña embebida en la URL).
 - No aplica hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`Group`); evaluar añadirlo.
+- Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).

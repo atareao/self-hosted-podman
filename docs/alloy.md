@@ -4,8 +4,8 @@
 
 `alloy` (`docker.io/atareao/alloy`) es un dashboard autoalojado para gestionar contenedores
 Docker/Podman (Rust/Axum en el backend + React en el frontend). Se despliega como un único
-contenedor tras Traefik, en la red `proxy`, y se sirve en el **dominio raíz `${FQDN}`**
-(no en un subdominio). Escucha en el puerto `3066` y autentica por OIDC.
+contenedor tras Traefik, en la red `proxy`, y se sirve en **`alloy.${FQDN}`**.
+Escucha en el puerto `3066` y autentica por OIDC.
 
 ## Ficheros
 
@@ -29,7 +29,7 @@ contenedor tras Traefik, en la red `proxy`, y se sirve en el **dominio raíz `${
   **secreto Podman** (`Secret=…,type=env,target=OIDC_CLIENT_SECRET`). `OIDC_REDIRECT_URL` se fija
   en el quadlet con `https://${FQDN}/api/auth/callback` (`${FQDN}` lo expande systemd en runtime).
 - **Healthcheck**: `wget -q --spider http://localhost:3066/api/health` (endpoint público, sin auth).
-- **Enrutado**: router `alloy` con `Host(`${FQDN}`)`, `entrypoints=websecure`,
+- **Enrutado**: router `alloy` con `Host(`alloy.${FQDN}`)`, `entrypoints=websecure`,
   `tls.certresolver=letsencrypt` y los middlewares del repo (`seguridadHeaders`, `compresionHeaders`).
 
 ## Variables / configuración
@@ -74,7 +74,7 @@ Verificar con `systemctl --user status alloy` o `journalctl --user -u alloy`.
 | `/var/run/docker.sock:/var/run/docker.sock` | `Volume=%t/podman/podman.sock:/var/run/docker.sock:ro` |
 | `data:/app/data` | `Volume=alloy-data.volume:/app/data:Z` |
 | `networks: proxy (external)` | `Network=proxy.network` |
-| labels: entrypoints `https`, `Host(${FQDN})` | router `websecure` + `tls.certresolver=letsencrypt` + `middlewares=seguridadHeaders@file,compresionHeaders@file`, `Host(`${FQDN}`)` |
+| labels: entrypoints `https`, `Host(${FQDN})` | router `websecure` + `tls.certresolver=letsencrypt` + `middlewares=seguridadHeaders@file,compresionHeaders@file`, `Host(`alloy.${FQDN}`)` |
 | healthcheck (nuevo) | `wget -q --spider http://localhost:3066/api/health || exit 1` (busybox) |
 
 ## Follow-ups
@@ -84,3 +84,4 @@ Verificar con `systemctl --user status alloy` o `journalctl --user -u alloy`.
 - Si el socket deja de ser accesible, revisar `UserNS=keep-id` (el uid del contenedor debe coincidir
   con el dueño del socket podman en el host).
 - Notificaciones opcionales (Telegram/Matrix) **no configuradas**.
+- Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).

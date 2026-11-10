@@ -30,11 +30,11 @@ NetworkAlias=grafana
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.grafana.loadbalancer.server.port=3000
-Label=traefik.http.routers.grafana.rule=Host(`tick.${FQDN}`)
-Label=traefik.http.routers.grafana.entrypoints=websecure
-Label=traefik.http.routers.grafana.tls.certresolver=letsencrypt
-Label=traefik.http.routers.grafana.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.tick-grafana.loadbalancer.server.port=3000
+Label=traefik.http.routers.tick-grafana.rule=Host(`tick.${FQDN}`)
+Label=traefik.http.routers.tick-grafana.entrypoints=websecure
+Label=traefik.http.routers.tick-grafana.tls.certresolver=letsencrypt
+Label=traefik.http.routers.tick-grafana.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 

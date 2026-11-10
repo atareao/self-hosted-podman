@@ -2,7 +2,7 @@
 
 ## Qué es
 
-`watchbeat` (`atareao/watchbeat`) es un monitor de uptime self-hosted escrito en Rust/Axum con frontend React. Comprueba endpoints periódicamente, guarda el historial en SQLite y notifica caídas (Telegram, Matrix, ntfy, webhook, Slack, Discord, Email, Gotify, configurados desde la UI). Se despliega como un único contenedor tras Traefik en la red `proxy`, servido en el dominio raíz `${FQDN}` en el puerto `3055`. La autenticación OIDC es **obligatoria**.
+`watchbeat` (`atareao/watchbeat`) es un monitor de uptime self-hosted escrito en Rust/Axum con frontend React. Comprueba endpoints periódicamente, guarda el historial en SQLite y notifica caídas (Telegram, Matrix, ntfy, webhook, Slack, Discord, Email, Gotify, configurados desde la UI). Se despliega como un único contenedor tras Traefik en la red `proxy`, servido en `watchbeat.${FQDN}` en el puerto `3055`. La autenticación OIDC es **obligatoria**.
 
 ## Ficheros
 
@@ -17,7 +17,7 @@
 - **Persistencia**: el volumen nombrado `watchbeat-data` se monta en `/app/data:Z`; SQLite en `/app/data/watchbeat.db`.
 - **Configuración**: recibe por `EnvironmentFile` los archivos `.env` versionados y de máquina local; el secreto `OIDC_CLIENT_SECRET` se inyecta con `Secret=…`; la variable `OIDC_REDIRECT_URL` se fija en el quadlet con `${FQDN}`.
 - **Healthcheck**: `wget --no-verbose --tries=1 --spider http://localhost:3055/health || exit 1` (endpoint público, sin auth).
-- **Enrutado**: router `watchbeat` con `Host(`${FQDN}`)`, `entrypoints=websecure`, `tls.certresolver=letsencrypt` y los middlewares `seguridadHeaders` y `compresionHeaders`. Arranque **fail‑closed**: hace discovery OIDC al inicio y no arranca si falla.
+- **Enrutado**: router `watchbeat` con `Host(`watchbeat.${FQDN}`)`, `entrypoints=websecure`, `tls.certresolver=letsencrypt` y los middlewares `seguridadHeaders` y `compresionHeaders`. Arranque **fail‑closed**: hace discovery OIDC al inicio y no arranca si falla.
 
 ## Variables / configuración
 
@@ -70,3 +70,4 @@ Verificar con `systemctl --user status watchbeat` o `journalctl --user -u watchb
 - OIDC obligatorio debe estar disponible al arranque.
 - Los noticadores se configuran en la UI, no con variables de entorno.
 - No se utiliza `ExecStartPost` para evitar retraso en el inicio de la unidad.
+- Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).

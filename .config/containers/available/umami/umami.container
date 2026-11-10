@@ -31,7 +31,7 @@ Environment=TZ=Europe/Madrid
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.umami.loadbalancer.server.port=3000
-Label=traefik.http.routers.umami.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.umami.rule=Host(`umami.${FQDN}`)
 Label=traefik.http.routers.umami.entrypoints=websecure
 Label=traefik.http.routers.umami.tls.certresolver=letsencrypt
 Label=traefik.http.routers.umami.middlewares=seguridadHeaders@file,compresionHeaders@file

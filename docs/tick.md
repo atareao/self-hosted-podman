@@ -11,8 +11,8 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 | `tick-telegraf` | `docker.io/library/telegraf:latest` | Recolector de métricas (host + socket de Podman) |
 
 - **Red(es):** `tick.network` (interna del stack, `NetworkName=tick`) para los tres contenedores; `tick-grafana` e `tick-influxdb` se unen además a `proxy.network`.
-- **Dominio:** `tick.${FQDN}` → **subdominio** `tick`, usado por **dos routers**: `grafana` e `influxdb`.
-- **Puertos internos (Traefik):** `3000` (`traefik.http.services.grafana.loadbalancer.server.port=3000`) e `8086` (`traefik.http.services.influxdb.loadbalancer.server.port=8086`).
+- **Dominios:** `tick.${FQDN}` (Grafana) e `influxdb.${FQDN}` (InfluxDB). Routers `tick-grafana` y `tick-influxdb`.
+- **Puertos internos (Traefik):** `3000` (`traefik.http.services.tick-grafana.loadbalancer.server.port=3000`) e `8086` (`traefik.http.services.tick-influxdb.loadbalancer.server.port=8086`).
 - No hay `PublishPort`: el acceso es solo vía Traefik.
 
 ## Ficheros
@@ -32,9 +32,9 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 ## Cómo funciona
 
 - **Redes:** `tick.network` aísla la comunicación interna (Telegraf → InfluxDB → Grafana). `tick-grafana` e `tick-influxdb` añaden `proxy.network` para que Traefik los alcance; `tick-telegraf` se queda solo en `tick.network` (no se publica).
-- **Enrutado Traefik:** ambos servicios web exponen labels equivalentes apuntando al **mismo host** `tick.${FQDN}`:
-  - `tick-grafana`: servicio `grafana` puerto `3000`, router `grafana` → `Host(\`tick.${FQDN}\`)`, `websecure`, `letsencrypt`, middlewares `seguridadHeaders@file,compresionHeaders@file`.
-  - `tick-influxdb`: servicio `influxdb` puerto `8086`, router `influxdb` → `Host(\`tick.${FQDN}\`)`, mismos entrypoint/TLS/middlewares.
+- **Enrutado Traefik:** cada servicio web expone su router en su propio host:
+  - `tick-grafana`: servicio `tick-grafana` puerto `3000`, router `tick-grafana` → `Host(\`tick.${FQDN}\`)`, `websecure`, `letsencrypt`, middlewares `seguridadHeaders@file,compresionHeaders@file`.
+  - `tick-influxdb`: servicio `tick-influxdb` puerto `8086`, router `tick-influxdb` → `Host(\`influxdb.${FQDN}\`)`, mismos entrypoint/TLS/middlewares.
 - **Volúmenes:** `tick-grafana_data.volume` → `/var/lib/grafana` (dashboards, BD interna, plugins) y `tick-influxdb_data.volume` → `/var/lib/influxdb` (datos de series temporales).
 - **Volúmenes de Telegraf (bind mounts de solo lectura):** `%h/.config/tick/telegraf.conf` → `/etc/telegraf/telegraf.conf`; `%t/podman/podman.sock` → `/var/run/docker.sock`; `/sys` → `/host/sys`; `/proc` → `/host/proc`; `/etc` → `/host/etc`. El socket de Podman permite a Telegraf recoger métricas de contenedores; los directorios del host (con `HOST_PROC`/`HOST_SYS`/`HOST_ETC`) permiten métricas del sistema anfitrión.
 - **Secretos / EnvironmentFile:** no hay `Secret=` ni `EnvironmentFile`; la config no secreta de cada contenedor va como `Environment=` y la de Telegraf vive en el `telegraf.conf` montado.
@@ -50,7 +50,7 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 | `HOST_PROC` | `tick-telegraf.container` (`Environment=`) | `/host/proc` | Ruta del `/proc` del host dentro del contenedor |
 | `HOST_SYS` | `tick-telegraf.container` (`Environment=`) | `/host/sys` | Ruta del `/sys` del host dentro del contenedor |
 | `HOST_ETC` | `tick-telegraf.container` (`Environment=`) | `/host/etc` | Ruta del `/etc` del host dentro del contenedor |
-| `FQDN` | `tick-grafana.container` / `tick-influxdb.container` (labels de router) | *(inyectada por systemd desde `~/.config/environment.d/fqdn.conf`)* | Dominio raíz del host; ambos routers usan `tick.${FQDN}` |
+| `FQDN` | `tick-grafana.container` / `tick-influxdb.container` (labels de router) | *(inyectada por systemd desde `~/.config/environment.d/fqdn.conf`)* | Dominio base; `tick-grafana` usa `tick.${FQDN}` y `tick-influxdb` usa `influxdb.${FQDN}` |
 
 No hay `.env` de stack para este servicio.
 
@@ -62,7 +62,7 @@ No hay `.env` de stack para este servicio.
 
 ## Follow-ups
 
-- **Colisión de routers:** `grafana` e `influxdb` declaran la misma regla `Host(\`tick.${FQDN}\`)` en `websecure`; Traefik no puede enrutar dos routers al mismo host/path sin prioridades. Conviene dar a InfluxDB otro subdominio (p. ej. `influxdb.tick.${FQDN}`) o servirlo por path.
+- Colisión de routers resuelta en PLAN-023: routers/servicios renombrados a `tick-grafana`/`tick-influxdb` (evita el nombre global `grafana` compartido con `grafana-influx-telegraf`) e InfluxDB movido a `influxdb.${FQDN}`.
 - Telegraf monta `podman.sock` y rutas del host (`/proc`, `/sys`, `/etc`) en solo lectura; es funcionalmente necesario pero amplía la superficie de exposición. No tiene `NoNewPrivileges` ni `User`.
 - `tick-influxdb` monta `/var/lib/influxdb` (ruta de InfluxDB 1.x); confirmar que la imagen `latest` (2.x) usa ese path.
 - Sin healthchecks en ninguno de los tres contenedores.

@@ -5,7 +5,7 @@
 - **Imagen:** docker.io/miniflux/miniflux:latest
 - **Consola contenedores:** 3 (miniflux, miniflux-postgresql, miniflux-reactflux)
 - **Redes:** proxy.network, miniflux.network
-- **Dominio:** `miniflux.${FQDN}` (subdominio)
+- **Dominios:** `miniflux.${FQDN}` (Miniflux, router `miniflux`) y `reactflux.${FQDN}` (ReactFlux, router `reactflux`)
 - **Puerto interno:** 8080 (traefik.http.services.miniflux.loadbalancer.server.port)
 
 ## Ficheros
@@ -25,7 +25,7 @@
 - **Secretos:** `DATABASE_URL`, `ADMIN_PASSWORD`, `POSTGRES_PASSWORD`
 - **EnvironmentFile:** carga variables públicas desde `.config/miniflux/miniflux.env` y `.config/miniflux/miniflux.env.local`
 - **Healthcheck:** PostgreSQL tiene healthcheck, Miniflux y Reactflux no definen ninguno
-- **Traefik:** enruta al puerto 8080 con host `miniflux.${FQDN}` y middlewares de seguridad
+- **Traefik:** enruta Miniflux al puerto 8080 con host `miniflux.${FQDN}` y ReactFlux al puerto 2000 con host `reactflux.${FQDN}`.
 - **User:** no especificado (se ejecuta como root en el quadlet)
 
 ## Variables / configuración
@@ -45,4 +45,4 @@
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- ReactFlux en subdominio propio desde PLAN-023 (antes colisionaba con Miniflux en `miniflux.${FQDN}`).

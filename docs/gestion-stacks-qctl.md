@@ -218,9 +218,7 @@ Qué elimina:
 
 Opciones: `--dry-run` (no cambia nada), `--force` (ignora la guarda cross-stack), `-y/--yes` (sin confirmación).
 
-Guarda cross-stack: si otro stack declara el mismo secreto o imagen, se **salta**. Ejemplos reales:
-`openobserve_root_password` (compartido con `vector`) y la imagen `mrmn/pdfding` (compartida con `dingpdf`);
-`--force` permite saltarse la guarda.
+Guarda cross-stack: si otro stack declara el mismo secreto o imagen, se **salta**. Ejemplo real: `openobserve_root_password` (compartido con `vector`); `--force` permite saltarse la guarda.
 
 ⚠️ Caveats:
 - Solo toca recursos **declarados en los quadlets**. Un secreto o imagen creado a mano y no referenciado por

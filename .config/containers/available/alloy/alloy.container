@@ -33,7 +33,7 @@ Environment=OIDC_REDIRECT_URL=https://${FQDN}/api/auth/callback
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.alloy.loadbalancer.server.port=3066
-Label=traefik.http.routers.alloy.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.alloy.rule=Host(`alloy.${FQDN}`)
 Label=traefik.http.routers.alloy.entrypoints=websecure
 Label=traefik.http.routers.alloy.tls.certresolver=letsencrypt
 Label=traefik.http.routers.alloy.middlewares=seguridadHeaders@file,compresionHeaders@file
