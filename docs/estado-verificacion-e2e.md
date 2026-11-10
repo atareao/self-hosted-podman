@@ -24,9 +24,9 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 129 |
-| Verificados E2E (probados y purgados) | 50 |
+| Verificados E2E (probados y purgados) | 56 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **75** |
+| **Sin verificar E2E** | **69** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -85,6 +85,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | silverbullet | `docs/silverbullet.md` | PLAN-021 / #16 | 200 | secreto `silverbullet_sb_user`; imagen no oficial |
 | yacht | `docs/yacht.md` | PLAN-021 / #16 | 200 | corregido: service port 3000→8000 |
 | dasherr | `docs/dasherr.md` | PLAN-021 / #16 | 401 | dominio `nginx.${FQDN}` (no colisiona: `nginx` sirve `web.${FQDN}`) |
+| homer | `docs/homer.md` | PLAN-022 / #17 | 200 | bind `~/.config/homer/assets` (chown 1000:1000) |
+| dockge | `docs/dockge.md` | PLAN-022 / #17 | 200 | bind podman.sock (ro); healthcheck `/app/extra/healthcheck` |
+| vaultwarden | `docs/vaultwarden.md` | PLAN-022 / #17 | 200 | secreto `vaultwarden_admin_token` |
+| microbin | `docs/microbin.md` | PLAN-022 / #17 | 401 | 2 secretos; volumen nombrado `microbin-microbin` |
+| pastebin | `docs/pastebin.md` | PLAN-022 / #17 | 303→200 | imagen `atareao/pastebin` desaparecida → upstream `mkaczanowski/pastebin` |
+| laverna | `docs/laverna.md` | PLAN-022 / #17 | 401/200 | imagen `atareao/laverna` desaparecida → `olegfiksel/laverna` + basicAuth en Traefik |
 
 ## En producción (desplegados y corriendo)
 
@@ -95,20 +101,20 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (75)
+## Sin verificar E2E (69)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
 alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, couchdb, crowdsec, dev, dim,
-dingpdf, dnote, dockge, facturascripts, firefly,
-focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, homer, huginn,
-immich, invidious, jellystat, kanboard, laverna, matrix, matrixmail, microbin,
+dingpdf, dnote, facturascripts, firefly,
+focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, huginn,
+immich, invidious, jellystat, kanboard, matrix, matrixmail,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
-odoo, open-webui, pastebin, photoprism,
+odoo, open-webui, photoprism,
 pinepods, planka, plausible, postgres, publirs, rabbitmq, radicale,
 registry, simple-torrent, snibox, socks5,
-tick, umami, unbound, vaultwarden, vector, vscode, wakapi,
+tick, umami, unbound, vector, vscode, wakapi,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wikijs, wordpress, wordpress-wp1, wordpress-wp2,
 zennotes, zincsearch.
 
@@ -119,3 +125,4 @@ zennotes, zincsearch.
 - Referencia del flujo de despliegue/purga: `docs/gestion-stacks-qctl.md`.
 - Infraestructura de producción: usuario `runner` (uid 1002) en `new_atareao`, FQDN `servidorlinux.es`.
 - ferrishare: el `--init` interactivo se automatizó con `ferrishare-init.py` (issue #11); ya no bloquea el despliegue.
+- Certificados de las rondas E2E: desde PLAN-022 se usa el resolver `letsencrypt-staging` (CA staging de Let's Encrypt) para no consumir la cuota de producción (50 certs/dominio/168 h). Ver `docs/traefik.md`.

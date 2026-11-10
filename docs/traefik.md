@@ -66,3 +66,14 @@ printf '%s' '<valor>' | podman secret create cf_dns_api_token -
 - Requiere `~/.config/traefik/traefik.yml` y `~/.config/traefik/dynamic/` presentes en el host; el stack no los versiona (solo el quadlet).
 - `Image=traefik:latest` sin `AutoUpdate=registry`: la actualización es manual.
 - `Restart=always` sin `RestartSec` ni límites de arranque, a diferencia del resto de stacks.
+
+## Certificados y resolvers ACME
+
+En `.config/traefik/traefik.yml` hay **dos** `certificatesResolvers`:
+
+- `letsencrypt` — CA de **producción** (`https://acme-v02.api.letsencrypt.org/directory`), reto **HTTP-01** por el entrypoint `web`, storage `/etc/traefik/certs/acme.json`. Es el que usan los stacks de producción.
+- `letsencrypt-staging` — CA de **staging** (`https://acme-staging-v02.api.letsencrypt.org/directory`), mismo reto HTTP-01, storage `/etc/traefik/certs/acme-staging.json`. Se usa **solo en rondas de verificación E2E** (los stacks de prueba), para no agotar la cuota de producción de Let's Encrypt (límite: 50 certificados por dominio registrado cada 168 h — nos topamos con un 429 durante PLAN-022).
+
+- **Cómo usar staging en un stack de prueba:** en su quadlet, `Label=traefik.http.routers.<x>.tls.certresolver=letsencrypt-staging` (en reposo, todos los quadlets versionados apuntan al resolver de producción `letsencrypt`).
+- Los certificados emitidos por la CA staging **no son de confianza** para los navegadores; sirven para validar que el reto ACME y el enrutado funcionan.
+- **Nota:** el dominio `servidorlinux.es` tiene los NS en `dondominio` (no Cloudflare), así que el `cf_dns_api_token` presente no sirve para un reto DNS-01/wildcard del apex; por eso el reto es HTTP-01 por subdominio y la cuota se consume rápido en rondas grandes.
