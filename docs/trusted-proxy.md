@@ -3,7 +3,7 @@
 
 ## Qué es
 
-Las apps detrás de Traefik (red `proxy`) ven como IP de origen la de **Traefik** (`10.89.0.85`), no
+Las apps detrás de Traefik (red `proxy`) ven como IP de origen la de **Traefik** (`10.89.0.x`, dinámica), no
 la del cliente, porque el proxy termina la conexión. Traefik **sí** añade las cabeceras
 `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-Ip` con la IP real, pero cada app debe estar
 configurada para **confiar** en ellas. No hay ajuste global posible en Traefik: es **por app**.

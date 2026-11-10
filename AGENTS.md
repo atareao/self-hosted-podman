@@ -195,6 +195,7 @@ no la del cliente. Traefik **ya** envía `X-Forwarded-For`/`X-Real-Ip`; cada app
 - `.config/systemd/user/http.socket` / `https.socket` provide rootless socket-activated ports 80/443 for Traefik.
 - `proxy.network` (Traefik edge network) lives in the `traefik` stack; other stacks join it via `Network=proxy.network`.
 - `qctl install` only links rendered units: run `unjinja` first so `*.jinja` exist as `.container`/`.volume`/`.network` before enabling a stack.
+- Al **recrear** un contenedor (`systemctl --user restart <stack>`), Traefik puede no re-registrar su router y el tráfico cae al catch-all de `errserve` (router `errserve-catchall@docker`): si tras recrear no enruta, `systemctl --user restart traefik`.
 
 ## Git
 
