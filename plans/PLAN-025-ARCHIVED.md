@@ -1,7 +1,7 @@
 # PLAN-025 — Apex con certificado válido y renombrado del volumen huginn
 
 - **Issue:** #20
-- **Estado:** en curso
+- **Estado:** completado (2026-11-11)
 - **Fecha:** 2026-11-11
 
 ## Contexto
@@ -30,14 +30,14 @@ documenta como invariante de enrutado #6.
 
 ## Objetivos
 
-- [ ] Añadir el router `errserve-apex` a `errserve.container` con `Host(\`${FQDN}\`)`,
+- [x] Añadir el router `errserve-apex` a `errserve.container` con `Host(\`${FQDN}\`)`,
       `tls.certresolver=letsencrypt`, `service=errserve` y `middlewares=errpages`.
-- [ ] Renombrar el volumen a `huginn-mariadb` (`.volume`, `VolumeName=`, `Volume=` del contenedor).
-- [ ] Corregir `docs/traefik.md` (invariante 3 + auditoría) y `docs/huginn.md`.
-- [ ] Actualizar `docs/estado-verificacion-e2e.md` y `HANDOFF.md`.
-- [ ] Desplegar en prod (`yadm pull` + restart `errserve`) y verificar el apex.
-- [ ] Archivar el plan: `plans/PLAN-025-ARCHIVED.md`.
-- [ ] Corregir la label del catch-all de `errserve` (`HostRegexp(.+) && !Path(/metrics)` → sin espacios) y documentar el invariante «sin espacios en `Label=`» en `docs/traefik.md`.
+- [x] Renombrar el volumen a `huginn-mariadb` (`.volume`, `VolumeName=`, `Volume=` del contenedor).
+- [x] Corregir `docs/traefik.md` (invariante 3 + auditoría) y `docs/huginn.md`.
+- [x] Actualizar `docs/estado-verificacion-e2e.md` y `HANDOFF.md`.
+- [x] Desplegar en prod (`yadm pull` + restart `errserve`) y verificar el apex.
+- [x] Archivar el plan: `plans/PLAN-025-ARCHIVED.md`.
+- [x] Corregir la label del catch-all de `errserve` (`HostRegexp(.+) && !Path(/metrics)` → sin espacios) y documentar el invariante «sin espacios en `Label=`» en `docs/traefik.md`.
 
 ## Fases
 
@@ -76,3 +76,12 @@ documenta como invariante de enrutado #6.
 - Decidir si el apex debe **redirigir** a un servicio concreto en vez de servir la página de error
   (cambio de 2 labels). Hoy: sirve `errserve`.
 - Renombrar los demás volúmenes con patrón `<stack>-<stack>_<rol>` (`dev-dev_mariadb`, `chevereto-chevereto_mariadb`, `caddy-caddy_data`, …) — cosmético, fuera de alcance de este plan.
+
+## Resultado (2026-11-11)
+
+- **Apex resuelto.** `errserve.container` gana el router `errserve-apex` (`Host(\`${FQDN}\`)`, `tls.certresolver=letsencrypt`, `service=errserve`, `middlewares=errpages`). Verificado en prod: `https://servidorlinux.es` responde **404 con certificado LE válido** (`ssl_verify=0`, `CN=servidorlinux.es`, válido hasta 2027-02-09). Antes: certificado autofirmado por defecto → aviso TLS.
+- **Bug latente corregido.** La regla del catch-all pasa a `HostRegexp(.+)&&!Path(/metrics)` (sin espacios): systemd truncaba la label en el primer espacio y se perdía el `!Path(/metrics)`. Documentado como invariante #6. Era el único caso del repo.
+- **Volumen** `huginn-huginn_mariadb` → `huginn-mariadb` (fichero, `VolumeName=` y `Volume=` del contenedor).
+- **Docs:** `docs/traefik.md` (invariante 3 reescrito + invariante 6 + 4ª comprobación de auditoría), `docs/huginn.md`, inventario y HANDOFF.
+- **Verificación:** `quadlet -user -dryrun` sobre `errserve` y `huginn` → 0 errores; auditoría de duplicados → solo `Host(headscale.${FQDN})` repetido (intencional); prod con 5 contenedores, `auth` 200 y `headscale` 200.
+- Commit `22feaa9` en `main`.
