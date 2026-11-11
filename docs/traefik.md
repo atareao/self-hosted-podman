@@ -90,11 +90,11 @@ colisiones detectadas al auditar los quadlets (PLAN-023 y PLAN-024).
      (`Host(headscale.${FQDN}) && PathPrefix(/admin)`): la regla más larga gana para `/admin`.
 2. **Los nombres de router y de service son globales en Traefik.** Dos stacks con el mismo nombre se
    sobrescriben entre sí. Prefijar siempre con el nombre del stack (`tick-grafana`, no `grafana`).
-3. **El apex `${FQDN}` lo posee `errserve`.** El router dedicado `errserve-apex`
-   (`Host(\`${FQDN}\`)`, `tls.certresolver=letsencrypt`) sirve la página de error del apex **con
-   certificado válido**. El catch-all `errserve-catchall` (`HostRegexp(.+)`, `priority=1`) sigue
-   cubriendo el resto de hosts sin dueño. El apex no redirige a ningún servicio; revisable si se
-   quiere una landing o un redirect en la raíz.
+3. **El apex `${FQDN}` lo posee `errserve` (redirect temporal).** El router `errserve-apex`
+   (`Host(\`${FQDN}\`)&&!Path(\`/404\`)`, `tls.certresolver=letsencrypt`) responde **302** a
+   `https://${FQDN}/404`, que sirve `errserve` vía catch-all: la página de error, con certificado
+   válido. `!Path(\`/404\`)` evita un bucle al reapuntar el redirect. Es provisional; el destino es un
+   cambio de 1 label (`errserve-apex-redirect.redirectregex.replacement`).
 4. **En stacks multi-contenedor solo se enruta la cara web.** BBDD, Redis y workers no llevan labels de
    Traefik. Protocolos no HTTP (p. ej. `mumble`, 64738 tcp/udp) se publican con `PublishPort` en vez de
    por Traefik.
