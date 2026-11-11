@@ -10,7 +10,6 @@ StartLimitBurst=3
 Image=lscr.io/linuxserver/bookstack:latest
 ContainerName=bookstack
 AutoUpdate=registry
-PodmanArgs=--init
 
 # ==== Command ====
 

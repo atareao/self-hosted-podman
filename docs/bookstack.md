@@ -39,7 +39,7 @@
   `%h/.config/bookstack/mariadb`. Crear ambos directorios antes de instalar y darles el UID/GID de
   `PUID`/`PGID` (1000) con `podman unshare chown -R 1000:1000 <dir>`.
 - Ambas imágenes son LinuxServer.io y respetan `PUID`/`PGID`; el proceso no corre como root.
-- `PodmanArgs=--init` en los dos contenedores; `AutoUpdate=registry` en ambos.
+- **Sin `PodmanArgs=--init`**: las imágenes LinuxServer.io usan s6-overlay y exigen ser PID 1 (`s6-overlay-suexec: fatal: can only run as pid 1`); se omitió `--init` en ambos contenedores (verificado 2026-11-11). `AutoUpdate=registry` en ambos.
 - Healthcheck no definido en los quadlets (no se añadió uno no verificado).
 
 ## Variables / configuración

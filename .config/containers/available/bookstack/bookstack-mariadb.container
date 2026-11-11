@@ -9,7 +9,6 @@ StartLimitBurst=3
 Image=lscr.io/linuxserver/mariadb:latest
 ContainerName=bookstack-mariadb
 AutoUpdate=registry
-PodmanArgs=--init
 
 # ==== Command ====
 

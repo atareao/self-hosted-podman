@@ -10,7 +10,6 @@ StartLimitBurst=3
 Image=lscr.io/linuxserver/hedgedoc:latest
 ContainerName=hedgedoc
 AutoUpdate=registry
-PodmanArgs=--init
 
 # ==== Command ====
 

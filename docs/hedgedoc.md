@@ -26,7 +26,7 @@ Hedgedoc es una aplicación web de wiki colaborativa que utiliza la base de dato
 - Healthcheck: No definido.
 - User: Los contenedores corre como UID 1000 (grafo) y UID 1000 para la base de datos.
 - NoNewPrivileges: No habilitado.
-- `PodmanArgs=--init` en ambos contenedores.
+- **Sin `PodmanArgs=--init`**: las imágenes LinuxServer.io usan s6-overlay y exigen ser PID 1 (`s6-overlay-suexec: fatal: can only run as pid 1`); se omitió `--init` en ambos contenedores (verificado 2026-11-11).
 - `AutoUpdate=registry` en ambos contenedores (tags `:latest`).
 
 ## Variables / configuración
