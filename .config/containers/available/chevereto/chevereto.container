@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=chevereto-chevereto.volume:/var/www/html/images:Z
+Volume=chevereto-data.volume:/var/www/html/images:Z
 
 # ==== Networks ====
 Network=proxy.network

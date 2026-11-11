@@ -5,12 +5,12 @@ Metube, Imagen=docker.io/alexta69/metube, 1 contenedor, red proxy.network, domin
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/metube/metube.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/metube/metube-metube.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/metube/metube-data.volume
 - Config no secreta: (ninguno)
 - Secretos: (ninguno)
 
 ## Cómo funciona
-Red: proxy.network. Volumen: metube-metube.volume montado en /downloads.
+Red: proxy.network. Volumen: metube-data.volume montado en /downloads.
 Sin Secrets.
 Sin EnvironmentFile.
 Sin socket de daemon.

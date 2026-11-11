@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=microbin-microbin.volume:/app/data:Z
+Volume=microbin-data.volume:/app/data:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====

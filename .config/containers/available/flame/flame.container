@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=flame-flame.volume:/app/data:Z
+Volume=flame-data.volume:/app/data:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====

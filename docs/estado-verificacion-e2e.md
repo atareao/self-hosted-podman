@@ -88,7 +88,7 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | homer | `docs/homer.md` | PLAN-022 / #17 | 200 | bind `~/.config/homer/assets` (chown 1000:1000) |
 | dockge | `docs/dockge.md` | PLAN-022 / #17 | 200 | bind podman.sock (ro); healthcheck `/app/extra/healthcheck` |
 | vaultwarden | `docs/vaultwarden.md` | PLAN-022 / #17 | 200 | secreto `vaultwarden_admin_token` |
-| microbin | `docs/microbin.md` | PLAN-022 / #17 | 401 | 2 secretos; volumen nombrado `microbin-microbin` |
+| microbin | `docs/microbin.md` | PLAN-022 / #17 | 401 | 2 secretos; volumen nombrado `microbin-data` |
 | pastebin | `docs/pastebin.md` | PLAN-022 / #17 | 303→200 | imagen `atareao/pastebin` desaparecida → upstream `mkaczanowski/pastebin` |
 
 ## En producción (desplegados y corriendo)

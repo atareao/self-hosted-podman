@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=picoshare-picoshare.volume:/data:Z
+Volume=picoshare-data.volume:/data:Z
 
 # ==== Networks ====
 Network=proxy.network

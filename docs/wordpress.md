@@ -7,14 +7,14 @@ wordpress, docker.io/library/wordpress:latest, 3 contenedores, red: wordpress.ne
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress.container
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress-mariadb.container
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress-valkey.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress-data.volume
 - Volumen(es): /data/self-hosted-podman/.config/containers/available/wordpress/wordpress-mariadb.volume
 - Config no secreta: N/A
 - Secretos: wordpress_db_password, mariadb_root_password
 
 ## Cómo funciona
 - Red: wordpress.network vinculada a los contenedores
-- Volúmenes: wordpress.volume montado en /var/www/html, wordpress-mariadb.volume montado en /var/lib/mysql
+- Volúmenes: wordpress-data.volume montado en /var/www/html, wordpress-mariadb.volume montado en /var/lib/mysql
 - Secretos: wordpress_db_password inyecta WORDPRESS_DB_PASSWORD, mariadb_root_password inyecta MARIADB_ROOT_PASSWORD_FILE
 - EnvironmentFile: N/A
 - Socket del daemon: N/A

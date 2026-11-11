@@ -16,7 +16,7 @@ PublishPort=8080:8080
 PublishPort=50051:50051
 
 # ==== Volumes ====
-Volume=weaviate-weaviate_data.volume:/var/lib/weaviate:Z
+Volume=weaviate-data.volume:/var/lib/weaviate:Z
 
 # ==== Networks ====
 

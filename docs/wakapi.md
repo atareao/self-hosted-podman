@@ -13,13 +13,13 @@ Puerto interno: 3000
   - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi.container`
   - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi-postgresql.container`
 - Volumen(es):
-  - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi-wakapi.volume`
-  - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi-pg_data.volume`
+  - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi-data.volume`
+  - `/data/self-hosted-podman/.config/containers/available/wakapi/wakapi-pg.volume`
 - Config no secreta: `/data/self-hosted-podman/.config/wakapi/wakapi.env`
 - Secretos: `wakapi_db_password`, `wakapi_postgres_password`
 
 ## Cómo funciona
-El contenedor `wakapi` se une a las redes `proxy.network` y `wakapi.network`, exponiendo el puerto 3000 a Traefik. El servicio PostgreSQL `wakapi-postgresql` está adjunto a la red `wakapi.network` solo para permitir la comunicación interna. Los volúmenes `wakapi-wakapi` y `wakapi-pg_data` persisten los datos de la aplicación y la base de datos respectivamente. Se inyectan los secretos `wakapi_db_password` y `wakapi_postgres_password` como variables de entorno. Traefik redirige las peticiones a `wakapi.${FQDN}`.
+El contenedor `wakapi` se une a las redes `proxy.network` y `wakapi.network`, exponiendo el puerto 3000 a Traefik. El servicio PostgreSQL `wakapi-postgresql` está adjunto a la red `wakapi.network` solo para permitir la comunicación interna. Los volúmenes `wakapi-data` y `wakapi-pg` persisten los datos de la aplicación y la base de datos respectivamente. Se inyectan los secretos `wakapi_db_password` y `wakapi_postgres_password` como variables de entorno. Traefik redirige las peticiones a `wakapi.${FQDN}`.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

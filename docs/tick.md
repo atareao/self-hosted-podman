@@ -22,8 +22,8 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
   - `.config/containers/available/tick/tick-influxdb.container`
   - `.config/containers/available/tick/tick-telegraf.container`
 - Volumen(es):
-  - `.config/containers/available/tick/tick-grafana_data.volume`
-  - `.config/containers/available/tick/tick-influxdb_data.volume`
+  - `.config/containers/available/tick/tick-grafana.volume`
+  - `.config/containers/available/tick/tick-influxdb.volume`
 - Red(es): `.config/containers/available/tick/tick.network` (+ `proxy.network`, definida en el stack `traefik`)
 - Config no secreta: no existe `.env` de stack (no hay `.config/tick/`).
 - Fichero de config montado: `%h/.config/tick/telegraf.conf` → `/etc/telegraf/telegraf.conf` (bind mount, `:ro`).
@@ -35,7 +35,7 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 - **Enrutado Traefik:** cada servicio web expone su router en su propio host:
   - `tick-grafana`: servicio `tick-grafana` puerto `3000`, router `tick-grafana` → `Host(\`tick.${FQDN}\`)`, `websecure`, `letsencrypt`, middlewares `seguridadHeaders@file,compresionHeaders@file`.
   - `tick-influxdb`: servicio `tick-influxdb` puerto `8086`, router `tick-influxdb` → `Host(\`influxdb.${FQDN}\`)`, mismos entrypoint/TLS/middlewares.
-- **Volúmenes:** `tick-grafana_data.volume` → `/var/lib/grafana` (dashboards, BD interna, plugins) y `tick-influxdb_data.volume` → `/var/lib/influxdb` (datos de series temporales).
+- **Volúmenes:** `tick-grafana.volume` → `/var/lib/grafana` (dashboards, BD interna, plugins) y `tick-influxdb.volume` → `/var/lib/influxdb` (datos de series temporales).
 - **Volúmenes de Telegraf (bind mounts de solo lectura):** `%h/.config/tick/telegraf.conf` → `/etc/telegraf/telegraf.conf`; `%t/podman/podman.sock` → `/var/run/docker.sock`; `/sys` → `/host/sys`; `/proc` → `/host/proc`; `/etc` → `/host/etc`. El socket de Podman permite a Telegraf recoger métricas de contenedores; los directorios del host (con `HOST_PROC`/`HOST_SYS`/`HOST_ETC`) permiten métricas del sistema anfitrión.
 - **Secretos / EnvironmentFile:** no hay `Secret=` ni `EnvironmentFile`; la config no secreta de cada contenedor va como `Environment=` y la de Telegraf vive en el `telegraf.conf` montado.
 - **Healthcheck:** ninguno de los tres define `Health*`.

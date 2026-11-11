@@ -15,7 +15,7 @@ ContainerName=postgres-postgres
 
 
 # ==== Volumes ====
-Volume=postgres-postgres_data.volume:/var/lib/postgresql/data:Z
+Volume=postgres-data.volume:/var/lib/postgresql/data:Z
 
 # ==== Networks ====
 Network=postgres.network

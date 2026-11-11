@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=cells-cellsdir.volume:/var/cells:Z
+Volume=cells-app.volume:/var/cells:Z
 Volume=cells-data.volume:/var/cells/data:Z
 
 # ==== Networks ====

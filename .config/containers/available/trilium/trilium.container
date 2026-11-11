@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=trilium-trilium.volume:/home/node/trilium-data:Z
+Volume=trilium-data.volume:/home/node/trilium-data:Z
 
 # ==== Networks ====
 Network=proxy.network

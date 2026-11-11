@@ -16,7 +16,7 @@ PodmanArgs=--init
  
  
 # ==== Volumes ====
-Volume=wakapi-wakapi.volume:/data:Z
+Volume=wakapi-data.volume:/data:Z
  
 # ==== Networks ====
 Network=proxy.network

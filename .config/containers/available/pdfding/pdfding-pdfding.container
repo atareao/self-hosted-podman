@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=pdfding-sqlite_data.volume:/home/nonroot/pdfding/db:Z
+Volume=pdfding-db.volume:/home/nonroot/pdfding/db:Z
 Volume=pdfding-media.volume:/home/nonroot/pdfding/media:Z
 
 # ==== Networks ====

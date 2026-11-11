@@ -14,15 +14,15 @@
   - /data/self-hosted-podman/.config/containers/available/cells/cells.container
   - /data/self-hosted-podman/.config/containers/available/cells/cells-mysql.container
 - Volumen(es):
-  - /data/self-hosted-podman/.config/containers/available/cells/cells-cellsdir.volume
+  - /data/self-hosted-podman/.config/containers/available/cells/cells-app.volume
   - /data/self-hosted-podman/.config/containers/available/cells/cells-data.volume
-  - /data/self-hosted-podman/.config/containers/available/cells/cells-mysqldir.volume
+  - /data/self-hosted-podman/.config/containers/available/cells/cells-mysql.volume
 - Config no secreta: N/A
 - Secretos: cells_mysql_root_password, cells_mysql_password
 
 ## Cómo funciona
 Red: usa proxy.network y internal cells.network.
-Volúmenes: cells-cellsdir.volume -> /var/cells (contenedor cells), cells-data.volume -> /var/cells/data (contenedor cells), cells-mysqldir.volume -> /var/lib/mysql (contenedor mysql).
+Volúmenes: cells-app.volume -> /var/cells (contenedor cells), cells-data.volume -> /var/cells/data (contenedor cells), cells-mysql.volume -> /var/lib/mysql (contenedor mysql).
 Secretos: cells_mysql_root_password, cells_mysql_password.
 Healthcheck: N/A
 Enrutado Traefik: Host(`cells.${FQDN}`), puerto 8080, middleware seguridadHeaders@file, compresionHeaders@file.

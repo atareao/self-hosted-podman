@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=homepage-homepage_config.volume:/app/config:Z
+Volume=homepage-config.volume:/app/config:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====

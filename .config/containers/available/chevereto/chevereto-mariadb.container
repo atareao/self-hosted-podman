@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=chevereto-chevereto_mariadb.volume:/var/lib/mysql:Z
+Volume=chevereto-mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=chevereto.network

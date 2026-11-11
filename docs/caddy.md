@@ -9,13 +9,13 @@
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/caddy/caddy.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/caddy/caddy-caddy_data.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/caddy/caddy-data.volume
 - Config no secreta: N/A
 - Secretos: N/A
 
 ## Cómo funciona
 Red: proxy.network
-Volúmenes: caddy-caddy_data.volume mounted at /data
+Volúmenes: caddy-data.volume mounted at /data
 Socket del daemon: /var/run/docker.sock (via podman.sock bind)
 Healthcheck: N/A
 Enrutado Traefik: N/A

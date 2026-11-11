@@ -15,8 +15,8 @@ ContainerName=custom-code-server
 
 
 # ==== Volumes ====
-Volume=custom-code-server-code_server_data.volume:/config:Z
-Volume=custom-code-server-code_server_workspace.volume:/config/workspace:Z
+Volume=custom-code-server-data.volume:/config:Z
+Volume=custom-code-server-workspace.volume:/config/workspace:Z
 
 # ==== Networks ====
 Network=proxy.network

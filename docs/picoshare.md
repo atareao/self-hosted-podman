@@ -10,12 +10,12 @@
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/picoshare/picoshare.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/picoshare/picoshare-picoshare.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/picoshare/picoshare-data.volume
 - Config no secreta: none
 - Secretos: picoshare_ps_shared_secret
 
 ## Cómo funciona
-Conecta a la red proxy.network. Persiste datos en picoshare-picoshare.volume. Inyecta PS_SHARED_SECRET mediante secret. No tiene socket del daemon ni healthcheck. Traefik enruta a https://picoshare.${FQDN} con puerto 4001.
+Conecta a la red proxy.network. Persiste datos en picoshare-data.volume. Inyecta PS_SHARED_SECRET mediante secret. No tiene socket del daemon ni healthcheck. Traefik enruta a https://picoshare.${FQDN} con puerto 4001.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

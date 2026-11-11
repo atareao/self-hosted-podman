@@ -10,7 +10,7 @@
 
 ## Ficheros
 - **Quadlet(s):** .config/containers/available/microbin/microbin.container
-- **Volumen(es):** .config/containers/available/microbin/microbin-microbin.volume
+- **Volumen(es):** .config/containers/available/microbin/microbin-data.volume
 - **Config no secreta:** .config/microbin/microbin.env
 - **Secretos:** microbin_basic_auth_password, microbin_admin_password
 

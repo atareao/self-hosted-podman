@@ -15,13 +15,13 @@ Puerto interno: 8000 (focalboard)
   - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard.container
   - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard-postgresql.container
 - Volumen(es):
-  - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard-focalboarddb.volume
-  - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard-focalboard.volume
+  - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard-db.volume
+  - /data/self-hosted-podman/.config/containers/available/focalboard/focalboard-data.volume
 - Config no secreta:
 - Secretos:
 
 ## Cómo funciona
-Red proxy.network y focalboard.network. Volúmenes focalboard-focalboard.volume (fichas) y focalboard-focalboarddb.volume (BD). Socket del daemon (none). Healthcheck (none). Enrutado Traefik, User/UserNS/NoNewPrivileges: none.
+Red proxy.network y focalboard.network. Volúmenes focalboard-data.volume (fichas) y focalboard-db.volume (BD). Socket del daemon (none). Healthcheck (none). Enrutado Traefik, User/UserNS/NoNewPrivileges: none.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

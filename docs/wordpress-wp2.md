@@ -7,14 +7,14 @@ wordpress-wp2, docker.io/library/wordpress, 3 contenedores, red: wordpress-wp2.n
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress-wp2/wordpress-wp2.container
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress-wp2/wordpress-wp2-mariadb.container
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wordpress-wp2/wordpress-wp2-redis.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/wordpress-wp2/wordpress-wp2-wp2.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/wordpress-wp2/wordpress-wp2-data.volume
 - Volumen(es): N/A
 - Config no secreta: N/A
 - Secretos: wordpress_wp2_wordpress_db_password
 
 ## Cómo funciona
 - Red: wordpress-wp2.network vinculada a los contenedores
-- Volúmenes: wordpress-wp2-wp2.volume montado en /var/www/html
+- Volúmenes: wordpress-wp2-data.volume montado en /var/www/html
 - Secretos: wordpress_wp2_wordpress_db_password inyecta WORDPRESS_DB_PASSWORD
 - EnvironmentFile: N/A
 - Socket del daemon: N/A

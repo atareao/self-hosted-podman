@@ -10,12 +10,12 @@ Puerto interno: 8080, 50051
 
 ## Ficheros
 - Quadlet(s): `/data/self-hosted-podman/.config/containers/available/weaviate/weaviate.container`
-- Volumen(es): `/data/self-hosted-podman/.config/containers/available/weaviate/weaviate-weaviate_data.volume`
+- Volumen(es): `/data/self-hosted-podman/.config/containers/available/weaviate/weaviate-data.volume`
 - Config no secreta: ninguno
 - Secretos: ninguno
 
 ## Cómo funciona
-El contenedor se ejecuta sin red pública y expone los puertos 8080 y 50051 localmente. Se persisten los datos en el volumen `weaviate-weaviate_data`. Traefik no se aplica, ya que el servicio no está expuesto públicamente en este stack.
+El contenedor se ejecuta sin red pública y expone los puertos 8080 y 50051 localmente. Se persisten los datos en el volumen `weaviate-data`. Traefik no se aplica, ya que el servicio no está expuesto públicamente en este stack.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

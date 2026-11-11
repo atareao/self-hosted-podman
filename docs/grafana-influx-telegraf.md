@@ -9,8 +9,8 @@ Esta stack combina **Grafana** para visualización, **InfluxDB** para almacenami
   - `grafana-influx-telegraf-influxdb.container`
   - `grafana-influx-telegraf-telegraf.container`
 - Volumen(es):
-  - `grafana-influx-telegraf-data_grafana.volume`
-  - `grafana-influx-telegraf-data_influxdb.volume`
+  - `grafana-influx-telegraf-grafana.volume`
+  - `grafana-influx-telegraf-influxdb.volume`
 - Config no secreta: *(ninguno)*
 - Secretos: `grafana_influx_telegraf_gf_security_admin_password`
 

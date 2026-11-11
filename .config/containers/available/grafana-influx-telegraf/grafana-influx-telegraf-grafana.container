@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=grafana-influx-telegraf-data_grafana.volume:/var/lib/grafana:Z
+Volume=grafana-influx-telegraf-grafana.volume:/var/lib/grafana:Z
 
 # ==== Networks ====
 Network=proxy.network

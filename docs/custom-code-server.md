@@ -12,8 +12,8 @@ Editor de código basado en VS Code accesible desde el navegador.
 ## Ficheros
 - **Quadlet(s)**: /data/self-hosted-podman/.config/containers/available/custom-code-server/custom-code-server.container
 - **Volumen(es)**:
-  - /data/self-hosted-podman/.config/containers/available/custom-code-server/custom-code-server-code_server_data.volume
-  - /data/self-hosted-podman/.config/containers/available/custom-code-server/custom-code-server-code_server_workspace.volume
+  - /data/self-hosted-podman/.config/containers/available/custom-code-server/custom-code-server-data.volume
+  - /data/self-hosted-podman/.config/containers/available/custom-code-server/custom-code-server-workspace.volume
 - **Config no secreta**: ninguna
 - **Secretos**: ninguno
 

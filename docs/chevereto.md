@@ -14,14 +14,14 @@
   - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto.container
   - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-mariadb.container
 - Volumen(es):
-  - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-chevereto.volume
-  - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-chevereto_mariadb.volume
+  - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-data.volume
+  - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-mariadb.volume
 - Config no secreta: N/A
 - Secretos: chevereto_db_pass, chevereto_mysql_password, chevereto_mariadb_root_password
 
 ## Cómo funciona
 Red: proxy.network y internal chevereto.network.
-Volúmenes: chevereto.volume -> /var/www/html/images, chevereto_mariadb.volume -> /var/lib/mysql.
+Volúmenes: chevereto-data.volume -> /var/www/html/images, chevereto-mariadb.volume -> /var/lib/mysql.
 Secretos: chevereto_db_pass, chevereto_mysql_password, chevereto_mariadb_root_password.
 Healthcheck: N/A
 Enrutado Traefik: Host(`chevereto.${FQDN}`), puerto 80, middleware seguridadHeaders@file, compresionHeaders@file.

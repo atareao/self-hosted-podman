@@ -15,7 +15,7 @@ ContainerName=tick-grafana
 
 
 # ==== Volumes ====
-Volume=tick-grafana_data.volume:/var/lib/grafana:Z
+Volume=tick-grafana.volume:/var/lib/grafana:Z
 
 # ==== Networks ====
 Network=proxy.network

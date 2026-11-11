@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=odoo-odoo.volume:/var/lib/odoo:Z
+Volume=odoo-data.volume:/var/lib/odoo:Z
 Volume=%h/.config/odoo/odoo.conf:/etc/odoo/odoo.conf:Z
 Volume=%h/.config/odoo/addons:/mnt/extra-addons:Z
 

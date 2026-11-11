@@ -8,7 +8,7 @@ Base de datos PostgreSQL y pgAdmin, basado en las imágenes `docker.io/library/p
   - `/data/self-hosted-podman/postgres-postgres.container`
   - `/data/self-hosted-podman/postgres-pgadmin.container`
 - Volumen(es):
-  - `/data/self-hosted-podman/postgres-postgres_data.volume`
+  - `/data/self-hosted-podman/postgres-data.volume`
   - `/data/self-hosted-podman/postgres-pgadmin.volume`
 - Config no secreta: (no dispone de .env)
 - Secretos:
@@ -16,7 +16,7 @@ Base de datos PostgreSQL y pgAdmin, basado en las imágenes `docker.io/library/p
   - postgres_pgadmin_default_password
 
 ## Cómo funciona
-El contenedor `postgres-postgres` expone la base de datos PostgreSQL y persiste los datos en `postgres-postgres_data.volume`. El contenedor `postgres-pgadmin` ofrece una interfaz web para administrar la base de datos y utiliza la red `proxy.network` para su exposición a Traefik. Los secretos `postgres_password` y `postgres_pgadmin_default_password` suministran la contraseña de la base de datos y del administrador respectivamente. La unidad se ejecuta con `Restart=always`. Traefik enruta el tráfico a través del puerto interno 80 de pgAdmin.
+El contenedor `postgres-postgres` expone la base de datos PostgreSQL y persiste los datos en `postgres-data.volume`. El contenedor `postgres-pgadmin` ofrece una interfaz web para administrar la base de datos y utiliza la red `proxy.network` para su exposición a Traefik. Los secretos `postgres_password` y `postgres_pgadmin_default_password` suministran la contraseña de la base de datos y del administrador respectivamente. La unidad se ejecuta con `Restart=always`. Traefik enruta el tráfico a través del puerto interno 80 de pgAdmin.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

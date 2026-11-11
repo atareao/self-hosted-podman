@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=cloudbeaver-cloudbeaver.volume:/opt/cloudbeaver/workspace:Z
+Volume=cloudbeaver-data.volume:/opt/cloudbeaver/workspace:Z
 
 # ==== Networks ====
 Network=proxy.network

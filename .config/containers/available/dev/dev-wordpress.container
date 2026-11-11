@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=dev-dev_wordpress.volume:/var/www/html:Z
+Volume=dev-wordpress.volume:/var/www/html:Z
 Volume=%h/.config/dev/plugins:/var/www/html/wp-content/plugins:Z
 Volume=%h/.config/dev/themes:/var/www/html/wp-content/themes:Z
 Volume=%h/.config/dev/uploads:/var/www/html/wp-content/uploads:Z

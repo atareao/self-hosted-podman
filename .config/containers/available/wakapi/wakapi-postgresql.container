@@ -15,7 +15,7 @@ PodmanArgs=--init
  
  
 # ==== Volumes ====
-Volume=wakapi-pg_data.volume:/var/lib/postgresql/data:Z
+Volume=wakapi-pg.volume:/var/lib/postgresql/data:Z
  
 # ==== Networks ====
 Network=wakapi.network

@@ -15,7 +15,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=rabbitmq-rabbitmq.volume:/var/lib/rabbitmq/mnseia/:Z
+Volume=rabbitmq-data.volume:/var/lib/rabbitmq/mnseia/:Z
 
 # ==== Networks ====
 Network=proxy.network

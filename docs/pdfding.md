@@ -10,12 +10,12 @@
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/pdfding/pdfding-pdfding.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/pdfding/pdfding-media.volume, /data/self-hosted-podman/.config/containers/available/pdfding/pdfding-sqlite_data.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/pdfding/pdfding-media.volume, /data/self-hosted-podman/.config/containers/available/pdfding/pdfding-db.volume
 - Config no secreta: none
 - Secretos: pdfding_secret_key
 
 ## Cómo funciona
-Usa la red proxy.network. Persiste datos en pdfding-sqlite_data.volume y pdfding-media.volume. Inyecta SECRET_KEY mediante secret. No tiene socket del daemon ni healthcheck. Traefik enruta a https://pdfding.${FQDN} con puerto 8000.
+Usa la red proxy.network. Persiste datos en pdfding-db.volume y pdfding-media.volume. Inyecta SECRET_KEY mediante secret. No tiene socket del daemon ni healthcheck. Traefik enruta a https://pdfding.${FQDN} con puerto 8000.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |

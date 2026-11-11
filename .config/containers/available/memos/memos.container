@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=memos-memos.volume:/var/opt/memos:Z
+Volume=memos-data.volume:/var/opt/memos:Z
 
 # ==== Networks ====
 Network=proxy.network

@@ -18,7 +18,7 @@ PublishPort=443:443
 
 # ==== Volumes ====
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
-Volume=caddy-caddy_data.volume:/data:Z
+Volume=caddy-data.volume:/data:Z
 
 # ==== Networks ====
 Network=proxy.network

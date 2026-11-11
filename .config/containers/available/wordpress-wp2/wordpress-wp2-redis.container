@@ -15,7 +15,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=wordpress-wp2-wp2_redis.volume:/data:Z
+Volume=wordpress-wp2-redis.volume:/data:Z
 
 # ==== Networks ====
 Network=wordpress-wp2.network

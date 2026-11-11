@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=wordpress-wp2-wp2_mariadb.volume:/var/lib/mysql:Z
+Volume=wordpress-wp2-mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=wordpress-wp2.network

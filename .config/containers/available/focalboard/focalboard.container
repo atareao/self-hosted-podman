@@ -16,7 +16,7 @@ ContainerName=focalboard
 
 # ==== Volumes ====
 Volume=%h/.config/focalboard/config.json:/opt/focalboard/config.json:Z
-Volume=focalboard-focalboard.volume:/opt/focalboard/files:Z
+Volume=focalboard-data.volume:/opt/focalboard/files:Z
 
 # ==== Networks ====
 Network=proxy.network

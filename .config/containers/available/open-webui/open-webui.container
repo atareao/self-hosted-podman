@@ -15,7 +15,7 @@ PodmanArgs=--init
 PublishPort=8080:8080
 
 # ==== Volumes ====
-Volume=open-webui-open-webui.volume:/app/backend/data:Z
+Volume=open-webui-data.volume:/app/backend/data:Z
 
 # ==== Networks ====
 Network=open-webui.network

@@ -7,13 +7,13 @@ Homepage es una herramienta de landing page para administrar servicios web. Se e
 - Quadlet(s):
   - `homepage.container`
 - Volumen(es):
-  - `homepage-homepage_config.volume`
+  - `homepage-config.volume`
 - Config no secreta: *(ninguno)*
 - Secretos: *(ninguno)*
 
 ## Cómo funciona
 - Red: Conexión a `proxy.network` para acceso público.
-- Volúmenes: Persistencia de la configuración en `homepage-homepage_config`.
+- Volúmenes: Persistencia de la configuración en `homepage-config`.
 - `EnvironmentFile`: No se usa.
 - Healthcheck: No definido.
 - User: Se ejecuta con la UID predeterminada (1000).

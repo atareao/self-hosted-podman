@@ -15,7 +15,7 @@ ContainerName=tick-influxdb
 
 
 # ==== Volumes ====
-Volume=tick-influxdb_data.volume:/var/lib/influxdb:Z
+Volume=tick-influxdb.volume:/var/lib/influxdb:Z
 
 # ==== Networks ====
 Network=proxy.network

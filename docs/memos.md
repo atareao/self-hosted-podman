@@ -14,14 +14,14 @@ Memos es un servicio de anotaciones rápidas (notas tipo *timeline*), autoalojad
 ## Ficheros
 
 - Quadlet: `.config/containers/available/memos/memos.container`
-- Volumen: `.config/containers/available/memos/memos-memos.volume` (`VolumeName=memos-memos`) → `/var/opt/memos` (datos + SQLite).
+- Volumen: `.config/containers/available/memos/memos-data.volume` (`VolumeName=memos-data`) → `/var/opt/memos` (datos + SQLite).
 - Config no secreta: — (ninguna).
 - Secretos: ninguno.
 
 ## Cómo funciona
 
 - **Red:** `proxy.network`.
-- **Volumen:** `memos-memos` en `/var/opt/memos` (base de datos y datos de la app).
+- **Volumen:** `memos-data` en `/var/opt/memos` (base de datos y datos de la app).
 - **Enrutado Traefik:** servicio `memos` puerto `5230`, router `memos` con `Host(`memos.${FQDN}`)`, `websecure`, `certresolver=letsencrypt`, middlewares `seguridadHeaders@file,compresionHeaders@file`.
 - **Secretos / EnvironmentFile:** ninguno.
 - **Socket del daemon:** no monta `podman.sock`.

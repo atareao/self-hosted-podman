@@ -15,7 +15,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=dev-dev_redis.volume:/data:Z
+Volume=dev-redis.volume:/data:Z
 
 # ==== Networks ====
 Network=dev.network

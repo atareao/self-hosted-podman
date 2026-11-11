@@ -10,13 +10,13 @@
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/rabbitmq/rabbitmq.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/rabbitmq/rabbitmq-rabbitmq.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/rabbitmq/rabbitmq-data.volume
 - Config no secreta: ninguno
 - Secretos: rabbitmq_default_pass
 
 ## Cómo funciona
 - **Red**: proxy.network
-- **Volúmenes**: rabbitmq-rabbitmq.volume -> /var/lib/rabbitmq/mnseia/
+- **Volúmenes**: rabbitmq-data.volume -> /var/lib/rabbitmq/mnseia/
 - **Secretos**: rabbitmq_default_pass (RABBITMQ_DEFAULT_PASS)
 - **Healthcheck**: ninguno
 - **Routing Traefik**: Host(`mq.${FQDN}`), puerto 15672

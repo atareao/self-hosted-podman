@@ -14,7 +14,7 @@
   - .config/containers/available/odoo/odoo-postgresql.container
 - Volumen(es):
   - .config/containers/available/odoo/odoo-db.volume
-  - .config/containers/available/odoo/odoo-odoo.volume
+  - .config/containers/available/odoo/odoo-data.volume
 - Config no secreta: ninguno
 - Secretos: odoo_password, odoo_postgres_password
 

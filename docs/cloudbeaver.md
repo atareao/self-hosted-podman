@@ -9,13 +9,13 @@
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/cloudbeaver/cloudbeaver.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/cloudbeaver/cloudbeaver-cloudbeaver.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/cloudbeaver/cloudbeaver-data.volume
 - Config no secreta: N/A
 - Secretos: N/A
 
 ## Cómo funciona
 Red: proxy.network
-Volúmenes: cloudbeaver-cloudbeaver.volume mounted at /opt/cloudbeaver/workspace
+Volúmenes: cloudbeaver-data.volume mounted at /opt/cloudbeaver/workspace
 Healthcheck: N/A
 Enrutado Traefik: Host(`cloudbeaver.${FQDN}`), puerto 8978, middleware seguridadHeaders@file, compresionHeaders@file.
 User/UserNS/NoNewPrivileges: N/A

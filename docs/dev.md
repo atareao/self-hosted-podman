@@ -16,9 +16,9 @@ Entorno con bases de datos, administración y CMS.
   - /data/self-hosted-podman/.config/containers/available/dev/dev-redis.container
   - /data/self-hosted-podman/.config/containers/available/dev/dev-wordpress.container
 - **Volumen(es)**:
-  - /data/self-hosted-podman/.config/containers/available/dev/dev-dev_mariadb.volume
-  - /data/self-hosted-podman/.config/containers/available/dev/dev-dev_redis.volume
-  - /data/self-hosted-podman/.config/containers/available/dev/dev-dev_wordpress.volume
+  - /data/self-hosted-podman/.config/containers/available/dev/dev-mariadb.volume
+  - /data/self-hosted-podman/.config/containers/available/dev/dev-redis.volume
+  - /data/self-hosted-podman/.config/containers/available/dev/dev-wordpress.volume
 - **Config no secreta**: ninguna
 - **Secretos**:
   - dev_mysql_password (target: MYSQL_PASSWORD)

@@ -15,7 +15,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=grafana-influx-telegraf-data_influxdb.volume:/var/lib/influxdb:Z
+Volume=grafana-influx-telegraf-influxdb.volume:/var/lib/influxdb:Z
 
 # ==== Networks ====
 Network=grafana-influx-telegraf.network

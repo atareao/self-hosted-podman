@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=metube-metube.volume:/downloads:Z
+Volume=metube-data.volume:/downloads:Z
 
 # ==== Networks ====
 Network=proxy.network

@@ -13,7 +13,7 @@
   - .config/containers/available/open-webui/open-webui.container
   - .config/containers/available/open-webui/open-webui-ollama.container
 - Volumen(es):
-  - .config/containers/available/open-webui/open-webui-open-webui.volume
+  - .config/containers/available/open-webui/open-webui-data.volume
   - .config/containers/available/open-webui/open-webui-ollama.volume
 - Config no secreta: ninguno
 - Secretos: ninguno

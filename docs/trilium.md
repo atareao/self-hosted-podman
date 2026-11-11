@@ -7,13 +7,13 @@ Trilium Notes: aplicación de toma de notas jerárquica y autoalojada (imagen `d
 ## Ficheros
 
 - Quadlet(s): `.config/containers/available/trilium/trilium.container`
-- Volumen(es): `.config/containers/available/trilium/trilium-trilium.volume`
+- Volumen(es): `.config/containers/available/trilium/trilium-data.volume`
 - Config no secreta: — (no existe `.env` de stack)
 - Secretos: — (ninguno)
 
 ## Cómo funciona
 
-Contenedor sin privilegios propios de red: se une a `proxy.network` con `NetworkAlias=trilium`, de modo que Traefik lo alcanza por el puerto interno `8080`. Los datos persisten en el volumen nombrado `trilium-trilium.volume` montado en `/home/node/trilium-data` (con sufijo `:Z` para SELinux), y el directorio se pasa a la app con `TRILIUM_DATA_DIR`. Se arranca con `PodmanArgs=--init` (init mínimo para reapear zombies) y `Restart=always`. No define healthcheck, ni hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`UserNS`), ni secretos. El enrutado Traefik usa el router `trilium` en el entrypoint `websecure`, con TLS vía `letsencrypt` y los middlewares `seguridadHeaders@file,compresionHeaders@file`.
+Contenedor sin privilegios propios de red: se une a `proxy.network` con `NetworkAlias=trilium`, de modo que Traefik lo alcanza por el puerto interno `8080`. Los datos persisten en el volumen nombrado `trilium-data.volume` montado en `/home/node/trilium-data` (con sufijo `:Z` para SELinux), y el directorio se pasa a la app con `TRILIUM_DATA_DIR`. Se arranca con `PodmanArgs=--init` (init mínimo para reapear zombies) y `Restart=always`. No define healthcheck, ni hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`UserNS`), ni secretos. El enrutado Traefik usa el router `trilium` en el entrypoint `websecure`, con TLS vía `letsencrypt` y los middlewares `seguridadHeaders@file,compresionHeaders@file`.
 
 ## Variables / configuración
 

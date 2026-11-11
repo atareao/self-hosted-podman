@@ -10,13 +10,13 @@ Puerto interno: 5005
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/flame/flame.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/flame/flame-flame.volume
+- Volumen(es): /data/self-hosted-podman/.config/containers/available/flame/flame-data.volume
 - Config no secreta:
 - Secretos:
   - flame_password
 
 ## Cómo funciona
-Red proxy.network, volumen flame-flame.volume, bind mount podman socket, socket del daemon (none), healthcheck (none), enrutado Traefik, User/UserNS/NoNewPrivileges: none.
+Red proxy.network, volumen flame-data.volume, bind mount podman socket, socket del daemon (none), healthcheck (none), enrutado Traefik, User/UserNS/NoNewPrivileges: none.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
