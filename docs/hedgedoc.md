@@ -8,20 +8,26 @@ Hedgedoc es una aplicación web de wiki colaborativa que utiliza la base de dato
   - `hedgedoc.container`
   - `hedgedoc-mariadb.container`
 - Volumen(es):
-  - `hedgedoc-config.volume`
-  - `hedgedoc-data.volume`
+  - `hedgedoc-config.volume` → `VolumeName=hedgedoc-config`
+  - `hedgedoc-data.volume` → `VolumeName=hedgedoc-data`
+  - ⚠️ **Los nombres están invertidos respecto a lo que sugerirían**: `hedgedoc-data` es el que monta **MariaDB** en `/config` (guarda la **base de datos**), mientras que `hedgedoc-config` es el que monta la **app** Hedgedoc en `/config` (guarda la **configuración de la aplicación**). Se mantienen así por compatibilidad; **no renombrar**.
 - Config no secreta: *(ninguno)*
 - Secretos: `hedgedoc_db_pass`, `hedgedoc_mysql_root_password`, `hedgedoc_mysql_password`
 
 ## Cómo funciona
 - Red: Conexión a `proxy.network` para acceso público y a `hedgedoc.network` para conexión interna entre la aplicación y la base de datos.
-- Volúmenes: Persistencia de la configuración y los datos en los volumes `hedgedoc-config` y `hedgedoc-data`.
+- Orden de arranque: `hedgedoc` declara `After=... hedgedoc-mariadb.service` + `Requires=hedgedoc-mariadb.service` (además de `traefik.service`); `hedgedoc-mariadb` solo `After=network-online.target`.
+- Volúmenes (**nombres invertidos, no renombrar**):
+  - `hedgedoc-data.volume` → montado por `hedgedoc-mariadb` en `/config` → contiene la **base de datos MariaDB**.
+  - `hedgedoc-config.volume` → montado por `hedgedoc` en `/config` → contiene la **configuración de la app Hedgedoc**.
 - Secrets: Contraseñas de la base de datos a través de los secretos `hedgedoc_db_pass`, `hedgedoc_mysql_root_password` y `hedgedoc_mysql_password`.
 - `EnvironmentFile`: Ninguno.
 - `podman.socket`: No expuesto.
 - Healthcheck: No definido.
 - User: Los contenedores corre como UID 1000 (grafo) y UID 1000 para la base de datos.
 - NoNewPrivileges: No habilitado.
+- `PodmanArgs=--init` en ambos contenedores.
+- `AutoUpdate=registry` en ambos contenedores (tags `:latest`).
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
@@ -50,4 +56,5 @@ Hedgedoc es una aplicación web de wiki colaborativa que utiliza la base de dato
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- ⚠️ Nombres de volumen **invertidos** (`hedgedoc-data` = BD de MariaDB; `hedgedoc-config` = config de la app). Documentado y **no se renombra** para no romper datos existentes.
+- La app Hedgedoc usa el secreto `hedgedoc_db_pass` (`DB_PASS`) y MariaDB usa `hedgedoc_mysql_password` (`MYSQL_PASSWORD`); deben contener **el mismo valor** aunque sean secretos distintos. No se han unificado en este cambio.
