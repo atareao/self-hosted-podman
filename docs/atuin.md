@@ -24,6 +24,7 @@
 - El contenedor atuin se une a `proxy.network` (Traefik) y a `atuin.network` para alcanzar `postgres_for_atuin:5432`.
 - Se almacena el historial en el volumen `atuin-data` montado en `/var/lib/postgresql` dentro del contenedor de PostgreSQL.
 - Variables de entorno de la aplicación se provienen de la configuración de la red y la base de datos.
+- La imagen no arranca el servidor por sí sola: el quadlet lanza `atuin server start` con `Exec=server start`.
 - Healthcheck no está definido en el quadlet.
 - El contenedor no corre como root; usa UID/GID no privilegiados.
 
@@ -44,3 +45,4 @@
 
 ## Follow-ups
 - `atuin_postgres_password` y el password embebido en `atuin_db_uri` deben coincidir.
+- La imagen `ellieh/atuin` es de terceros (no oficial); revisar si upstream publica imagen de servidor propia.

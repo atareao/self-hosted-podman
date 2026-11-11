@@ -13,7 +13,7 @@ ContainerName=atuin
 PodmanArgs=--init
 
 # ==== Command ====
-
+Exec=server start
 
 # ==== Ports ====
 
