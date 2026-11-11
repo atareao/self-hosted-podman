@@ -40,4 +40,4 @@ El contenedor `wakapi` se une a las redes `proxy.network` y `wakapi.network`, ex
 4. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- Verificado E2E el 2026-11-11 (PLAN-030, issue #25): 200 en `/` y en `/api/health`, sin cambios en el quadlet. Los secretos `wakapi_postgres_password` y `wakapi_db_password` deben crearse con el **mismo** valor.

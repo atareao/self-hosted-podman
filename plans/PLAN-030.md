@@ -2,7 +2,7 @@
 
 - **Issue:** #25
 - **Fecha:** 2026-11-11
-- **Estado:** EN CURSO
+- **Estado:** COMPLETADO (2026-11-11)
 
 ## Objetivo
 
@@ -56,20 +56,20 @@ Notas por stack:
 
 ## Tareas
 
-- [ ] T1 — Preflight en prod: `systemctl --user is-system-running`, `qctl check` de los 6 stacks,
+- [x] T1 — Preflight en prod: `systemctl --user is-system-running`, `qctl check` de los 6 stacks,
       `unjinja` (los `.jinja` renderizados existen).
-- [ ] T2 — Corregir estáticamente el bug de `radicale` (router/servicio `expulsabot` → `radicale`) en
+- [x] T2 — Corregir estáticamente el bug de `radicale` (router/servicio `expulsabot` → `radicale`) en
       `available/radicale/radicale.container`; validar con `QUADLET_UNIT_DIRS` + `quadlet -user -dryrun`.
-- [ ] T3 — Desplegar **atuin**: secretos, `qctl install`, 5 puntos E2E.
-- [ ] T4 — Desplegar **beszel**: secretos, binds/volúmenes, `qctl install`, 5 puntos E2E.
-- [ ] T5 — Desplegar **radicale**: binds + `.htpasswd-users`, `qctl install`, 5 puntos E2E.
-- [ ] T6 — Desplegar **wakapi**: secretos, `.env`, `qctl install`, 5 puntos E2E.
-- [ ] T7 — Desplegar **wikijs**: secretos, bind de datos, `qctl install`, 5 puntos E2E.
-- [ ] T8 — Desplegar **zincsearch**: secretos, `qctl install`, 5 puntos E2E.
-- [ ] T9 — Purga por stack: `qctl uninstall`, volúmenes, secretos, binds e imágenes.
-- [ ] T10 — Actualizar `docs/estado-verificacion-e2e.md` (tabla «Verificados E2E», cifras 127 = 65 + 4 + 2 + 56
+- [x] T3 — Desplegar **atuin**: secretos, `qctl install`, 5 puntos E2E.
+- [x] T4 — Desplegar **beszel**: secretos, binds/volúmenes, `qctl install`, 5 puntos E2E.
+- [x] T5 — Desplegar **radicale**: binds + `.htpasswd-users`, `qctl install`, 5 puntos E2E.
+- [x] T6 — Desplegar **wakapi**: secretos, `.env`, `qctl install`, 5 puntos E2E.
+- [x] T7 — Desplegar **wikijs**: secretos, bind de datos, `qctl install`, 5 puntos E2E.
+- [x] T8 — Desplegar **zincsearch**: secretos, `qctl install`, 5 puntos E2E.
+- [x] T9 — Purga por stack: `qctl uninstall`, volúmenes, secretos, binds e imágenes.
+- [x] T10 — Actualizar `docs/estado-verificacion-e2e.md` (tabla «Verificados E2E», cifras 127 = 65 + 4 + 2 + 56
       si los 6 pasan) y `docs/<stack>.md` con hallazgos.
-- [ ] T11 — Commit gitmoji en `main` (`🐛 fix`/`📝 docs` según corresponda) y archivar el plan a
+- [x] T11 — Commit gitmoji en `main` (`🐛 fix`/`📝 docs` según corresponda) y archivar el plan a
       `plans/PLAN-030-ARCHIVED.md`; actualizar `HANDOFF.md`.
 
 ## Criterio de verificado E2E (5 puntos)
@@ -95,3 +95,10 @@ Notas por stack:
 - `radicale` sin nombres globales `expulsabot`.
 - Ningún stack del lote queda desplegado al cerrar la ronda.
 - `docs/estado-verificacion-e2e.md` actualizado y plan archivado.
+
+## Resultado (2026-11-11)
+
+- Verificados E2E y purgados: atuin, beszel, radicale, wakapi, wikijs, zincsearch (6/6).
+- Bugs latentes corregidos: 7 (atuin ×3, beszel ×2, radicale ×2, wikijs ×2 — ver `docs/<stack>.md`).
+- Producción: sólo quedan los 4 stacks base + `headscale-headplane`; sin restos de la ronda.
+- Cifras actualizadas: 127 = 65 verificados + 4 en producción + 2 bloqueados + 56 sin verificar.

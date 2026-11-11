@@ -36,4 +36,5 @@ Red: proxy.network. Volumen montado en /data. Secretos: zincsearch_zinc_first_ad
 4. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- Verificado E2E el 2026-11-11 (PLAN-030, issue #25): `/` → 302 a `/ui/` (200) y `/healthz` → 200, sin cambios en el quadlet.
+- Los secretos `zincsearch_zinc_first_admin_password` y `zincsearch_token` se crean con `podman secret create` antes del primer arranque.
