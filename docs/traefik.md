@@ -90,9 +90,11 @@ colisiones detectadas al auditar los quadlets (PLAN-023 y PLAN-024).
      (`Host(headscale.${FQDN}) && PathPrefix(/admin)`): la regla más larga gana para `/admin`.
 2. **Los nombres de router y de service son globales en Traefik.** Dos stacks con el mismo nombre se
    sobrescriben entre sí. Prefijar siempre con el nombre del stack (`tick-grafana`, no `grafana`).
-3. **El apex `${FQDN}` no tiene dueño.** Ningún stack lo declara; lo atiende el router catch-all
-   `errserve-catchall` (`HostRegexp(.+)` con `priority=1`), que sirve las páginas de error. Decisión
-   revisable si algún día se quiere una landing o un redirect en la raíz.
+3. **El apex `${FQDN}` lo posee `errserve`.** El router dedicado `errserve-apex`
+   (`Host(\`${FQDN}\`)`, `tls.certresolver=letsencrypt`) sirve la página de error del apex **con
+   certificado válido**. El catch-all `errserve-catchall` (`HostRegexp(.+)`, `priority=1`) sigue
+   cubriendo el resto de hosts sin dueño. El apex no redirige a ningún servicio; revisable si se
+   quiere una landing o un redirect en la raíz.
 4. **En stacks multi-contenedor solo se enruta la cara web.** BBDD, Redis y workers no llevan labels de
    Traefik. Protocolos no HTTP (p. ej. `mumble`, 64738 tcp/udp) se publican con `PublishPort` en vez de
    por Traefik.
@@ -100,6 +102,10 @@ colisiones detectadas al auditar los quadlets (PLAN-023 y PLAN-024).
    `open-webui`, `authentik`, `publirs`, `miniflux-client`, `matrixmail` (además de los internos
    `caddy`, `crowdsec`, `unbound`, `vector`, `weaviate`, `whisper`, `mtproxy`, `socks5`,
    `simple-torrent`, `dev`).
+6. **Los valores de `Label=` no pueden contener espacios.** systemd divide el `ExecStart` generado en
+   cada espacio, así que una label con un espacio se **trunca** en el primero (verificado en prod: el
+   catch-all de `errserve` perdía `&& !Path(\`/metrics\`)`). Escribir las reglas con `&&` / `||`
+   **sin espacios**, como hace `headplane` (`Host(\`headscale.${FQDN}\`)&&PathPrefix(\`/admin\`)`).
 
 ### Auditoría rápida
 
@@ -111,6 +117,9 @@ grep -rh '^ContainerName=' .config/containers/available/*/*.container | sort | u
 grep -rho 'traefik.http.routers\.[a-zA-Z0-9_.-]*\.rule' .config/containers/available/*/*.container | sed 's/.*routers\.//;s/\.rule//' | sort | uniq -d
 grep -rho 'traefik.http.services\.[a-zA-Z0-9_-]*\.loadbalancer' .config/containers/available/*/*.container | sed 's/.*services\.//;s/\.loadbalancer//' | sort | uniq -d
 grep -rho 'Host(`[^`]*`)' .config/containers/available/*/*.container | sort | uniq -d
+grep -rnE '^Label=[^=]*=.*[[:space:]]' .config/containers/available/*/*.container
 ```
 
-Salida esperada: vacío en los tres primeros y solo `Host(\`headscale.${FQDN}\`)` en el último.
+Salida esperada: vacío en las comprobaciones de duplicados (`ContainerName`, routers, services) y en la de labels con espacios; la de `Host(...)` repetidos devuelve solo `Host(\`headscale.${FQDN}\`)` (intencional).
+
+Nota: `Host(\`${FQDN}\`)` aparece una sola vez (router `errserve-apex`); la única regla `Host(...)` repetida sigue siendo `headscale.${FQDN}` (intencional).

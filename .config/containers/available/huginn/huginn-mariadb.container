@@ -16,7 +16,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=huginn-huginn_mariadb.volume:/var/lib/mysql:Z
+Volume=huginn-mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=huginn.network

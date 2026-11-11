@@ -31,7 +31,7 @@ Label=traefik.http.services.errserve.loadbalancer.server.port=8080
 Label=traefik.http.middlewares.errpages.errors.status=400-599
 Label=traefik.http.middlewares.errpages.errors.service=errserve
 Label=traefik.http.middlewares.errpages.errors.query=/{status}
-Label=traefik.http.routers.errserve-catchall.rule=HostRegexp(`.+`) && !Path(`/metrics`)
+Label=traefik.http.routers.errserve-catchall.rule=HostRegexp(`.+`)&&!Path(`/metrics`)
 Label=traefik.http.routers.errserve-catchall.entrypoints=websecure
 Label=traefik.http.routers.errserve-catchall.service=errserve
 Label=traefik.http.routers.errserve-catchall.middlewares=errpages
@@ -39,6 +39,11 @@ Label=traefik.http.routers.errserve-catchall.priority=1
 Label=traefik.http.middlewares.errfixed.errors.status=400-599
 Label=traefik.http.middlewares.errfixed.errors.service=errserve
 Label=traefik.http.middlewares.errfixed.errors.query=/404
+Label=traefik.http.routers.errserve-apex.rule=Host(`${FQDN}`)
+Label=traefik.http.routers.errserve-apex.entrypoints=websecure
+Label=traefik.http.routers.errserve-apex.service=errserve
+Label=traefik.http.routers.errserve-apex.middlewares=errpages
+Label=traefik.http.routers.errserve-apex.tls.certresolver=letsencrypt
 
 # ==== Healthcheck ====
 

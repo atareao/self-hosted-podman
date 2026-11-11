@@ -25,7 +25,7 @@ stacks con worker, p. ej. `wger`).
   - `.config/containers/available/huginn/huginn-threaded.container` (worker)
   - `.config/containers/available/huginn/huginn-mariadb.container` (BD)
 - Volumen(es):
-  - `.config/containers/available/huginn/huginn-huginn_mariadb.volume` (`VolumeName=huginn-huginn_mariadb`)
+  - `.config/containers/available/huginn/huginn-mariadb.volume` (`VolumeName=huginn-mariadb`)
 - Red(es):
   - `.config/containers/available/huginn/huginn.network` (`NetworkName=huginn`)
 - Config no secreta: ninguna (todo por `Environment=` y `Secret=`).
@@ -39,7 +39,7 @@ stacks con worker, p. ej. `wger`).
   (no se expone).
 - **BD** (`huginn-mariadb.container`): `MYSQL_DATABASE=huginn`, `MYSQL_USER=huginn`, secretos
   `huginn_mysql_password` (`MYSQL_PASSWORD`) y `huginn_mariadb_root_password` (`MARIADB_ROOT_PASSWORD`);
-  volumen `huginn-huginn_mariadb.volume` en `/var/lib/mysql:Z`.
+  volumen `huginn-mariadb.volume` en `/var/lib/mysql:Z`.
 - Ninguno de los tres declara healthcheck ni `After=`/`Requires=` sobre la BD: si la web arranca antes que
   MariaDB, reintenta.
 
@@ -82,5 +82,4 @@ systemctl --user daemon-reload
 
 ## Follow-ups
 
-- Renombrar el volumen `huginn-huginn_mariadb` a `huginn-mariadb` (convención `<stack>-<rol>`); es cosmético y requiere cambiar el nombre del `.volume` y la `Volume=` del quadlet.
 - Ningún contenedor declara healthcheck.
