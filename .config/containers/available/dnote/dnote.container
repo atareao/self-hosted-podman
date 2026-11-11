@@ -1,14 +1,16 @@
 [Unit]
 Description=dnote
-After=network-online.target traefik.service
+After=network-online.target traefik.service dnote-postgres.service
+Requires=dnote-postgres.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
 Image=docker.io/dnote/dnote:latest
-AutoUpdate=registry
 ContainerName=dnote
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -21,10 +23,11 @@ ContainerName=dnote
 
 # ==== Networks ====
 Network=proxy.network
+Network=dnote.network
 NetworkAlias=dnote
 
 # ==== Secrets ====
-Secret=dnote_dbpassword,type=env,target=DBPassword
+Secret=dnote_postgres_password,type=env,target=DBPassword
 
 # ==== Environment ====
 Environment=GO_ENV=PRODUCTION

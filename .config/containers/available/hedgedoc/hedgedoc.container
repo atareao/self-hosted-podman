@@ -1,14 +1,16 @@
 [Unit]
 Description=hedgedoc
-After=network-online.target traefik.service
+After=network-online.target traefik.service hedgedoc-mariadb.service
+Requires=hedgedoc-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
 Image=lscr.io/linuxserver/hedgedoc:latest
-AutoUpdate=registry
 ContainerName=hedgedoc
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 

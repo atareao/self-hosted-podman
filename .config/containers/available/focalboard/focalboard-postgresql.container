@@ -6,44 +6,47 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/postgres:latest
-AutoUpdate=registry
+Image=docker.io/library/postgres:18-alpine
 ContainerName=focalboard-postgresql
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=focalboard-db.volume:/var/lib/postgresql/data:Z
+Volume=focalboard-db.volume:/var/lib/postgresql:Z
 
 # ==== Networks ====
 Network=focalboard.network
 NetworkAlias=focalboarddb
 
 # ==== Secrets ====
-
+Secret=focalboard_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-
+Environment=POSTGRES_USER=focalboard
+Environment=POSTGRES_DB=focalboard
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=pg_isready -U focalboard -d focalboard
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
 [Service]
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-Restart=always
+Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=60
 

@@ -1,23 +1,22 @@
 [Unit]
 Description=focalboard
-After=network-online.target traefik.service
+After=network-online.target traefik.service focalboard-postgresql.service
+Requires=focalboard-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/mattermost/focalboard
-AutoUpdate=registry
+Image=docker.io/mattermost/focalboard:latest
 ContainerName=focalboard
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=%h/.config/focalboard/config.json:/opt/focalboard/config.json:Z
 Volume=focalboard-data.volume:/opt/focalboard/files:Z
 
 # ==== Networks ====
@@ -26,10 +25,11 @@ Network=focalboard.network
 NetworkAlias=focalboard
 
 # ==== Secrets ====
-
+Secret=focalboard_database_url,type=env,target=FOCALBOARD_DBCONFIG
 
 # ==== Environment ====
-
+Environment=FOCALBOARD_DBTYPE=postgres
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -41,9 +41,7 @@ Label=traefik.http.routers.focalboard.middlewares=seguridadHeaders@file,compresi
 
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

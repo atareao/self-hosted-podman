@@ -7,8 +7,9 @@ StartLimitBurst=3
 [Container]
 # ==== Image ====
 Image=lscr.io/linuxserver/mariadb:latest
-AutoUpdate=registry
 ContainerName=hedgedoc-mariadb
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 

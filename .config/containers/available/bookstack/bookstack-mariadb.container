@@ -6,18 +6,17 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=lscr.io/linuxserver/mariadb
-AutoUpdate=registry
+Image=lscr.io/linuxserver/mariadb:latest
 ContainerName=bookstack-mariadb
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=%h/.config/bookstack/config:/config:Z
+Volume=%h/.config/bookstack/mariadb:/config:Z
 
 # ==== Networks ====
 Network=bookstack.network
@@ -36,12 +35,9 @@ Environment=MYSQL_USER=bookstack
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

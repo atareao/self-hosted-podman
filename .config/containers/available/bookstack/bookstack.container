@@ -1,25 +1,26 @@
 [Unit]
 Description=bookstack
-After=network-online.target traefik.service
+After=network-online.target traefik.service bookstack-mariadb.service
+Requires=bookstack-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=lscr.io/linuxserver/bookstack
-AutoUpdate=registry
+Image=lscr.io/linuxserver/bookstack:latest
 ContainerName=bookstack
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=%h/.config/bookstack/config:/config:Z
 
 # ==== Networks ====
+Network=bookstack.network
 Network=proxy.network
 NetworkAlias=bookstack
 
@@ -44,9 +45,7 @@ Label=traefik.http.routers.bookstack.middlewares=seguridadHeaders@file,compresio
 
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

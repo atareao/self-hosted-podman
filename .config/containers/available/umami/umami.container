@@ -1,7 +1,7 @@
 [Unit]
 Description=Umami Analytics
-After=network-online.target umamidb.service proxy.network
-Requires=umamidb.service
+After=network-online.target umami-postgresql.service
+Requires=umami-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 

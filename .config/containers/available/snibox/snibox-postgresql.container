@@ -8,6 +8,7 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/library/postgres:10.7-alpine
 ContainerName=snibox-postgresql
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
@@ -24,7 +25,7 @@ Network=snibox.network
 NetworkAlias=database
 
 # ==== Secrets ====
-
+Secret=snibox_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
 

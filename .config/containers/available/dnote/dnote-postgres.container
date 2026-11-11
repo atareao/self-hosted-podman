@@ -1,5 +1,5 @@
 [Unit]
-Description=postgres
+Description=dnote PostgreSQL
 After=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=3
@@ -8,6 +8,8 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/library/postgres:11-alpine
 ContainerName=dnote-postgres
+AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 

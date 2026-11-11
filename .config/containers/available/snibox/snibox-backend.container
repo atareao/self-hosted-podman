@@ -1,14 +1,15 @@
 [Unit]
 Description=snibox-backend
-After=network-online.target
+After=network-online.target snibox-postgresql.service
+Requires=snibox-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
 Image=docker.io/snibox/snibox:latest
-AutoUpdate=registry
 ContainerName=snibox-backend
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
@@ -25,7 +26,7 @@ Network=snibox.network
 NetworkAlias=backend
 
 # ==== Secrets ====
-Secret=snibox_db_pass,type=env,target=DB_PASS
+Secret=snibox_postgres_password,type=env,target=DB_PASS
 Secret=snibox_mailgun_smtp_password,type=env,target=MAILGUN_SMTP_PASSWORD
 Secret=snibox_mailgun_api_key,type=env,target=MAILGUN_API_KEY
 Secret=snibox_mailgun_public_key,type=env,target=MAILGUN_PUBLIC_KEY

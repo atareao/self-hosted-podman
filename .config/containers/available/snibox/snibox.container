@@ -1,6 +1,7 @@
 [Unit]
 Description=snibox
-After=network-online.target traefik.service
+After=network-online.target traefik.service snibox-backend.service
+Requires=snibox-backend.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -8,6 +9,7 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/snibox/nginx-puma:1.15.9
 ContainerName=snibox
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
@@ -21,6 +23,7 @@ Volume=snibox-static-files.volume:/var/www/html:Z
 
 # ==== Networks ====
 Network=proxy.network
+Network=snibox.network
 NetworkAlias=snibox
 
 # ==== Secrets ====
