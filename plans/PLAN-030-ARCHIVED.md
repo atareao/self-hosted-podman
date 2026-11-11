@@ -2,7 +2,7 @@
 
 - **Issue:** #25
 - **Fecha:** 2026-11-11
-- **Estado:** COMPLETADO (2026-11-11)
+- **Estado:** ARCHIVADO (2026-11-11)
 
 ## Objetivo
 
