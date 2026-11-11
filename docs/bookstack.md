@@ -20,7 +20,7 @@
   - BD: `%h/.config/bookstack/mariadb` → `/config` (`:Z`)
 - Config no secreta: `Environment=` de cada quadlet (no hay `.env` de stack)
 - Secretos:
-  - `bookstack_db_pass` → `DB_PASS` (app)
+  - `bookstack_db_pass` → `DB_PASSWORD` (app)
   - `bookstack_app_key` → `APP_KEY` (app). Formato obligatorio `base64:<32 bytes aleatorios en base64>`;
     sin él el contenedor aborta con «The application key is missing, halting init!». Se inyecta con
     `Secret=bookstack_app_key,type=env,target=APP_KEY`.
@@ -44,6 +44,11 @@
 - Ambas imágenes son LinuxServer.io y respetan `PUID`/`PGID`; el proceso no corre como root.
 - **Sin `PodmanArgs=--init`**: las imágenes LinuxServer.io usan s6-overlay y exigen ser PID 1 (`s6-overlay-suexec: fatal: can only run as pid 1`); se omitió `--init` en ambos contenedores (verificado 2026-11-11). `AutoUpdate=registry` en ambos.
 - Healthcheck no definido en los quadlets (no se añadió uno no verificado).
+- **Nombres de variables de la imagen LinuxServer.io**: la app espera `DB_USERNAME` y `DB_PASSWORD`
+  (no `DB_USER`/`DB_PASS`). El `.env.example` de la imagen usa esos nombres; con los antiguos
+  BookStack caía al literal `database_username` y la conexión fallaba
+  (`SQLSTATE[HY000] [1045] Access denied for user 'database_username'@...`, HTTP 500). El secreto
+  sigue llamándose `bookstack_db_pass`; solo cambia su `target` a `DB_PASSWORD`.
 
 ## Variables / configuración
 
@@ -53,14 +58,15 @@
 | PGID | Environment= | 1000 | GID del grupo de la aplicación |
 | APP_URL | Environment= | `https://bookstack.${FQDN}` | URL pública del servicio |
 | DB_HOST | Environment= (`bookstack.container`) | `bookstack_db` | Host de la BD: alias de `bookstack-mariadb` en `bookstack.network` |
-| DB_USER | Environment= | `bookstack` | Usuario DB |
+| DB_PORT | Environment= | `3306` | Puerto de la BD (valor por defecto de la imagen, explicitado) |
+| DB_USERNAME | Environment= | `bookstack` | Usuario DB |
 | DB_DATABASE | Environment= | `bookstackapp` | Base de datos |
 | TZ | Environment= (`bookstack-mariadb.container`) | `Europe/Madrid` | Zona horaria de la BD |
 | MYSQL_DATABASE | Environment= (`bookstack-mariadb.container`) | `bookstackapp` | Base de datos creada por la BD |
 | MYSQL_USER | Environment= (`bookstack-mariadb.container`) | `bookstack` | Usuario creado por la BD |
-| DB_PASS | Secret=`bookstack_db_pass` | *(secreto)* | Contraseña del usuario `bookstack` |
+| DB_PASSWORD | Secret=`bookstack_db_pass` (`type=env,target=DB_PASSWORD`) | *(secreto)* | Contraseña del usuario `bookstack` |
 | APP_KEY | Secret=`bookstack_app_key` (`type=env,target=APP_KEY`) | *(secreto)* | Clave de aplicación Laravel; formato `base64:<32 bytes aleatorios en base64>`. Sin ella el contenedor aborta con «The application key is missing, halting init!» |
-| MYSQL_PASSWORD | Secret=`bookstack_mysql_password` | *(secreto)* | Debe coincidir con `DB_PASS` |
+| MYSQL_PASSWORD | Secret=`bookstack_mysql_password` | *(secreto)* | Debe coincidir con `DB_PASSWORD` |
 | MYSQL_ROOT_PASSWORD | Secret=`bookstack_mysql_root_password` | *(secreto)* | Contraseña root de MariaDB |
 
 ## Cómo habilitar / desplegar

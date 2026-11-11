@@ -24,7 +24,7 @@ Network=proxy.network
 NetworkAlias=bookstack
 
 # ==== Secrets ====
-Secret=bookstack_db_pass,type=env,target=DB_PASS
+Secret=bookstack_db_pass,type=env,target=DB_PASSWORD
 Secret=bookstack_app_key,type=env,target=APP_KEY
 
 # ==== Environment ====
@@ -32,7 +32,8 @@ Environment=PUID=1000
 Environment=PGID=1000
 Environment=APP_URL="https://bookstack.${FQDN}"
 Environment=DB_HOST=bookstack_db
-Environment=DB_USER=bookstack
+Environment=DB_PORT=3306
+Environment=DB_USERNAME=bookstack
 Environment=DB_DATABASE=bookstackapp
 
 # ==== Labels ====
