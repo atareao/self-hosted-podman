@@ -1,0 +1,3 @@
+0 0,6,12,18 * * * curl http://publirs:8080/api/v1/status >> /proc/1/fd/1
+0 20 * * 2,4      curl http://publirs:8080/api/v1/publish_tip >> /proc/1/fd/1
+0 20 * * 0        curl http://publirs:8080/api/v1/publish_poll >> /proc/1/fd/1
