@@ -31,7 +31,7 @@ Secret=wikijs_db_pass,type=env,target=DB_PASS
 Environment=POSTGRES_DB=wiki
 Environment=POSTGRES_USER=wikijs
 Environment=DB_TYPE=postgres
-Environment=DB_HOST=db
+Environment=DB_HOST=postgres
 Environment=DB_PORT=5432
 Environment=DB_USER=wikijs
 Environment=DB_NAME=wiki
