@@ -15,12 +15,19 @@ PodmanArgs=--init
 
 
 # ==== Ports ====
-PublishPort=53:53/tcp
-PublishPort=53:53/udp
+# Podman rootless (net.ipv4.ip_unprivileged_port_start=80) no puede enlazar el 53
+# en el host: se publica en 5353 conservando el 53 interno del contenedor.
+PublishPort=5353:53/tcp
+PublishPort=5353:53/udp
 
 # ==== Volumes ====
-Volume=%h/.config/unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:Z
-Volume=%h/.config/unbound/conf:/opt/unbound/etc/unbound/unbound.conf.d/:Z
+# La imagen genera su propio unbound.conf y solo incluye a-records.conf,
+# srv-records.conf y forward-records.conf (NO unbound.conf.d/). Montamos el
+# fragmento versionado sobre forward-records.conf: es el punto de extensión
+# que documenta la imagen (y al comentar la forward-zone deja de reenviar a
+# Cloudflare y resuelve por recursión). NO se monta nada sobre unbound.conf,
+# que sigue siendo el de la imagen.
+Volume=%h/.config/unbound/conf/forward-records.conf:/opt/unbound/etc/unbound/forward-records.conf:ro,Z
 
 # ==== Networks ====
 
