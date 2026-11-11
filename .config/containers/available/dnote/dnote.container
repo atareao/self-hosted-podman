@@ -46,7 +46,7 @@ Environment=DisableRegistration=false
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.dnote.loadbalancer.server.port=3000
+Label=traefik.http.services.dnote.loadbalancer.server.port=3001
 Label=traefik.http.routers.dnote.rule=Host(`dnote.${FQDN}`)
 Label=traefik.http.routers.dnote.entrypoints=websecure
 Label=traefik.http.routers.dnote.tls.certresolver=letsencrypt

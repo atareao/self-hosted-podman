@@ -5,7 +5,7 @@
 **Número de contenedores**: 2
 **Red**: `proxy.network` (entrada Traefik) y `dnote.network` (interna app ↔ postgres). El contenedor `dnote` se une a **ambas**; `dnote-postgres` solo a `dnote.network`.
 **Dominio**: `dnote.${FQDN}`
-**Puerto interno**: `3000`
+**Puerto interno**: `3001`
 
 ## Ficheros
 - Quadlet(s):
@@ -29,6 +29,8 @@
   Así la contraseña de la app y la de la BD nunca se desincronizan.
 - Healthcheck: no
 - Enrutado Traefik: reglas en las Labels
+  - **Puerto real de la app: 3001.** El contenedor `docker.io/dnote/dnote:latest` (v3.0.0) arranca migrando la BD y su log lo confirma: `{"msg":"Dnote server starting","port":"3001",...}`. El label `traefik.http.services.dnote.loadbalancer.server.port` apuntaba a `3000`, por lo que Traefik enviaba el tráfico a un puerto sin escucha y `https://dnote.${FQDN}` devolvía **502**.
+  - **Fix aplicado**: label Traefik `3000` → `3001` en `dnote.container`, para que coincida con el puerto interno real. No se cambia nada más en el quadlet.
 - User/UserNS/NoNewPrivileges: no especificado
 
 ## Variables / configuración
