@@ -1,7 +1,6 @@
 [Unit]
 Description=Beszel Agent
 After=network-online.target beszel.service
-Requires=beszel.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -18,7 +17,6 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=beszel-agent-data.volume:/var/lib/beszel-agent:Z
-Volume=beszel-socket.volume:/beszel_socket:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 
 # ==== Networks ====
@@ -26,11 +24,9 @@ Network=beszel.network
 
 # ==== Secrets ====
 Secret=beszel_key,type=env,target=KEY
-Secret=beszel_token,type=env,target=TOKEN
 
 # ==== Environment ====
-Environment=LISTEN=/beszel_socket/beszel.sock
-Environment=HUB_URL=http://beszel:8090
+Environment=LISTEN=45876
 
 # ==== Labels ====
 

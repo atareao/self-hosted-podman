@@ -17,7 +17,6 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=beszel-data.volume:/beszel_data:Z
-Volume=beszel-socket.volume:/beszel_socket:Z
 
 # ==== Networks ====
 Network=beszel.network
@@ -26,7 +25,6 @@ Network=proxy.network
 # ==== Secrets ====
 
 # ==== Environment ====
-Environment=DISABLE_PASSWORD_AUTH=true
 
 # ==== Labels ====
 Label=traefik.enable=true
