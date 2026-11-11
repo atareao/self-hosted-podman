@@ -16,8 +16,9 @@
 - **Acceso al daemon**: el contenedor no necesita socket externo; corre con `uid/gid 1000` de la imagen.
 - **Persistencia**: el volumen nombrado `watchbeat-data` se monta en `/app/data:Z`; SQLite en `/app/data/watchbeat.db`.
 - **Configuración**: recibe por `EnvironmentFile` los archivos `.env` versionados y de máquina local; el secreto `OIDC_CLIENT_SECRET` se inyecta con `Secret=…`; la variable `OIDC_REDIRECT_URL` se fija en el quadlet con `${FQDN}`.
-- **Healthcheck**: `wget --no-verbose --tries=1 --spider http://localhost:3055/health || exit 1` (endpoint público, sin auth).
+- **Healthcheck**: `wget --no-verbose --tries=1 --spider http://127.0.0.1:3055/health || exit 1` (endpoint público, sin auth). Se usa **`127.0.0.1`, no `localhost`**: en este host `localhost` resuelve primero a `[::1]` (IPv6) y la app escucha en IPv4, así que el healthcheck fallaba, Traefik veía el contenedor como `starting` (`Filtering unhealthy or starting container`) y **nunca registraba el router**.
 - **Enrutado**: router `watchbeat` con `Host(`watchbeat.${FQDN}`)`, `entrypoints=websecure`, `tls.certresolver=letsencrypt` y los middlewares `seguridadHeaders` y `compresionHeaders`. Arranque **fail‑closed**: hace discovery OIDC al inicio y no arranca si falla.
+- **`AddHost=auth.${FQDN}:host-gateway`**: en la red `proxy`, el `NetworkAlias` de PocketID (`auth`) sombrea `auth.${FQDN}`, por lo que el discovery OIDC del arranque fallaba con `❌ OIDC discovery failed`. Con este `AddHost` el contenedor resuelve `auth.${FQDN}` a la *host gateway*. Mismo patrón que `traefik.container`.
 
 ## Variables / configuración
 
@@ -67,6 +68,7 @@ Verificar con `systemctl --user status watchbeat` o `journalctl --user -u watchb
 
 ## Follow-ups
 
+- **Cliente OIDC `watchbeat` sin registrar en PocketID**: la tabla `oidc_clients` de PocketID solo tiene `traefik`, así que el login OIDC **aún no funciona**. Verificado hasta `GET /auth/login` → `303` a `https://auth.${FQDN}/authorize` con el `redirect_uri=https://watchbeat.${FQDN}/auth/callback` correcto. Para completarlo: registrar en PocketID el cliente `watchbeat` con redirect `https://watchbeat.${FQDN}/auth/callback` y **reconstruir** el secreto `watchbeat_oidc_client_secret` con el valor real (`podman secret create`, nunca `crypta store`).
 - OIDC obligatorio debe estar disponible al arranque.
 - Los noticadores se configuran en la UI, no con variables de entorno.
 - No se utiliza `ExecStartPost` para evitar retraso en el inicio de la unidad.

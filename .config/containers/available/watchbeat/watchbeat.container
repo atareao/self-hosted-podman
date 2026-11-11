@@ -21,6 +21,7 @@ Volume=watchbeat-data.volume:/app/data:Z
 # ==== Networks ====
 Network=proxy.network
 NetworkAlias=watchbeat
+AddHost=auth.${FQDN}:host-gateway
 
 # ==== Secrets ====
 Secret=watchbeat_oidc_client_secret,type=env,target=OIDC_CLIENT_SECRET
@@ -40,7 +41,7 @@ Label=traefik.http.routers.watchbeat.tls.certresolver=letsencrypt
 Label=traefik.http.routers.watchbeat.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=wget --no-verbose --tries=1 --spider http://localhost:3055/health || exit 1
+HealthCmd=wget --no-verbose --tries=1 --spider http://127.0.0.1:3055/health || exit 1
 HealthInterval=300s
 HealthRetries=3
 HealthTimeout=10s
