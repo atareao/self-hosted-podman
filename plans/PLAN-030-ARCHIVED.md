@@ -99,6 +99,6 @@ Notas por stack:
 ## Resultado (2026-11-11)
 
 - Verificados E2E y purgados: atuin, beszel, radicale, wakapi, wikijs, zincsearch (6/6).
-- Bugs latentes corregidos: 7 (atuin ×3, beszel ×2, radicale ×2, wikijs ×2 — ver `docs/<stack>.md`).
+- Bugs latentes corregidos: 9 (atuin ×3, beszel ×2, radicale ×2, wikijs ×2 — ver `docs/<stack>.md`).
 - Producción: sólo quedan los 4 stacks base + `headscale-headplane`; sin restos de la ronda.
 - Cifras actualizadas: 127 = 65 verificados + 4 en producción + 2 bloqueados + 56 sin verificar.
