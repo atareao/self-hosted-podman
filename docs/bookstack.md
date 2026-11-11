@@ -21,6 +21,9 @@
 - Config no secreta: `Environment=` de cada quadlet (no hay `.env` de stack)
 - Secretos:
   - `bookstack_db_pass` → `DB_PASS` (app)
+  - `bookstack_app_key` → `APP_KEY` (app). Formato obligatorio `base64:<32 bytes aleatorios en base64>`;
+    sin él el contenedor aborta con «The application key is missing, halting init!». Se inyecta con
+    `Secret=bookstack_app_key,type=env,target=APP_KEY`.
   - `bookstack_mysql_root_password` → `MYSQL_ROOT_PASSWORD` (BD)
   - `bookstack_mysql_password` → `MYSQL_PASSWORD` (BD)
 
@@ -56,6 +59,7 @@
 | MYSQL_DATABASE | Environment= (`bookstack-mariadb.container`) | `bookstackapp` | Base de datos creada por la BD |
 | MYSQL_USER | Environment= (`bookstack-mariadb.container`) | `bookstack` | Usuario creado por la BD |
 | DB_PASS | Secret=`bookstack_db_pass` | *(secreto)* | Contraseña del usuario `bookstack` |
+| APP_KEY | Secret=`bookstack_app_key` (`type=env,target=APP_KEY`) | *(secreto)* | Clave de aplicación Laravel; formato `base64:<32 bytes aleatorios en base64>`. Sin ella el contenedor aborta con «The application key is missing, halting init!» |
 | MYSQL_PASSWORD | Secret=`bookstack_mysql_password` | *(secreto)* | Debe coincidir con `DB_PASS` |
 | MYSQL_ROOT_PASSWORD | Secret=`bookstack_mysql_root_password` | *(secreto)* | Contraseña root de MariaDB |
 
@@ -74,9 +78,13 @@
    printf '%s' '<valor>' | podman secret create bookstack_db_pass -
    printf '%s' '<valor>' | podman secret create bookstack_mysql_password -
    printf '%s' '<valor>' | podman secret create bookstack_mysql_root_password -
+   printf '%s' "base64:$(openssl rand -base64 32)" | podman secret create bookstack_app_key -
    ```
 
-   `bookstack_db_pass` y `bookstack_mysql_password` deben tener el mismo valor.
+   `bookstack_db_pass` y `bookstack_mysql_password` deben tener el mismo valor. La `bookstack_app_key`
+   debe llevar el prefijo `base64:` (formato que espera Laravel/BookStack); sin ella la app no arranca
+   («The application key is missing, halting init!»). Recordatorio: **SIEMPRE `podman secret create`,
+   nunca `crypta store`** (Podman resuelve por ID y `crypta store` deja la clave huérfana).
 
 3. `cd .config/containers/available/bookstack && qctl install`
 4. `systemctl --user daemon-reload`
@@ -95,4 +103,10 @@ mkdir -p /tmp/qd/bookstack && cp .config/containers/available/bookstack/* /tmp/q
 - Si ya había datos en `~/.config/bookstack/config` (bind compartido), mover los ficheros de MariaDB
   al nuevo `~/.config/bookstack/mariadb` antes de arrancar o la BD inicializará vacía.
 - Valorar healthcheck (`/status` de BookStack y `mariadb-admin ping`) cuando se pueda verificar.
+- `APP_KEY` se inyecta por el secreto `bookstack_app_key` (`Secret=…,type=env,target=APP_KEY`); si el
+  contenedor aborta con «The application key is missing, halting init!», el secreto no existe o está
+  vacío: recrearlo con
+  `printf '%s' "base64:$(openssl rand -base64 32)" | podman secret create bookstack_app_key -`
+  (**siempre `podman secret create`, nunca `crypta store`**). Rotar la `APP_KEY` con datos ya creados
+  invalida las sesiones/cifrados previos, así que solo debe rellenarse en el primer despliegue.
 - No aplica hardening adicional (`ReadOnly`, `NoNewPrivileges`); evaluar `ReadOnly` en la BD.

@@ -25,6 +25,7 @@ NetworkAlias=bookstack
 
 # ==== Secrets ====
 Secret=bookstack_db_pass,type=env,target=DB_PASS
+Secret=bookstack_app_key,type=env,target=APP_KEY
 
 # ==== Environment ====
 Environment=PUID=1000
