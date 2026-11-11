@@ -6,7 +6,7 @@
 - **Nº contenedores**: 1 (radicale)
 - **Red**: proxy.network
 - **Dominio**: radicale.${FQDN} (subdominio "radicale")
-- **Puerto interno**: 5232 (traefik http.services expulsabot loadbalancer.port)
+- **Puerto interno**: 5232 (traefik http.services radicale loadbalancer.port)
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/radicale/radicale.container
@@ -19,7 +19,7 @@
 - **Volúmenes**: %h/.config/radicale/.htpasswd-users -> /app/.htpasswd-users; %h/.config/radicale/data -> /app/data
 - **Secretos**: ninguno
 - **Healthcheck**: ninguno
-- **Routing Traefik**: Host(`radicale.${FQDN}`), puerto 5232 (servicio expulsabot)
+- **Routing Traefik**: Host(`radicale.${FQDN}`), puerto 5232 (servicio radicale)
 - **User/UserNS/NoNewPrivileges**: ninguno
 
 ## Variables / configuración
@@ -32,5 +32,5 @@
 2. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- El servicio Traefik expone el contenedor con el nombre "expulsabot" pero la app es radicale.
+- El router y el servicio de Traefik se llaman `radicale`, como el stack.
 - (ninguno)

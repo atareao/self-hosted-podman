@@ -31,11 +31,11 @@ NetworkAlias=radicale
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.expulsabot.loadbalancer.server.port=5232
-Label=traefik.http.routers.expulsabot.rule=Host(`radicale.${FQDN}`)
-Label=traefik.http.routers.expulsabot.entrypoints=websecure
-Label=traefik.http.routers.expulsabot.tls.certresolver=letsencrypt
-Label=traefik.http.routers.expulsabot.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.radicale.loadbalancer.server.port=5232
+Label=traefik.http.routers.radicale.rule=Host(`radicale.${FQDN}`)
+Label=traefik.http.routers.radicale.entrypoints=websecure
+Label=traefik.http.routers.radicale.tls.certresolver=letsencrypt
+Label=traefik.http.routers.radicale.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 
