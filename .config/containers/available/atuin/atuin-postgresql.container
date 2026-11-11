@@ -6,7 +6,7 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/postgres:latest
+Image=docker.io/library/postgres:18-alpine
 AutoUpdate=registry
 ContainerName=atuin-postgresql
 PodmanArgs=--init
@@ -18,7 +18,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=atuin-data.volume:/var/lib/postgresql/data:Z
+Volume=atuin-data.volume:/var/lib/postgresql:Z
 
 # ==== Networks ====
 Network=atuin.network

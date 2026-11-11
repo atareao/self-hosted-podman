@@ -1,6 +1,7 @@
 [Unit]
 Description=atuin
 After=network-online.target traefik.service
+After=atuin.network
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -22,6 +23,7 @@ PodmanArgs=--init
 
 # ==== Networks ====
 Network=proxy.network
+Network=atuin.network
 NetworkAlias=atuin
 
 # ==== Secrets ====
