@@ -10,12 +10,12 @@ Aplicación Kan Board para gestión de proyectos.
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/kanboard/kanboard.container
-- Volumen(es): /data/self-hosted-podman/.config/containers/available/kanboard/kanboard-data.volume, /data/self-hosted-podman/.config/containers/available/kanboard/kanboard-plugins.volume
+- Volumen(es): binds host %h/.config/kanboard/kanboard_data → /var/www/app/data y %h/.config/kanboard/kanboard_plugins → /var/www/app/plugins (no hay volúmenes nombrados)
 - Config no secreta: N/A
 - Secretos: N/A
 
 ## Cómo funciona
-Conecta a proxy.network, monta volúmenes kanboard-data y kanboard-plugins, healthcheck none, enrutamiento Traefik con TLS.
+Conecta a proxy.network, monta los binds kanboard_data y kanboard_plugins, healthcheck none, enrutamiento Traefik con TLS.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
@@ -24,8 +24,9 @@ Conecta a proxy.network, monta volúmenes kanboard-data y kanboard-plugins, heal
 
 ## Cómo habilitar / desplegar
 1. Secretos (si existen; NUNCA crypta store): Ninguno
-2. `cd .config/containers/available/kanboard && qctl install`
-3. `systemctl --user daemon-reload`
+2. Crear los binds host: `mkdir -p ~/.config/kanboard/kanboard_data ~/.config/kanboard/kanboard_plugins`
+3. `cd .config/containers/available/kanboard && qctl install`
+4. `systemctl --user daemon-reload`
 
 ## Follow-ups
 - (ninguno)

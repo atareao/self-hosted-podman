@@ -15,7 +15,7 @@ ContainerName=kanboard
 
 
 # ==== Volumes ====
-Volume=%h/.config/kanboard/kanboard_data:/bar/www/app/data:Z
+Volume=%h/.config/kanboard/kanboard_data:/var/www/app/data:Z
 Volume=%h/.config/kanboard/kanboard_plugins:/var/www/app/plugins:Z
 
 # ==== Networks ====

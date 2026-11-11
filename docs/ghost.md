@@ -5,18 +5,18 @@
 - imagen: docker.io/library/ghost:4-alpine
 - nº contenedores: 1
 - red: proxy.network
-- dominio: raíz ${FQDN}, subdominio ghost.${FQDN}
+- dominio: ghost.${FQDN}
 - puerto interno: 2368
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/ghost/ghost.container
-- Volumen(es): ninguno
+- Volumen(es): bind host %h/.config/ghost/blog → /var/lib/ghost/content (no hay volumen nombrado)
 - Config no secreta: ninguno
 - Secretos: ninguno
 
 ## Cómo funciona
 - red proxy.network
-- volúmenes: (host path %h/.config/ghost/blog, no volumenes de disco)
+- volúmenes: bind host %h/.config/ghost/blog → /var/lib/ghost/content (no hay volúmenes nombrados)
 - secretos: ninguno
 - EnvironmentFile: ninguno
 - socket del daemon: ninguno
@@ -27,7 +27,7 @@
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
-| url | Environment= | ghost.${FQDN} | |
+| url | Environment= | https://ghost.${FQDN} | URL pública; Ghost exige el protocolo |
 
 ## Cómo habilitar / desplegar
 1. Secretos (solo si existen; NUNCA crypta store): `printf '%s' '<valor>' | podman secret create <nombre> -`

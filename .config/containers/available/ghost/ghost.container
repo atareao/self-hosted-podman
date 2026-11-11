@@ -14,7 +14,7 @@ ContainerName=ghost
 
 
 # ==== Volumes ====
-Volume=%h/.config/ghost/blog:/var/lig/ghost/content:Z
+Volume=%h/.config/ghost/blog:/var/lib/ghost/content:Z
 
 # ==== Networks ====
 Network=proxy.network
@@ -24,7 +24,7 @@ NetworkAlias=ghost
 
 
 # ==== Environment ====
-Environment=url="ghost.${FQDN}"
+Environment=url=https://ghost.${FQDN}
 
 # ==== Labels ====
 Label=traefik.enable=true
