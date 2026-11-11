@@ -82,3 +82,8 @@
 - El contenedor requiere que la API key y contraseñas IMAP/SMTP sean válidos; de lo contrario no arranca.
 - Los secretos están gestionados por `podman secret create` y no por `crypta store`.
 - Si el dominio cambia, solo modificar la variable `${FQDN}` que se expande en `systemd` y en el router de Traefik.
+
+## Hallazgos (ronda E2E, 2026-11-11)
+
+- Desplegado y funcional: `/api/health` → `200` JSON y certificado LE válido (staging en la ronda).
+- **Arranque en frío roto**: el healthcheck de conmon sale con **exit 125** porque el quadlet usa `Secret=…,type=env` con el driver externo `shell` (crypta). Ver issue #23 / `plans/PLAN-028.md` (remediación prevista: `type=mount`).

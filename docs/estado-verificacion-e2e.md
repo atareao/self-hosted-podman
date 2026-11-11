@@ -24,9 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 55 |
+| Verificados E2E (probados y purgados) | 59 |
+| Bloqueados / hallazgos (ver sección) | 2 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **68** |
+| **Sin verificar E2E** | **62** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -90,6 +91,19 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | vaultwarden | `docs/vaultwarden.md` | PLAN-022 / #17 | 200 | secreto `vaultwarden_admin_token` |
 | microbin | `docs/microbin.md` | PLAN-022 / #17 | 401 | 2 secretos; volumen nombrado `microbin-data` |
 | pastebin | `docs/pastebin.md` | PLAN-022 / #17 | 303→200 | imagen `atareao/pastebin` desaparecida → upstream `mkaczanowski/pastebin` |
+| couchdb | `docs/couchdb.md` | PLAN-027 / #22 | 200 | 2 contenedores; `COUCHDB_USER`/`COUCHDB_PASSWORD` en el primer arranque |
+| dim | `docs/dim.md` | PLAN-027 / #22 | 200 | bind `~/.config/dim/config` + volumen `dim-media` |
+| ghost | `docs/ghost.md` | PLAN-027 / #22 | 200 | corregido: `url` con `https://` y bind `/var/lib/ghost/content` (errata `lig`→`lib`) |
+| kanboard | `docs/kanboard.md` | PLAN-027 / #22 | 302 | corregido: bind `/var/www/app/data` (errata `bar`→`var`) |
+
+## Bloqueados / hallazgos
+
+Desplegados y funcionales a nivel de servicio, pero **no verificados E2E completos** por un bloqueo externo:
+
+| Stack | Motivo | Referencia |
+|---|---|---|
+| apimail | Sirve OK (`/api/health` → 200 JSON, cert LE staging), pero **no arranca en frío**: el healthcheck de conmon sale con exit 125 por el bug de secretos con driver externo (`shell`) + `type=env` (afecta a 13 units). | Issue #23 / `plans/PLAN-028.md` |
+| alloy | Requiere un cliente **OIDC real** en PocketID (`OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URL`); sin él la discovery falla y el contenedor sale con `exit=1` (crash-loop). | — |
 
 ## En producción (desplegados y corriendo)
 
@@ -100,15 +114,15 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (68)
+## Sin verificar E2E (62)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-alloy, apimail, atuin, authentik, beszel, bookstack, caddy, cells,
-chevereto, codimd, couchdb, crowdsec, dev, dim,
+atuin, authentik, beszel, bookstack, caddy, cells,
+chevereto, codimd, crowdsec, dev,
 dnote, facturascripts, firefly,
-focalboard, ghost, gitea, grafana-influx-telegraf, hedgedoc, huginn,
-immich, invidious, jellystat, kanboard, matrix, matrixmail,
+focalboard, gitea, grafana-influx-telegraf, hedgedoc, huginn,
+immich, invidious, jellystat, matrix, matrixmail,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
 odoo, open-webui, photoprism,
 pinepods, planka, plausible, postgres, publirs, rabbitmq, radicale,
@@ -129,3 +143,4 @@ zennotes, zincsearch.
 - PLAN-024 (issue #19): auditados los 45 stacks multi-contenedor y documentados los invariantes de enrutado en `docs/traefik.md` (host único por router, nombres de router/servicio globales, apex `${FQDN}` sin dueño — lo atiende el catch-all de `errserve` —, y stacks sin router por diseño). Sin cambios de código; `huginn` no era un duplicado (es web + worker).
 - PLAN-025 (issue #20): `errserve` pasa a poseer el apex `${FQDN}` con router propio (`errserve-apex`, `tls.certresolver=letsencrypt`) → `https://servidorlinux.es` sirve la página de error con **certificado LE válido** (antes: autofirmado). Corregido de paso el catch-all (`HostRegexp(.)&&!Path(/metrics)`: las labels de quadlet no admiten espacios). Volumen `huginn-huginn_mariadb` → `huginn-mariadb`. Docs: invariantes de enrutado #3 y #6.
 - PLAN-026 (issue #21): el apex `${FQDN}` pasa de servir a **redirigir** (302) a la página de error (`errserve-apex` → `https://${FQDN}/404`, con `!Path(/404)` para evitar bucle). Además, 40 volúmenes normalizados a la convención `<stack>-<rol>` (fichero, `VolumeName=` y `Volume=`), sin cambios en prod. Sin cambios de cifras (127 / 55 / 68).
+- PLAN-027 (issue #22): ronda E2E lote 1 (alloy, apimail, couchdb, dim, ghost, kanboard). Verificados y purgados: couchdb, dim, ghost, kanboard. Corregidos bugs latentes de `ghost` (url + bind `lig`→`lib`) y `kanboard` (bind `bar`→`var`). `apimail` funcional pero bloqueado por #23; `alloy` bloqueado por OIDC. Cifras: 127 = 59 verificados + 4 en producción + 2 bloqueados + 62 sin verificar.

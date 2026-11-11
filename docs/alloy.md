@@ -85,3 +85,8 @@ Verificar con `systemctl --user status alloy` o `journalctl --user -u alloy`.
   con el dueño del socket podman en el host).
 - Notificaciones opcionales (Telegram/Matrix) **no configuradas**.
 - Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).
+
+## Hallazgos (ronda E2E, 2026-11-11)
+
+- **Bloqueado**: requiere un cliente OIDC real en PocketID (`OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URL`). Con la discovery fallida el contenedor sale con `exit=1` (crash-loop) y el router nunca se registra.
+- Además, afectado por el bug repo-wide de secretos + healthcheck (issue #23 / `plans/PLAN-028.md`).
