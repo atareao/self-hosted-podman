@@ -19,7 +19,6 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=%h/.config/publirs/crontab.txt:/crontab.txt:ro,Z
-Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 # ==== Networks ====
