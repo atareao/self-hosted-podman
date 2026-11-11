@@ -6,7 +6,8 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/onerahmet/openai-whisper-asr-webservice:latest-gpu
+# CPU: la maquina no tiene GPU NVIDIA; :latest-gpu exigiria el runtime NVIDIA.
+Image=docker.io/onerahmet/openai-whisper-asr-webservice:latest
 AutoUpdate=registry
 ContainerName=whisper
 PodmanArgs=--init
@@ -15,7 +16,8 @@ PodmanArgs=--init
 
 
 # ==== Ports ====
-PublishPort=9000:9000
+# Host 9001: el 9000 lo publica authentik en 0.0.0.0:9000:9000.
+PublishPort=9001:9000
 
 # ==== Volumes ====
 Volume=whisper-data.volume:/data/whisper:Z
@@ -27,7 +29,8 @@ Volume=whisper-data.volume:/data/whisper:Z
 
 
 # ==== Environment ====
-Environment=ASR_MODEL=large-v1
+# Modelo pequeno para verificacion: large-v1 descargaba varios GB en el 1er arranque.
+Environment=ASR_MODEL=small
 Environment=ASR_ENGINE=faster_whisper
 Environment=ASR_MODEL_PATH=/data/whisper
 

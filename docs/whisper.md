@@ -1,7 +1,7 @@
 # whisper — Servicio de reconocimiento de voz Whisper
 
 ## Qué es
-whisper, docker.io/onerahmet/openai-whisper-asr-webservice:latest-gpu, 1 contenedor, sin red, sin dominio, 9000
+whisper, docker.io/onerahmet/openai-whisper-asr-webservice:latest (variante CPU), 1 contenedor, sin red, sin dominio, 9001
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/whisper/whisper.container
@@ -22,7 +22,7 @@ whisper, docker.io/onerahmet/openai-whisper-asr-webservice:latest-gpu, 1 contene
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
 |-----|-------|-------|-------------|
-| ASR_MODEL | whisper.container | large-v1 | |
+| ASR_MODEL | whisper.container | small | |
 | ASR_ENGINE | whisper.container | faster_whisper | |
 | ASR_MODEL_PATH | whisper.container | /data/whisper | |
 
@@ -32,4 +32,6 @@ whisper, docker.io/onerahmet/openai-whisper-asr-webservice:latest-gpu, 1 contene
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- Imagen CPU (`:latest`): prod no tiene GPU NVIDIA, `:latest-gpu` exigiria el runtime NVIDIA. `faster_whisper` es dependencia base de la imagen, valida tambien en CPU.
+- `ASR_MODEL=small` por defecto (verificacion); subir a `large-v3` cuando se quiera calidad, asumiendo la descarga de GB en el primer arranque.
+- Host port 9001 (el 9000 lo publica authentik en `0.0.0.0:9000:9000`).
