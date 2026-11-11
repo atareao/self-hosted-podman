@@ -30,7 +30,7 @@ NetworkAlias=wallabag
 
 # ==== Environment ====
 Environment=SYMFONY__ENV__DOMAIN_NAME="https://wallabag.${FQDN}"
-Environment=SYMFONY__ENV__SERVER_NAME="el nombre que quieras"
+Environment=SYMFONY__ENV__SERVER_NAME=wallabag
 
 # ==== Labels ====
 Label=traefik.enable=true

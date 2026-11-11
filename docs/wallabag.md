@@ -21,11 +21,12 @@ El contenedor se une a la red `proxy.network` y expone el puerto 80 a Traefik a 
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
 | SYMFONY__ENV__DOMAIN_NAME | `Environment=` | "https://wallabag.${FQDN}" | Dominio externo |
-| SYMFONY__ENV__SERVER_NAME | `Environment=` | "el nombre que quieras" | Nombre del servidor |
+| SYMFONY__ENV__SERVER_NAME | `Environment=` | `wallabag` | Nombre del servidor (issuer 2FA) |
 
 ## Cómo habilitar / desplegar
 1. `cd .config/containers/available/wallabag && qctl install`
 2. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- Base de datos: sin `DATABASE_URL` la imagen usa SQLite (`SYMFONY__ENV__DATABASE_DRIVER` por defecto `pdo_sqlite`); el entrypoint crea `/var/www/wallabag/data/db/wallabag.sqlite` y ejecuta `wallabag:install` (migraciones) solo si el fichero falta o esta vacio. No requiere `DATABASE_URL`.
+- Cron: **no** se añade contenedor cron. El compose upstream no lo trae; la importacion programada usa un worker Redis (`wallabag import`, comando del entrypoint) que solo aplica si se despliega Redis con la cola de import. Follow-up si en el futuro se quiere importacion en background.
