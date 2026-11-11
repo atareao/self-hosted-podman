@@ -1,7 +1,7 @@
 # PLAN-028 — Healthcheck con driver de secretos externo (crypta): `no such secret`
 
 - **Issue:** #23
-- **Estado:** causa raíz encontrada y fix validado en prod; pendiente de versionar/desplegar
+- **Estado:** COMPLETADO — fix versionado (commit adcfb0a) y desplegado+validado E2E en prod.
 - **Fecha:** 2026-11-11
 - **Sustituye al enfoque inicial** (remediación por-unit `type=mount`/fallback), descartado al hallar la causa raíz.
 
@@ -57,8 +57,8 @@ El enfoque inicial proponía migrar 8 units a `type=mount` (que soportan `*_FILE
 - [x] T2. Matriz de remediación (descartada tras hallar la causa raíz).
 - [x] T3. Diagnóstico reproducido en prod (unit transitoria + `no such secret`).
 - [x] T4. Fix de raíz identificado y validado E2E en prod.
-- [ ] T5. Versionar en el repo: `.config/environment.d/crypta.conf`, `docs/secrets-healthcheck.md` y nota en `AGENTS.md`.
-- [ ] T6. Desplegar en prod (`yadm pull` como runner) + `systemctl --user daemon-reexec`; re-verificar un stack afectado en arranque en frío.
+- [x] T5. Versionar en el repo: `.config/environment.d/crypta.conf`, `docs/secrets-healthcheck.md` y nota en `AGENTS.md`.
+- [x] T6. Desplegar en prod (`yadm pull` como runner) + `systemctl --user daemon-reexec`; re-verificar un stack afectado en arranque en frío.
 - [ ] T7. (Opcional) Reporte upstream: la unit transitoria del healthcheck debería heredar el entorno del contenedor/unit, o documentarse.
 - [ ] T8. Cerrar: marcar tareas, renombrar a `plans/PLAN-028-ARCHIVED.md`, cerrar el issue #23.
 
@@ -73,3 +73,10 @@ El enfoque inicial proponía migrar 8 units a `type=mount` (que soportan `*_FILE
 - Nunca usar `crypta store` para secretos de Podman: se crean con `podman secret create` (el driver `shell` resuelve por ID).
 - Los secretos de Podman son write-only: no sirven para guardar una contraseña recuperable.
 - Follow-up independiente: `StartLimitIntervalSec`/`StartLimitBurst` están en `[Service]` (systemd los ignora; van en `[Unit]`).
+
+## Cierre (2026-11-11)
+
+- Fix versionado en `main` (commit `adcfb0a`): `.config/environment.d/crypta.conf`, `docs/secrets-healthcheck.md`, nota en `AGENTS.md`, este plan.
+- Desplegado en prod: `yadm pull` (runner) + `systemctl --user daemon-reexec`.
+- Verificación E2E en prod (Podman 5.7.0): contenedor con `--secret X,type=env --health-cmd …` → `Health=healthy`; stacks reales (`traefik`, `pocketid`, `headscale`, `errserve`) intactos; artefactos de prueba eliminados.
+- Nota de despliegue: el `yadm pull` abortaba porque el `crypta.conf` creado a mano durante el diagnóstico estaba sin commitear (untracked) y colisionaba con el del repo; se eliminó y el pull fast-forwardeó.
