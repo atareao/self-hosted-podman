@@ -28,7 +28,7 @@ Stack de un **único contenedor** que expone un proxy SOCKS5 autenticado por usu
 - **Enrutado Traefik:** no hay labels `traefik.*`; el servicio no pasa por el edge router.
 - **Hardening:** sección `Hardening` vacía (sin `User`, `NoNewPrivileges` ni `ReadOnly`).
 - **AutoUpdate:** `AutoUpdate=registry` (imagen sin tag fijo).
-- **Arranque:** `After=network-online.target`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`. `PodmanArgs=--init`.
+- **Arranque:** `After=network-online.target`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`. `PodmanArgs=--init`.
 
 ## Variables / configuración
 

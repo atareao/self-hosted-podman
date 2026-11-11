@@ -41,7 +41,7 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 - **Healthcheck:** ninguno de los tres define `Health*`.
 - **Hardening:** solo `tick-grafana` declara `User=1000:1000`. InfluxDB y Telegraf no tienen `Hardening` (Telegraf corre además con acceso a socket y rutas del host).
 - **AutoUpdate:** los tres usan `AutoUpdate=registry`.
-- **Arranque:** `tick-grafana` y `tick-influxdb` con `After=network-online.target traefik.service`; `tick-telegraf` solo con `After=network-online.target`. Los tres: `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`. Ninguno usa `PodmanArgs=--init`.
+- **Arranque:** `tick-grafana` y `tick-influxdb` con `After=network-online.target traefik.service`; `tick-telegraf` solo con `After=network-online.target`. Los tres: `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`. Ninguno usa `PodmanArgs=--init`.
 
 ## Variables / configuración
 

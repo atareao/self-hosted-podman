@@ -28,7 +28,7 @@ Storyteller es una plataforma autoalojada para generar y servir audiolibros sinc
 - **Healthcheck:** no define `Health*`.
 - **Hardening:** sección `Hardening` vacía (sin `User`, `NoNewPrivileges` ni `ReadOnly`).
 - **AutoUpdate:** `AutoUpdate=registry` (imagen `latest`).
-- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`.
+- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`.
 
 ## Variables / configuración
 

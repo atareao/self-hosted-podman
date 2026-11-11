@@ -1,6 +1,8 @@
 [Unit]
 Description=Vector Log Router (Rust-based)
 After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -50,8 +52,6 @@ AddCapability=CAP_DAC_READ_SEARCH
 [Service]
 Restart=on-failure
 RestartSec=10s
-StartLimitIntervalSec=300
-StartLimitBurst=3
 TimeoutStartSec=60
 ExecStartPre=/usr/bin/sleep 2
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" vector) != "healthy" ]; do sleep 2; done'

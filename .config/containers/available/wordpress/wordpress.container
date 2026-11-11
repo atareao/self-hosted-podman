@@ -2,6 +2,8 @@
 Description=WordPress Engine
 After=wordpress.network mariadb.service valkey.service
 Requires=mariadb.service valkey.service
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -54,8 +56,6 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=on-failure
 RestartSec=10s
-StartLimitIntervalSec=300
-StartLimitBurst=3
 TimeoutStartSec=60
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress)" != "healthy" ]; do sleep 2; done'
 

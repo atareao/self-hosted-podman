@@ -2,6 +2,8 @@
 Description=Umami Analytics
 After=network-online.target umamidb.service proxy.network
 Requires=umamidb.service
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -52,8 +54,6 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 RestartSec=10s
-StartLimitIntervalSec=300
-StartLimitBurst=3
 TimeoutStartSec=60
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" umami)" != "healthy" ]; do sleep 2; done'
 

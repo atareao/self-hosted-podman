@@ -1,6 +1,8 @@
 [Unit]
 Description=CrowdSec Security Engine
 After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -43,8 +45,6 @@ HealthStartPeriod=60s
 [Service]
 Restart=on-failure
 RestartSec=10s
-StartLimitIntervalSec=300
-StartLimitBurst=3
 TimeoutStartSec=120
 ExecStartPre=/usr/bin/sleep 2
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" crowdsec)" != "healthy" ]; do sleep 2; done'

@@ -38,7 +38,7 @@ Snibox es una aplicación web para guardar y organizar fragmentos de código (sn
 - **Healthcheck:** ninguno de los tres contenedores define `Health*`.
 - **Hardening:** ninguna sección `Hardening` está poblada (sin `User`, sin `NoNewPrivileges`, sin `ReadOnly`).
 - **AutoUpdate:** solo `snibox-backend` (`AutoUpdate=registry`); nginx y PostgreSQL quedan con tag fijo (`1.15.9`, `10.7-alpine`) sin auto-actualización.
-- **Arranque:** `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`.
+- **Arranque:** `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`.
 
 ## Variables / configuración
 

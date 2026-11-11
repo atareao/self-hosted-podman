@@ -30,7 +30,7 @@ Navidrome es un servidor de música autoalojado compatible con la API Subsonic.
 - **Healthcheck:** no define `Health*`.
 - **Hardening:** solo `User=1000:1000` (sin `NoNewPrivileges` ni `ReadOnly`).
 - **AutoUpdate:** `AutoUpdate=registry` (imagen `latest`).
-- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`.
+- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`.
 
 ## Variables / configuración
 

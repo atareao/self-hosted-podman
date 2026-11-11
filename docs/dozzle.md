@@ -30,7 +30,7 @@ Dozzle es un visor web en tiempo real de los logs de los contenedores (Podman/Do
 - **Healthcheck:** no define `Health*`.
 - **Hardening:** sección vacía (sin `User` ni `NoNewPrivileges`).
 - **AutoUpdate:** `AutoUpdate=registry`; `PodmanArgs=--init`.
-- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`.
+- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`.
 
 ## Variables / configuración
 

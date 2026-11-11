@@ -83,6 +83,8 @@ Copy-paste template (all 11 sections always present):
 Description=<desc>
 After=<deps>
 Requires=<deps>
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -116,8 +118,6 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=<always|on-failure>
 RestartSec=10s
-StartLimitIntervalSec=300
-StartLimitBurst=3
 TimeoutStartSec=<seconds>
 {% raw %}   # only in .jinja files, NEVER in plain .container
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" <name>)" != "healthy" ]; do sleep 2; done'
@@ -149,7 +149,7 @@ Parser acceptance (verified against `/usr/lib/podman/quadlet` 6.1.4 on this host
 
 Composition rules:
 
-- The eleven `[Container]` sections are fixed; `[Unit]` (`Description`, then `After`, then `Requires`) and `[Service]`/`[Install]` follow the fixed shapes above.
+- The eleven `[Container]` sections are fixed; `[Unit]` (`Description`, then `After`, then `Requires`, then `StartLimitIntervalSec`/`StartLimitBurst`) and `[Service]`/`[Install]` follow the fixed shapes above.
 - Rootless units MUST use `WantedBy=default.target` (never `multi-user.target` — it is not pulled in by the user manager, so the container would not autostart).
 - `{% raw %}`/`{% endraw %}` around a shell `{{ ... }}` ONLY in `.jinja` files; a plain `.container` must carry the literal `{{.State.Health.Status}}` unescaped (adding the markers there is a systemd syntax error).
 - File naming: a unit is `.jinja` iff it contains any **template** variable (`{{ env.* }}` other than FQDN); otherwise plain (e.g. `available/umami/umamidb.container`). `${FQDN}` is NOT a template variable — it is expanded by systemd at runtime, so a unit using only `${FQDN}` is a plain `.container`.

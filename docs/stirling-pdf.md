@@ -38,7 +38,7 @@ Stirling PDF es una suite web (autoalojada) para manipular PDF: unir, dividir, c
 - **Healthcheck:** no define `Health*`.
 - **Hardening:** sección `Hardening` vacía (sin `User`, `NoNewPrivileges` ni `ReadOnly`).
 - **AutoUpdate:** `AutoUpdate=registry` (imagen `latest`).
-- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300`, `StartLimitBurst=3`, `TimeoutStartSec=60`, `WantedBy=default.target`. `PodmanArgs=--init`.
+- **Arranque:** `After=network-online.target traefik.service`, `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`. `PodmanArgs=--init`.
 
 ## Variables / configuración
 
