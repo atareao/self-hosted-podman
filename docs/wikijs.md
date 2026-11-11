@@ -1,7 +1,7 @@
 # wikijs — Wiki de conocimiento basada en Markdown
 
 ## Qué es
-wikijs, ghcr.io/requarks/wiki:2, 2 contenedores, redes: proxy.network, wikijs.network, dominio: wikijs.${FQDN}, puerto interno: 80
+wikijs, ghcr.io/requarks/wiki:2, 2 contenedores, redes: proxy.network, wikijs.network, dominio: wikijs.${FQDN}, puerto interno: 3000 (Wiki.js escucha en 3000; es también el `loadbalancer.server.port` del servicio Traefik)
 
 ## Ficheros
 - Quadlet(s): /data/self-hosted-podman/.config/containers/available/wikijs/wikijs.container
@@ -17,7 +17,7 @@ wikijs, ghcr.io/requarks/wiki:2, 2 contenedores, redes: proxy.network, wikijs.ne
 - EnvironmentFile: N/A
 - Socket del daemon: N/A
 - Healthcheck: N/A
-- Enrutado Traefik: Host wikijs.${FQDN} apunta al servicio 80
+- Enrutado Traefik: Host wikijs.${FQDN} apunta al servicio 3000 (`traefik.http.services.wikijs.loadbalancer.server.port=3000`); Wiki.js escucha internamente en el puerto 3000, no en 80
 - User/UserNS/NoNewPrivileges: N/A
 
 ## Variables / configuración
@@ -53,4 +53,4 @@ podman unshare chown -R 70:70 ~/.config/wikijs/data
 ```
 
 ## Follow-ups
-- Verificado E2E el 2026-11-11 (PLAN-030, issue #25): corregido `DB_HOST` (`db` → `postgres`, alias real del contenedor PostgreSQL); el bind `~/.config/wikijs/data` debe pertenecer a uid 70 (`podman unshare chown -R 70:70`).
+- Verificado E2E el 2026-11-11 (PLAN-030, issue #25): corregido `DB_HOST` (`db` → `postgres`, alias real del contenedor PostgreSQL); el bind `~/.config/wikijs/data` debe pertenecer a uid 70 (`podman unshare chown -R 70:70`). Además, el service port de Traefik era 80 y se corrigió a 3000.

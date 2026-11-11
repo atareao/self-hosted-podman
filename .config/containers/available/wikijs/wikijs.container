@@ -39,7 +39,7 @@ Environment=DB_NAME=wiki
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.wikijs.loadbalancer.server.port=80
+Label=traefik.http.services.wikijs.loadbalancer.server.port=3000
 Label=traefik.http.routers.wikijs.rule=Host(`wikijs.${FQDN}`)
 Label=traefik.http.routers.wikijs.entrypoints=websecure
 Label=traefik.http.routers.wikijs.tls.certresolver=letsencrypt
