@@ -7,13 +7,13 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/ellieh/atuin:latest
+Image=ghcr.io/atuinsh/atuin:latest
 AutoUpdate=registry
 ContainerName=atuin
 PodmanArgs=--init
 
 # ==== Command ====
-Exec=server start
+Exec=start
 
 # ==== Ports ====
 
