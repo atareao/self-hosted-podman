@@ -1,6 +1,6 @@
 # Estado de verificación E2E de los stacks
 
-Última actualización: 2026-11-10.
+Última actualización: 2026-11-11.
 
 Inventario de fiabilidad del repo: distingue lo que ya se ha **probado end-to-end en producción**
 de lo que sólo existe como quadlet + doc sin validar en el host real.
@@ -24,10 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 59 |
+| Verificados E2E (probados y purgados) | 60 |
 | Bloqueados / hallazgos (ver sección) | 2 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **62** |
+| **Sin verificar E2E** | **61** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -95,6 +95,7 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | dim | `docs/dim.md` | PLAN-027 / #22 | 200 | bind `~/.config/dim/config` + volumen `dim-media` |
 | ghost | `docs/ghost.md` | PLAN-027 / #22 | 200 | corregido: `url` con `https://` y bind `/var/lib/ghost/content` (errata `lig`→`lib`) |
 | kanboard | `docs/kanboard.md` | PLAN-027 / #22 | 302 | corregido: bind `/var/www/app/data` (errata `bar`→`var`) |
+| atuin | `docs/atuin.md` | PLAN-030 / #25 | 200 | fix: imagen oficial `ghcr.io/atuinsh/atuin` + `Exec=start`; `postgres:18-alpine` con volumen en `/var/lib/postgresql`; atuin en `atuin.network` |
 
 ## Bloqueados / hallazgos
 
@@ -114,11 +115,11 @@ Desplegados y funcionales a nivel de servicio, pero **no verificados E2E complet
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (62)
+## Sin verificar E2E (61)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-atuin, authentik, beszel, bookstack, caddy, cells,
+authentik, beszel, bookstack, caddy, cells,
 chevereto, codimd, crowdsec, dev,
 dnote, facturascripts, firefly,
 focalboard, gitea, grafana-influx-telegraf, hedgedoc, huginn,
@@ -144,3 +145,4 @@ zennotes, zincsearch.
 - PLAN-025 (issue #20): `errserve` pasa a poseer el apex `${FQDN}` con router propio (`errserve-apex`, `tls.certresolver=letsencrypt`) → `https://servidorlinux.es` sirve la página de error con **certificado LE válido** (antes: autofirmado). Corregido de paso el catch-all (`HostRegexp(.)&&!Path(/metrics)`: las labels de quadlet no admiten espacios). Volumen `huginn-huginn_mariadb` → `huginn-mariadb`. Docs: invariantes de enrutado #3 y #6.
 - PLAN-026 (issue #21): el apex `${FQDN}` pasa de servir a **redirigir** (302) a la página de error (`errserve-apex` → `https://${FQDN}/404`, con `!Path(/404)` para evitar bucle). Además, 40 volúmenes normalizados a la convención `<stack>-<rol>` (fichero, `VolumeName=` y `Volume=`), sin cambios en prod. Sin cambios de cifras (127 / 55 / 68).
 - PLAN-027 (issue #22): ronda E2E lote 1 (alloy, apimail, couchdb, dim, ghost, kanboard). Verificados y purgados: couchdb, dim, ghost, kanboard. Corregidos bugs latentes de `ghost` (url + bind `lig`→`lib`) y `kanboard` (bind `bar`→`var`). `apimail` funcional pero bloqueado por #23; `alloy` bloqueado por OIDC. Cifras: 127 = 59 verificados + 4 en producción + 2 bloqueados + 62 sin verificar.
+- PLAN-030 (issue #25): ronda E2E lote 2 **en curso** — `atuin` verificado E2E (200, cert LE válido) y purgado; `radicale` corregido estáticamente (router/servicio Traefik `expulsabot` → `radicale`), pendiente de desplegar. Pendientes del lote: beszel, radicale, wakapi, wikijs, zincsearch. Cifras: 127 = 60 verificados + 4 en producción + 2 bloqueados + 61 sin verificar.
