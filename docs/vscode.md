@@ -30,4 +30,4 @@ El contenedor se une a la red `proxy.network` y expone el puerto 8443 a Traefik 
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- **Primer arranque verificado**: imagen LinuxServer.io (LSNG) arranca correctamente **sin** `PodmanArgs=--init` (s6-overlay exige ser PID 1; con `--init` abortaría con `s6-overlay-suexec: fatal: can only run as pid 1`). El login funciona con el secreto `PASSWORD` (`vscode_password`).
