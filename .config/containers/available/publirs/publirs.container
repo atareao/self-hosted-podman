@@ -23,6 +23,8 @@ Volume=publirs-db.volume:/app/db:Z
 # ==== Networks ====
 Network=publirs.network
 NetworkAlias=publirs
+Network=proxy.network
+NetworkAlias=publirs
 
 # ==== Secrets ====
 Secret=publirs_token,type=env,target=TOKEN
@@ -34,6 +36,12 @@ Environment=PORT=8080
 Environment=ENVIRONMENT=PRODUCTION
 
 # ==== Labels ====
+Label=traefik.enable=true
+Label=traefik.http.services.publirs.loadbalancer.server.port=8080
+Label=traefik.http.routers.publirs.rule=Host(`publirs.${FQDN}`)
+Label=traefik.http.routers.publirs.entrypoints=websecure
+Label=traefik.http.routers.publirs.tls.certresolver=letsencrypt
+Label=traefik.http.routers.publirs.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 
 # ==== Healthcheck ====
