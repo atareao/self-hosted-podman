@@ -1,7 +1,7 @@
 # PLAN-026 — Apex: redirect temporal + renombrar volúmenes a `<stack>-<rol>`
 
 - **Issue:** #21
-- **Estado:** en curso
+- **Estado:** completado (2026-11-11)
 - **Fecha:** 2026-11-11
 
 ## Contexto
@@ -12,12 +12,12 @@ cambiando 1 label; (2) normalizar el resto de volúmenes a `<stack>-<rol>`.
 
 ## Objetivos
 
-- [ ] `errserve.container`: router `errserve-apex` con `redirectregex` → 302 a `https://${FQDN}/404`.
-- [ ] Renombrar 40 volúmenes (22 stacks) a `<stack>-<rol>` (fichero, `VolumeName=`, `Volume=`).
-- [ ] Actualizar referencias en `docs/`.
-- [ ] `docs/traefik.md`: invariante 3 describe el redirect.
-- [ ] Verificar (dryrun + grep), desplegar en prod (solo cambia `errserve`) y comprobar el 302.
-- [ ] Inventario + HANDOFF; archivar como `plans/PLAN-026-ARCHIVED.md`.
+- [x] `errserve.container`: router `errserve-apex` con `redirectregex` → 302 a `https://${FQDN}/404`.
+- [x] Renombrar 40 volúmenes (22 stacks) a `<stack>-<rol>` (fichero, `VolumeName=`, `Volume=`).
+- [x] Actualizar referencias en `docs/`.
+- [x] `docs/traefik.md`: invariante 3 describe el redirect.
+- [x] Verificar (dryrun + grep), desplegar en prod (solo cambia `errserve`) y comprobar el 302.
+- [x] Inventario + HANDOFF; archivar como `plans/PLAN-026-ARCHIVED.md`.
 
 ## Apex (errserve)
 
@@ -96,3 +96,11 @@ Ninguno está desplegado en producción → sin migración de datos.
 - `cells-cellsdir` → `cells-app` porque `cells-data` ya existe (monta `/var/cells/data`).
 
 Verificación: pega la salida real de `wc -l plans/PLAN-026.md` y `grep -c '^| ' plans/PLAN-026.md`.
+
+## Resultado (2026-11-11)
+
+- **Apex con redirect.** `errserve-apex` (`Host(\`${FQDN}\`)&&!Path(\`/404\`)`) responde **302** a `https://${FQDN}/404` vía el middleware `errserve-apex-redirect` (`redirectregex`, `permanent=false`); `/404` lo sirve el catch-all (`errserve`) con certificado válido. Verificado en prod: `code=302 -> https://servidorlinux.es/404`; siguiendo el redirect, `final=404`. Reapuntar a un servicio real = cambiar 1 label.
+- **40 volúmenes normalizados** a `<stack>-<rol>` en 22 stacks (fichero `.volume`, `VolumeName=` y `Volume=`): `<stack>-data` para datos de app, nombre de motor para BBDD/caché. Ninguno desplegado en prod → sin migración de datos.
+- **Verificación:** `quadlet -user -dryrun` sobre los 28 stacks afectados → 0 errores; 0 referencias a nombres viejos (quadlets y docs); 0 `Volume=` sin fichero `.volume`; auditoría de duplicados limpia (solo `Host(headscale.${FQDN})`); 0 labels con espacios; 139 `.volume` en total.
+- Prod: 5 contenedores (`errserve`, `headscale`, `headscale-headplane`, `pocketid`, `traefik`), `auth` 200, `headscale` 200.
+- Commits en `main`: `97c122d`.
