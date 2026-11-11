@@ -31,10 +31,10 @@
 | `RUST_LOG` | `.config/watchbeat/watchbeat.env` | `info` | Nivel de logs |
 | `LOG_FORMAT` | `.config/watchbeat/watchbeat.env` | `pretty` | Formato de logs |
 | `WATCHBEAT_RETENTION_DAYS` | `.config/watchbeat/watchbeat.env` | `30` | Retención de checkpoints |
-| `OIDC_ISSUER_URL` | `.config/watchbeat/watchbeat.env` | `https://auth.example.com` | URL OIDC issuer |
+| `OIDC_ISSUER_URL` | fijo en el quadlet | `https://auth.${FQDN}` | URL OIDC issuer (PocketID) |
 | `OIDC_CLIENT_ID` | `.config/watchbeat/watchbeat.env` | `watchbeat` | Client ID OIDC |
 | `OIDC_CLIENT_SECRET` | secreto Podman `watchbeat_oidc_client_secret` | — | Secreto OIDC |
-| `OIDC_REDIRECT_URL` | fijo en el quadlet | `https://${FQDN}/auth/callback` | Callback OIDC |
+| `OIDC_REDIRECT_URL` | fijo en el quadlet | `https://watchbeat.${FQDN}/auth/callback` | Callback OIDC |
 
 ## Habilitar / desplegar
 
@@ -42,7 +42,7 @@
 # 1. Crear el secreto ANTES de arrancar (NUNCA con crypta store)
 printf '%s' '<client-secret>' | podman secret create watchbeat_oidc_client_secret -
 
-# 2. Ajustar OIDC_ISSUER_URL / OIDC_CLIENT_ID reales en .config/watchbeat/watchbeat.env.local
+# 2. Ajustar OIDC_CLIENT_ID si el client ID no es "watchbeat" en .config/watchbeat/watchbeat.env.local
 
 # 3. Enlazar y recargar
 cd .config/containers/available/watchbeat

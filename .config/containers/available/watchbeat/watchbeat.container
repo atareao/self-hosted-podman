@@ -28,7 +28,8 @@ Secret=watchbeat_oidc_client_secret,type=env,target=OIDC_CLIENT_SECRET
 # ==== Environment ====
 EnvironmentFile=%h/.config/watchbeat/watchbeat.env
 EnvironmentFile=%h/.config/watchbeat/watchbeat.env.local
-Environment=OIDC_REDIRECT_URL=https://${FQDN}/auth/callback
+Environment=OIDC_ISSUER_URL=https://auth.${FQDN}
+Environment=OIDC_REDIRECT_URL=https://watchbeat.${FQDN}/auth/callback
 
 # ==== Labels ====
 Label=traefik.enable=true
