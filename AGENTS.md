@@ -197,6 +197,7 @@ no la del cliente. Traefik **ya** envía `X-Forwarded-For`/`X-Real-Ip`; cada app
 - `proxy.network` (Traefik edge network) lives in the `traefik` stack; other stacks join it via `Network=proxy.network`.
 - `qctl install` only links rendered units: run `unjinja` first so `*.jinja` exist as `.container`/`.volume`/`.network` before enabling a stack.
 - Al **recrear** un contenedor (`systemctl --user restart <stack>`), Traefik puede no re-registrar su router y el tráfico cae al catch-all de `errserve` (router `errserve-catchall@docker`): si tras recrear no enruta, `systemctl --user restart traefik`.
+- **`StartLimitIntervalSec`/`StartLimitBurst` van en `[Unit]`, NO en `[Service]`:** en systemd ≥ 230 `[Service]` los ignora (`Unknown key 'StartLimitIntervalSec' in section [Service], ignoring`), así que el límite de reinicios no se aplica. Ver issue #24 / `plans/PLAN-029-ARCHIVED.md`.
 
 ## Git
 
