@@ -24,14 +24,16 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 65 |
+| Verificados E2E (probados y purgados) | 71 |
 | Bloqueados / hallazgos (ver sección) | 2 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **56** |
+| **Sin verificar E2E** | **50** |
 
 ## Verificados E2E (probados y purgados)
 
-Todos entre el **2026-11-09** y el **2026-11-10**: desplegados, verificados end-to-end y **purgados** el mismo día (unit
+Todos entre el **2026-11-09** y el **2026-11-11** (el **lote 3**, los seis últimos — `bookstack`, `dnote`,
+`focalboard`, `snibox`, `umami` y `hedgedoc` —, es del **2026-11-11**): desplegados, verificados end-to-end y
+**purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
 
 | Stack | Doc | Plan / Issue | HTTP | Notas |
@@ -101,6 +103,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | wakapi | `docs/wakapi.md` | PLAN-030 / #25 | 200 | sin cambios; secretos DB con el mismo valor |
 | wikijs | `docs/wikijs.md` | PLAN-030 / #25 | 200 | fix: `DB_HOST` `db` → `postgres` (alias real) y service port Traefik 80 → 3000; bind de datos uid 70 |
 | zincsearch | `docs/zincsearch.md` | PLAN-030 / #25 | 200 | sin cambios; `/` → 302 a `/ui/` |
+| bookstack | `docs/bookstack.md` | PLAN-031 / #26 | 302 (/), 200 (/login) | fix: app añadida a `bookstack.network` y binds separados (`config` app / `mariadb` BD); `APP_KEY` por secreto `bookstack_app_key`; imagen LSNG espera `DB_USERNAME`/`DB_PASSWORD` (no `DB_USER`/`DB_PASS`) |
+| dnote | `docs/dnote.md` | PLAN-031 / #26 | 302 | fix: app añadida a `dnote.network` (resolvía `postgres`), secreto único `dnote_postgres_password`; service port interno 3001 (no 3000) |
+| focalboard | `docs/focalboard.md` | PLAN-031 / #26 | 200 | fix: `postgres:18-alpine` con volumen en `/var/lib/postgresql`; secretos `focalboard_postgres_password` + `focalboard_database_url` (`FOCALBOARD_DBCONFIG`); bind `config.json` → `FOCALBOARD_DBTYPE=postgres` |
+| snibox | `docs/snibox.md` | PLAN-031 / #26 | 302 | fix: nginx añadido a `snibox.network` (daba 502) y `snibox_postgres_password` compartido app/BD |
+| umami | `docs/umami.md` | PLAN-031 / #26 | 200 (/ y /login) | fix: `Requires=`/`After=` apuntaban a `umamidb.service` → `umami-postgresql.service` (la unit no cargaba) |
+| hedgedoc | `docs/hedgedoc.md` | PLAN-031 / #26 | 200 | fix: faltaban `Requires=`/`After=` hacia MariaDB; sin `PodmanArgs=--init` (imagen LSNG/s6-overlay exige PID 1) |
 
 ## Bloqueados / hallazgos
 
@@ -111,6 +119,11 @@ Desplegados y funcionales a nivel de servicio, pero **no verificados E2E complet
 | apimail | Sirve OK (`/api/health` → 200 JSON, cert LE staging), pero **no arranca en frío**: el healthcheck de conmon sale con exit 125 por el bug de secretos con driver externo (`shell`) + `type=env` (afecta a 13 units). | Issue #23 / `plans/PLAN-028.md` |
 | alloy | Requiere un cliente **OIDC real** en PocketID (`OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URL`); sin él la discovery falla y el contenedor sale con `exit=1` (crash-loop). | — |
 
+Hallazgo transversal (PLAN-031 / #26): `PodmanArgs=--init` es **incompatible** con las imágenes LinuxServer.io
+(`lscr.io/linuxserver/*`): usan s6-overlay y exigen ser PID 1, y abortan con
+`s6-overlay-suexec: fatal: can only run as pid 1`. Se omitió `--init` en los quadlets afectados. Ver
+`docs/bookstack.md` y `docs/hedgedoc.md`.
+
 ## En producción (desplegados y corriendo)
 
 | Stack | Doc | Estado |
@@ -120,20 +133,20 @@ Desplegados y funcionales a nivel de servicio, pero **no verificados E2E complet
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (56)
+## Sin verificar E2E (50)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-authentik, bookstack, caddy, cells,
+authentik, caddy, cells,
 chevereto, codimd, crowdsec, dev,
-dnote, facturascripts, firefly,
-focalboard, gitea, grafana-influx-telegraf, hedgedoc, huginn,
+facturascripts, firefly,
+gitea, grafana-influx-telegraf, huginn,
 immich, invidious, jellystat, matrix, matrixmail,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
 odoo, open-webui, photoprism,
 pinepods, planka, plausible, postgres, publirs, rabbitmq,
-registry, simple-torrent, snibox, socks5,
-tick, umami, unbound, vector, vscode,
+registry, simple-torrent, socks5,
+tick, unbound, vector, vscode,
 wallabag, watchbeat, weaviate, webdav, wger, whisper, wordpress, wordpress-wp1, wordpress-wp2,
 zennotes.
 
@@ -151,3 +164,4 @@ zennotes.
 - PLAN-026 (issue #21): el apex `${FQDN}` pasa de servir a **redirigir** (302) a la página de error (`errserve-apex` → `https://${FQDN}/404`, con `!Path(/404)` para evitar bucle). Además, 40 volúmenes normalizados a la convención `<stack>-<rol>` (fichero, `VolumeName=` y `Volume=`), sin cambios en prod. Sin cambios de cifras (127 / 55 / 68).
 - PLAN-027 (issue #22): ronda E2E lote 1 (alloy, apimail, couchdb, dim, ghost, kanboard). Verificados y purgados: couchdb, dim, ghost, kanboard. Corregidos bugs latentes de `ghost` (url + bind `lig`→`lib`) y `kanboard` (bind `bar`→`var`). `apimail` funcional pero bloqueado por #23; `alloy` bloqueado por OIDC. Cifras: 127 = 59 verificados + 4 en producción + 2 bloqueados + 62 sin verificar.
 - PLAN-030 (issue #25): ronda E2E lote 2 **completada** — verificados y purgados: `atuin`, `beszel`, `radicale`, `wakapi`, `wikijs` y `zincsearch`. Bugs latentes corregidos: atuin (imagen oficial + `Exec=start`, PG 18 con volumen en `/var/lib/postgresql`, red de BD), beszel (login por contraseña, agente SSH/TCP con clave del hub, volumen `beszel-socket` eliminado), radicale (router `expulsabot`→`radicale`, binds uid 1000, htpasswd apr1/md5), wikijs (`DB_HOST` `db`→`postgres`, service port 80→3000). Cifras: 127 = 65 verificados + 4 en producción + 2 bloqueados + 56 sin verificar.
+- PLAN-031 (issue #26): ronda E2E lote 3 **completada** — verificados y purgados: `bookstack`, `dnote`, `focalboard`, `snibox`, `umami` y `hedgedoc`. Bugs latentes corregidos: umami (`Requires=`/`After=` → `umami-postgresql.service`), focalboard (PG 18 con volumen en `/var/lib/postgresql`, secretos `focalboard_postgres_password` + `focalboard_database_url`, bind `config.json` → `FOCALBOARD_DBTYPE=postgres`), bookstack (app en `bookstack.network`, binds separados app/BD, `APP_KEY` por secreto, `DB_USERNAME`/`DB_PASSWORD`), dnote (app en `dnote.network`, secreto único de BD, service port 3001), snibox (nginx en `snibox.network`, `snibox_postgres_password` compartido) y hedgedoc (`Requires=`/`After=` hacia MariaDB). Regla nueva: sin `PodmanArgs=--init` en imágenes LinuxServer.io (s6-overlay exige PID 1). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 71 verificados + 4 en producción + 2 bloqueados + 50 sin verificar.

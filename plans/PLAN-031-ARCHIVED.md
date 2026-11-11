@@ -2,7 +2,7 @@
 
 - **Issue:** #26
 - **Fecha:** 2026-11-11
-- **Estado:** EN CURSO
+- **Estado:** ARCHIVADO (2026-11-11)
 
 ## Objetivo
 
@@ -90,31 +90,31 @@ Higiene (aplicar según el skeleton canónico de `AGENTS.md`):
 
 ## Tareas
 
-- [ ] T1 — Preflight en prod: `systemctl --user is-system-running`, `systemctl --user daemon-reload`,
+- [x] T1 — Preflight en prod: `systemctl --user is-system-running`, `systemctl --user daemon-reload`,
       `qctl check` de los 6 stacks, `unjinja` ejecutado y `.jinja` renderizados presentes.
-- [ ] T2 — Corregir **umami** (`Requires=`/`After=` → `umami-postgresql.service`, quitar `proxy.network`
+- [x] T2 — Corregir **umami** (`Requires=`/`After=` → `umami-postgresql.service`, quitar `proxy.network`
       del `After=`, corregir `docs/umami.md`) y validar con quadlet dryrun.
-- [ ] T3 — Corregir **focalboard**: volumen PG18 en `/var/lib/postgresql`, secreto
+- [x] T3 — Corregir **focalboard**: volumen PG18 en `/var/lib/postgresql`, secreto
       `focalboard_postgres_password` + `POSTGRES_*`, crear `%h/.config/focalboard/config.json` con la
       `dbconfig` (host `focalboarddb`), `Requires=`/`After=`, `--init`, tag de imagen. Dryrun.
-- [ ] T4 — Corregir **bookstack**: añadir `bookstack.network` a la app, separar los binds `/config`
+- [x] T4 — Corregir **bookstack**: añadir `bookstack.network` a la app, separar los binds `/config`
       app vs MariaDB, `Requires=`/`After=`, `--init`, tags. Dryrun.
-- [5] T5 — Corregir **dnote**: añadir `dnote.network` a la app, unificar secreto de BD,
+- [x] T5 — Corregir **dnote**: añadir `dnote.network` a la app, unificar secreto de BD,
       `Description`, `Requires=`/`After=`, `--init`, política de tag/EOL de PG. Dryrun.
-- [ ] T6 — Corregir **snibox**: `snibox` en `snibox.network`, `POSTGRES_PASSWORD` en la BD,
+- [x] T6 — Corregir **snibox**: `snibox` en `snibox.network`, `POSTGRES_PASSWORD` en la BD,
       `Requires=`/`After=`, `--init`, `AutoUpdate`. Dryrun.
-- [ ] T7 — Revisar **hedgedoc** (redes y secretos ya correctos): `Requires=`/`After=`, `--init`,
+- [x] T7 — Revisar **hedgedoc** (redes y secretos ya correctos): `Requires=`/`After=`, `--init`,
       tags, y documentar los nombres de volumen invertidos. Dryrun.
-- [ ] T8 — Desplegar y verificar los 6 stacks (uno a uno): secretos con `podman secret create`,
+- [x] T8 — Desplegar y verificar los 6 stacks (uno a uno): secretos con `podman secret create`,
       binds con permisos correctos, `qctl install`, 5 puntos E2E con `letsencrypt-staging`.
       Anotar por stack el código HTTP final y los fixes aplicados.
-- [ ] T9 — Purga por stack: `qctl uninstall`, volúmenes nombrados, secretos, binds (`podman unshare rm -rf`
+- [x] T9 — Purga por stack: `qctl uninstall`, volúmenes nombrados, secretos, binds (`podman unshare rm -rf`
       si el uid no es `runner`), imágenes. Borrar también los symlinks en `~/.config/containers/systemd/`
       (un symlink colgante rompe el generador para todo el stack).
-- [ ] T10 — Actualizar `docs/estado-verificacion-e2e.md` (tabla «Verificados E2E» + cifras
+- [x] T10 — Actualizar `docs/estado-verificacion-e2e.md` (tabla «Verificados E2E» + cifras
       127 = 71 + 4 + 2 + 50 si los 6 pasan; bloquear los que fallen) y `docs/<stack>.md` de los 6
       stacks con hallazgos, fixes y follow-ups.
-- [ ] T11 — Commit gitmoji en `main`, archivar el plan a `plans/PLAN-031-ARCHIVED.md`, actualizar
+- [x] T11 — Commit gitmoji en `main`, archivar el plan a `plans/PLAN-031-ARCHIVED.md`, actualizar
       `HANDOFF.md` y cerrar la issue #26.
 
 ## Criterio de verificado E2E (5 puntos)
@@ -135,3 +135,47 @@ Higiene (aplicar según el skeleton canónico de `AGENTS.md`):
   `systemctl --user restart traefik`.
 - Los symlinks huérfanos en `~/.config/containers/systemd/` son la causa número uno de que
   `daemon-reload` no genere ninguna unit del stack.
+
+## Resultado
+
+Ronda completada el **2026-11-11**. Los 6 stacks se desplegaron, verificaron los 5 puntos E2E
+(unit `active`, contenedor en ejecución, router registrado en Traefik, TLS válido con el resolver
+**staging**, HTTP esperado) y se purgaron.
+
+**HTTP finales:**
+
+| Stack | Dominio | HTTP |
+|---|---|---|
+| bookstack | `bookstack.${FQDN}/` | 302; `bookstack.${FQDN}/login` → 200 |
+| dnote | `dnote.${FQDN}` | 302 |
+| focalboard | `focalboard.${FQDN}` | 200 |
+| snibox | `snibox.${FQDN}` | 302 |
+| umami | `umami.${FQDN}/` | 200; `/login` → 200 |
+| hedgedoc | `doc.${FQDN}` | 200 |
+
+**Bugs corregidos (10):**
+
+1. **umami:** `Requires=`/`After=` apuntaban a `umamidb.service` (inexistente) → `umami-postgresql.service`.
+2. **focalboard:** `postgres:latest` (PG18) con volumen en `/var/lib/postgresql/data` → `postgres:18-alpine` y volumen en `/var/lib/postgresql`; secretos `focalboard_postgres_password` + `focalboard_database_url` (`FOCALBOARD_DBCONFIG`) y fuera el bind roto `config.json`.
+3. **bookstack:** la app no estaba en `bookstack.network` y compartía el bind `/config` con MariaDB → red añadida y binds separados por rol.
+4. **dnote:** la app no estaba en `dnote.network` y el secreto de BD estaba duplicado → red añadida y secreto unificado.
+5. **snibox:** nginx fuera de `snibox.network` (no resolvía `backend`, 502) y la BD sin `POSTGRES_PASSWORD` → red añadida y secreto compartido.
+6. **hedgedoc:** sin `Requires=`/`After=` hacia MariaDB (carrera en arranque en frío) → dependencias añadidas.
+7. **Regla nueva:** `PodmanArgs=--init` rompe las imágenes `lscr.io/linuxserver/*` (s6-overlay exige PID 1) → quitado de bookstack/hedgedoc y documentado en `AGENTS.md`.
+8. **bookstack:** sin `APP_KEY` la imagen LSNG aborta («The application key is missing, halting init!») → secreto `bookstack_app_key`.
+9. **bookstack:** la imagen LSNG espera `DB_USERNAME`/`DB_PASSWORD` (no `DB_USER`/`DB_PASS`), daba HTTP 500 → variables corregidas.
+10. **dnote:** el servidor escucha en 3001 y el label Traefik decía 3000 (502) → label corregido.
+
+**Purga:** limpia. Symlinks, volúmenes nombrados, secretos, binds e imágenes eliminados; producción
+sin contenedores/volúmenes/secretos residuales, sin labels `letsencrypt-staging` y sin cambios
+locales en el repo de prod.
+
+**Inventario actualizado:** `docs/estado-verificacion-e2e.md` → 127 = **71 verificados** + 4 en
+producción + 2 bloqueados + **50 sin verificar**.
+
+**Notas:**
+
+- **Healthchecks:** no se añadieron nuevos a ningún stack (el `HealthCmd` no se pudo verificar de
+  forma fiable en esta ronda). Queda como follow-up.
+- **Commit / issue #26:** el commit gitmoji y el cierre de la issue #26 no se hicieron en esta
+  sesión (sin commit por instrucción); pendientes en la sesión de cierre.

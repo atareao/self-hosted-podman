@@ -58,3 +58,4 @@ Hedgedoc es una aplicación web de wiki colaborativa que utiliza la base de dato
 ## Follow-ups
 - ⚠️ Nombres de volumen **invertidos** (`hedgedoc-data` = BD de MariaDB; `hedgedoc-config` = config de la app). Documentado y **no se renombra** para no romper datos existentes.
 - La app Hedgedoc usa el secreto `hedgedoc_db_pass` (`DB_PASS`) y MariaDB usa `hedgedoc_mysql_password` (`MYSQL_PASSWORD`); deben contener **el mismo valor** aunque sean secretos distintos. No se han unificado en este cambio.
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 200 (`https://doc.${FQDN}`); **purgado** tras la verificación.

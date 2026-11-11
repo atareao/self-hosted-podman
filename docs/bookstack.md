@@ -116,3 +116,4 @@ mkdir -p /tmp/qd/bookstack && cp .config/containers/available/bookstack/* /tmp/q
   (**siempre `podman secret create`, nunca `crypta store`**). Rotar la `APP_KEY` con datos ya creados
   invalida las sesiones/cifrados previos, así que solo debe rellenarse en el primer despliegue.
 - No aplica hardening adicional (`ReadOnly`, `NoNewPrivileges`); evaluar `ReadOnly` en la BD.
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 302 en `/` y 200 en `/login` (`https://bookstack.${FQDN}`); **purgado** tras la verificación.

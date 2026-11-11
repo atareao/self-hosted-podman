@@ -43,3 +43,4 @@ Umami Analytics: plataforma de analítica web ligera y respetuosa con la privaci
 - `umamidb_password` y `umami_database_url` deben coincidir (misma contraseña embebida en la URL).
 - No aplica hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`Group`); evaluar añadirlo.
 - Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 200 en `/` y `/login` (`https://umami.${FQDN}`); **purgado** tras la verificación.

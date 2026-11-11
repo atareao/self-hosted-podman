@@ -83,3 +83,4 @@ printf '%s' '<valor>' | podman secret create snibox_secret_key_base -
 - `MAILGUN_SMTP_LOGIN` y `MAILGUN_DOMAIN` están vacíos en el quadlet; el envío de correo no funcionará hasta rellenarlos.
 - **Imágenes EOL:** `snibox` usa `nginx-puma:1.15.9` y `snibox-postgresql` usa `postgres:10.7-alpine`, ambas fuera de soporte (PostgreSQL 10 EOL desde nov-2022). Se mantienen los tags tal cual (no se suben a ciegas) con `AutoUpdate=registry`, que solo aplica parches del mismo tag. Migrar de major (nginx-puma y PostgreSQL) requiere pruebas de la app Rails y un dump/restore de la BD.
 - Sin healthchecks ni hardening (`User`, `NoNewPrivileges`, `ReadOnly`) en ninguno de los tres contenedores.
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 302 (`https://snibox.${FQDN}`); **purgado** tras la verificación.

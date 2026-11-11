@@ -96,3 +96,4 @@ mkdir -p /tmp/qd/focalboard && cp .config/containers/available/focalboard/* /tmp
   migrar a la alternativa mantenida si se usa en producción.
 - Sin `HealthCmd` en la app: no hay endpoint fiable verificado en esta ronda.
 - No aplica hardening (`ReadOnly`, `NoNewPrivileges`, `User`/`Group`); evaluar añadirlo.
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 200 (`https://focalboard.${FQDN}`); **purgado** tras la verificación.

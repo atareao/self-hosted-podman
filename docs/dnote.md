@@ -63,3 +63,4 @@
 ## Follow-ups
 - **PostgreSQL 11 EOL**: `dnote-postgres` usa `docker.io/library/postgres:11-alpine` (rama 11 sin soporte desde nov-2023). Se ha fijado el tag tal cual (no se sube a ciegas) y se le ha añadido `AutoUpdate=registry` para el día que se decida migrar. dnote **no está probado con PostgreSQL moderno**: antes de subir de versión hay que hacer un dump/restore y validar la app. No cambiar el tag sin pruebas.
 - El bind de datos `~/.config/dnote/dnote_data` no tiene backup automatizado propio; incluirlo en la política de copias.
+- **Verificado E2E el 2026-11-11 (PLAN-031 / issue #26)**: HTTP final 302 (`https://dnote.${FQDN}`); **purgado** tras la verificación.
