@@ -1,6 +1,6 @@
 # Estado de verificación E2E de los stacks
 
-Última actualización: 2026-11-11.
+Última actualización: 2026-11-12.
 
 Inventario de fiabilidad del repo: distingue lo que ya se ha **probado end-to-end en producción**
 de lo que sólo existe como quadlet + doc sin validar en el host real.
@@ -24,15 +24,17 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 71 |
+| Verificados E2E (probados y purgados) | 77 |
 | Bloqueados / hallazgos (ver sección) | 2 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **50** |
+| **Sin verificar E2E** | **44** |
 
 ## Verificados E2E (probados y purgados)
 
-Todos entre el **2026-11-09** y el **2026-11-11** (el **lote 3**, los seis últimos — `bookstack`, `dnote`,
-`focalboard`, `snibox`, `umami` y `hedgedoc` —, es del **2026-11-11**): desplegados, verificados end-to-end y
+Todos entre el **2026-11-09** y el **2026-11-12** (el **lote 3** — `bookstack`, `dnote`,
+`focalboard`, `snibox`, `umami` y `hedgedoc` — es del **2026-11-11**; el **lote 4** — `wallabag`,
+`vscode`, `whisper`, `unbound`, `watchbeat` y `publirs` —, del **2026-11-11/12**): desplegados,
+verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
 
@@ -109,6 +111,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | snibox | `docs/snibox.md` | PLAN-031 / #26 | 302 | fix: nginx añadido a `snibox.network` (daba 502) y `snibox_postgres_password` compartido app/BD |
 | umami | `docs/umami.md` | PLAN-031 / #26 | 200 (/ y /login) | fix: `Requires=`/`After=` apuntaban a `umamidb.service` → `umami-postgresql.service` (la unit no cargaba) |
 | hedgedoc | `docs/hedgedoc.md` | PLAN-031 / #26 | 200 | fix: faltaban `Requires=`/`After=` hacia MariaDB; sin `PodmanArgs=--init` (imagen LSNG/s6-overlay exige PID 1) |
+| wallabag | `docs/wallabag.md` | PLAN-032 / #27 | 302 (/), 200 (/login) | fix: quitado el placeholder sin sustituir de `SYMFONY__ENV__SERVER_NAME`; las migraciones del 1.er arranque crean `~/.config/wallabag/data/db/wallabag.sqlite` (SQLite); sin reinicios |
+| vscode | `docs/vscode.md` | PLAN-032 / #27 | 302 (/), 200 (/login) | imagen LSNG sin `--init` (correcto); login con el secreto `vscode_password` |
+| whisper | `docs/whisper.md` | PLAN-032 / #27 | 200 (/docs), 307 (/) | **interno, sin Traefik** (excepción); fix: imagen `:latest` (prod sin GPU NVIDIA), modelo `small`, host 9001→contenedor 9000 (colisión con authentik); 1.er arranque ~200 s (pull de 5,31 GB) |
+| unbound | `docs/unbound.md` | PLAN-032 / #27 | n/a | **interno, sin Traefik** (excepción); fix: publica **5353** (rootless no puede enlazar el 53) y monta la config por el include real de la imagen; recursión verificada (`NOERROR` con `ad`); ACL de la IP de host pendiente (comentada) |
+| watchbeat | `docs/watchbeat.md` | PLAN-032 / #27 | 200 (/), 200 (/health), 303 (/auth/login) | fix: issuer OIDC real de PocketID + redirect al **subdominio**; healthcheck en `127.0.0.1` + `AddHost=auth.${FQDN}:host-gateway`; **OIDC pendiente** (no existe cliente `watchbeat` en PocketID y `watchbeat_oidc_client_secret` quedó con placeholder) |
+| publirs | `docs/publirs.md` | PLAN-032 / #27 | 200 (/api/v1/status) | 2 units (`publirs` + `publirs-croni`); fix: expuesto por Traefik en `publirs.${FQDN}`, `crontab.txt` montado en croni, quitado el bind a `/etc/timezone`; croni carga las 3 tareas; `publirs_token` **placeholder** (envío a Telegram no probado) |
 
 ## Bloqueados / hallazgos
 
@@ -124,6 +132,15 @@ Hallazgo transversal (PLAN-031 / #26): `PodmanArgs=--init` es **incompatible** c
 `s6-overlay-suexec: fatal: can only run as pid 1`. Se omitió `--init` en los quadlets afectados. Ver
 `docs/bookstack.md` y `docs/hedgedoc.md`.
 
+### Pendientes abiertos del lote 4 (PLAN-032 / #27)
+
+Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con follow-ups abiertos (no bloquean la ronda):
+
+- **watchbeat:** falta registrar el cliente OIDC `watchbeat` en PocketID; `watchbeat_oidc_client_secret` quedó con **placeholder**, así que el login no funciona de extremo a extremo.
+- **publirs:** `publirs_token` quedó con **placeholder** → el envío a Telegram no se ha probado.
+- **publirs (croni):** las 3 tareas del `crontab.txt` invocan `publish_tip`/`publish_poll` por **GET** y la API responde 404/405 (probablemente requiera **POST**) → esos jobs fallarán.
+- **unbound:** la ACL de la IP del host sigue **comentada**; el puerto **53 del host queda sin cubrir a propósito** (limitación rootless, ver nota abajo).
+
 ## En producción (desplegados y corriendo)
 
 | Stack | Doc | Estado |
@@ -133,7 +150,7 @@ Hallazgo transversal (PLAN-031 / #26): `PodmanArgs=--init` es **incompatible** c
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (50)
+## Sin verificar E2E (44)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
@@ -144,10 +161,10 @@ gitea, grafana-influx-telegraf, huginn,
 immich, invidious, jellystat, matrix, matrixmail,
 miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
 odoo, open-webui, photoprism,
-pinepods, planka, plausible, postgres, publirs, rabbitmq,
+pinepods, planka, plausible, postgres, rabbitmq,
 registry, simple-torrent, socks5,
-tick, unbound, vector, vscode,
-wallabag, watchbeat, weaviate, webdav, wger, whisper, wordpress, wordpress-wp1, wordpress-wp2,
+tick, vector,
+weaviate, webdav, wger, wordpress, wordpress-wp1, wordpress-wp2,
 zennotes.
 
 ## Notas
@@ -165,3 +182,4 @@ zennotes.
 - PLAN-027 (issue #22): ronda E2E lote 1 (alloy, apimail, couchdb, dim, ghost, kanboard). Verificados y purgados: couchdb, dim, ghost, kanboard. Corregidos bugs latentes de `ghost` (url + bind `lig`→`lib`) y `kanboard` (bind `bar`→`var`). `apimail` funcional pero bloqueado por #23; `alloy` bloqueado por OIDC. Cifras: 127 = 59 verificados + 4 en producción + 2 bloqueados + 62 sin verificar.
 - PLAN-030 (issue #25): ronda E2E lote 2 **completada** — verificados y purgados: `atuin`, `beszel`, `radicale`, `wakapi`, `wikijs` y `zincsearch`. Bugs latentes corregidos: atuin (imagen oficial + `Exec=start`, PG 18 con volumen en `/var/lib/postgresql`, red de BD), beszel (login por contraseña, agente SSH/TCP con clave del hub, volumen `beszel-socket` eliminado), radicale (router `expulsabot`→`radicale`, binds uid 1000, htpasswd apr1/md5), wikijs (`DB_HOST` `db`→`postgres`, service port 80→3000). Cifras: 127 = 65 verificados + 4 en producción + 2 bloqueados + 56 sin verificar.
 - PLAN-031 (issue #26): ronda E2E lote 3 **completada** — verificados y purgados: `bookstack`, `dnote`, `focalboard`, `snibox`, `umami` y `hedgedoc`. Bugs latentes corregidos: umami (`Requires=`/`After=` → `umami-postgresql.service`), focalboard (PG 18 con volumen en `/var/lib/postgresql`, secretos `focalboard_postgres_password` + `focalboard_database_url`, bind `config.json` → `FOCALBOARD_DBTYPE=postgres`), bookstack (app en `bookstack.network`, binds separados app/BD, `APP_KEY` por secreto, `DB_USERNAME`/`DB_PASSWORD`), dnote (app en `dnote.network`, secreto único de BD, service port 3001), snibox (nginx en `snibox.network`, `snibox_postgres_password` compartido) y hedgedoc (`Requires=`/`After=` hacia MariaDB). Regla nueva: sin `PodmanArgs=--init` en imágenes LinuxServer.io (s6-overlay exige PID 1). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 71 verificados + 4 en producción + 2 bloqueados + 50 sin verificar.
+- PLAN-032 (issue #27): ronda E2E lote 4 **completada** — verificados y purgados: `wallabag`, `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs`. Bugs latentes corregidos: wallabag (placeholder `SYMFONY__ENV__SERVER_NAME`), whisper (imagen `:latest` sin GPU + modelo `small` + host 9000→9001), unbound (publica 5353 y config por el include real de la imagen), watchbeat (issuer OIDC real + redirect al subdominio, healthcheck en `127.0.0.1` + `AddHost`), publirs (Traefik en `publirs.${FQDN}`, `crontab.txt` en croni, sin bind a `/etc/timezone`). Excepciones internas sin Traefik: `whisper` y `unbound`. Pendientes abiertos en la sección «Bloqueados / hallazgos». Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 77 verificados + 4 en producción + 2 bloqueados + 44 sin verificar.
