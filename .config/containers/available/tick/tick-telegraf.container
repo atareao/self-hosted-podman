@@ -10,7 +10,7 @@ StartLimitBurst=3
 Image=docker.io/library/telegraf:latest
 AutoUpdate=registry
 ContainerName=tick-telegraf
-PodmanArgs=--init
+PodmanArgs=--init --group-add keep-groups
 
 # ==== Command ====
 
@@ -47,8 +47,7 @@ HealthTimeout=5s
 HealthStartPeriod=30s
 
 # ==== Hardening ====
-AddCapability=cap_net_raw
-AddCapability=cap_net_bind_service
+User=telegraf
 
 # ==== Resources ====
 
