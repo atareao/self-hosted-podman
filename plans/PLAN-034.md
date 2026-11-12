@@ -3,7 +3,7 @@
 
 - **Issue:** #29
 - **Fecha:** 2026-11-12
-- **Estado:** EN CURSO (tick ✅ verificado E2E y purgado; 5 stacks pendientes)
+- **Estado:** COMPLETADO (tick, mumble, cells, chevereto y jellystat ✅ verificados E2E y purgados; mysteryshack bloqueado por imagen inexistente)
 
 ## Objetivo
 
@@ -64,8 +64,9 @@ Excepción documentada: stacks sin dominio propio (servicio interno, sin labels 
 - **`tick`** — ✅ verificado E2E (5/5) y purgado el 2026-11-12. Correcciones: `telegraf.conf` creado y adaptado a Telegraf 1.40; `influxdb:2.7` + `/var/lib/influxdb2` + setup por secretos; `tick-telegraf` con `User=telegraf` y `--group-add keep-groups`; dependencias telegraf→influxdb y healthchecks en los 3. Purga sin `--data` (binds versionados). Nota: se usaron certificados LE de producción, no staging.
 - **`mumble`** — ✅ verificado E2E (5/5, con excepción TCP/UDP: puerto 64738 tcp/udp publicado y alcanzable desde el exterior, proceso `mumble-server` vivo) y purgado el 2026-11-12. Corrección extra detectada en despliegue: healthcheck de `mumble-recorder` comprobaba `ffmpeg` (solo presente bajo audio) → ahora comprueba el proceso Python real.
 - **`mysteryshack`** — ⛔ BLOQUEADO: su imagen `docker.io/atareao/mysteryshack:v1.0` no existe en ningún registro (nunca se publicó; el repo origen la construía localmente con base `ubuntu:18.04`/`libssl1.0.0`, hoy EOL). Documentado en `docs/mysteryshack.md`. Requiere decisión de re-publicar imagen o migrar a la upstream.
-- **`cells`, `chevereto`, `jellystat`** — correcciones estáticas aplicadas y en `main`; aún **no desplegados**.
+- **`cells`, `chevereto`, `jellystat`** — ✅ verificados E2E (5/5) y purgados el 2026-11-12.
 - **Hallazgo fuera de alcance:** `grafana-influx-telegraf` figura como verificado en `docs/estado-verificacion-e2e.md` pero está roto (su unit monta `%h/.config/grafana-influx-telegraf/telegraf.conf`, directorio inexistente en el repo, y su telegraf no lleva `User`/`keep-groups`). Requiere plan propio.
+- **Lote cerrado:** 127 = 88 verificados + 4 en producción + 3 bloqueados + 32 sin verificar.
 
 ## Tareas
 

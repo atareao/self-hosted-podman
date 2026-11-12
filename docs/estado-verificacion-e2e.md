@@ -24,10 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 83 |
-| Bloqueados / hallazgos (ver sección) | 2 |
+| Verificados E2E (probados y purgados) | 88 |
+| Bloqueados / hallazgos (ver sección) | 3 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **38** |
+| **Sin verificar E2E** | **32** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -35,7 +35,8 @@ Todos entre el **2026-11-09** y el **2026-11-12** (el **lote 3** — `bookstack`
 `focalboard`, `snibox`, `umami` y `hedgedoc` — es del **2026-11-11**; el **lote 4** — `wallabag`,
 `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs` —, del **2026-11-11/12**; el **lote 5** —
 `mtproxy`, `simple-torrent`, `socks5`, `webdav`, `miniflux-client` y `zennotes` — se verificó y
-purgó el **2026-11-12**): desplegados,
+purgó el **2026-11-12**; el **lote 6** — `tick`, `mumble`, `cells`, `chevereto` y `jellystat` — se
+verificó y purgó el **2026-11-12**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -125,6 +126,11 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | webdav | `docs/webdav.md` | PLAN-033 / #28 | 401 | cert LE real; bind `htpasswd` (bcrypt, user `admin`) + `share/` |
 | zennotes | `docs/zennotes.md` | PLAN-033 / #28 | 200 | cert LE real; secreto `zennotes_auth_token`; contenedor `healthy` |
 | miniflux-client | `docs/miniflux-client.md` | PLAN-033 / #28 | n/a | **interno, sin Traefik** (excepción); solo **arranque** verificado: arranca y hace panic al no alcanzar `miniflux.servidorlinux.es` (dependencia `miniflux`/`matrix` no desplegadas) → **bloqueado por dependencia** |
+| tick | `docs/tick.md` | PLAN-034 / #29 | 302 (/), 200 (influxdb) | 3 contenedores; `telegraf.conf` creado; InfluxDB 2.7; certs LE reales |
+| mumble | `docs/mumble.md` | PLAN-034 / #29 | n/a | **interno TCP/UDP** (excepción); puerto 64738; certs autofirmados |
+| cells | `docs/cells.md` | PLAN-034 / #29 | 200 | 2 contenedores; `MYSQL_DATABASE`/`MYSQL_USER` por `cells.env`; dependencia app→MySQL |
+| chevereto | `docs/chevereto.md` | PLAN-034 / #29 | 302 | service port 8080; `User=0`; healthcheck con `curl` |
+| jellystat | `docs/jellystat.md` | PLAN-034 / #29 | 200 | 2 contenedores; `POSTGRES_*` por `jellystat.env`; dependencia app→PostgreSQL |
 
 ## Bloqueados / hallazgos
 
@@ -134,6 +140,7 @@ Desplegados y funcionales a nivel de servicio, pero **no verificados E2E complet
 |---|---|---|
 | apimail | Sirve OK (`/api/health` → 200 JSON, cert LE staging), pero **no arranca en frío**: el healthcheck de conmon sale con exit 125 por el bug de secretos con driver externo (`shell`) + `type=env` (afecta a 13 units). | Issue #23 / `plans/PLAN-028.md` |
 | alloy | Requiere un cliente **OIDC real** en PocketID (`OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URL`); sin él la discovery falla y el contenedor sale con `exit=1` (crash-loop). | — |
+| mysteryshack | La imagen `docker.io/atareao/mysteryshack:v1.0` no existe en Docker Hub ni en GHCR (404); nunca se publicó. El repo origen la construía con `ubuntu:18.04`/`libssl1.0.0` (EOL). | `docs/mysteryshack.md` |
 
 Hallazgo transversal (PLAN-031 / #26): `PodmanArgs=--init` es **incompatible** con las imágenes LinuxServer.io
 (`lscr.io/linuxserver/*`): usan s6-overlay y exigen ser PID 1, y abortan con
@@ -158,20 +165,19 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (38)
+## Sin verificar E2E (32)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-authentik, caddy, cells,
-chevereto, codimd, crowdsec, dev,
+authentik, caddy, codimd, crowdsec, dev,
 facturascripts, firefly,
 gitea, grafana-influx-telegraf, huginn,
-immich, invidious, jellystat, matrix, matrixmail,
-miniflux, mumble, mysteryshack, nextcloud, nitter,
+immich, invidious, matrix, matrixmail,
+miniflux, nextcloud, nitter,
 odoo, open-webui, photoprism,
 pinepods, planka, plausible, postgres, rabbitmq,
 registry,
-tick, vector,
+vector,
 weaviate, wger, wordpress, wordpress-wp1, wordpress-wp2.
 
 ## Notas

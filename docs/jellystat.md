@@ -32,5 +32,23 @@ Conecta a proxy.network y jellystat.network, volúmenes back-up y base de datos,
 2. `cd .config/containers/available/jellystat && qctl install`
 3. `systemctl --user daemon-reload`
 
+## Verificación E2E (2026-11-12)
+
+Verificado en producción (`new_atareao`, usuario `runner`) y después purgado:
+
+1. Units `jellystat-db` y `jellystat` → `active`.
+2. Contenedores `jellystat-db` y `jellystat` → `Up (healthy)`.
+3. Router `jellystat` registrado en Traefik.
+4. Certificado Let's Encrypt válido para `jellystat.${FQDN}`.
+5. `https://jellystat.${FQDN}` → `200` (interfaz de Jellystat).
+
+Bugs latentes corregidos para llegar hasta aquí:
+
+- Faltaba la dependencia `Requires=`/`After=` de `jellystat` hacia `jellystat-db`.
+- `POSTGRES_USER`/`POSTGRES_DB` se declaraban en `Environment=` sin `EnvironmentFile`; se movieron a `jellystat.env`.
+- No había healthchecks en ninguno de los dos contenedores.
+
+Purga: `qctl purge --secrets --images`. Sin restos.
+
 ## Follow-ups
 - (ninguno)

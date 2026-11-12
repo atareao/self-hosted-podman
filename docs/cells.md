@@ -43,5 +43,23 @@ User/UserNS/NoNewPrivileges: N/A
 2. `cd .config/containers/available/cells && qctl install`
 3. `systemctl --user daemon-reload`
 
+## Verificación E2E (2026-11-12)
+
+Verificado en producción (`new_atareao`, usuario `runner`) y después purgado:
+
+1. Units `cells-mysql` y `cells` → `active`.
+2. Contenedores `cells-mysql` y `cells` → `Up (healthy)`.
+3. Router `cells` registrado en Traefik.
+4. Certificado Let's Encrypt válido para `cells.${FQDN}`.
+5. `https://cells.${FQDN}` → `200` (interfaz de Pydio Cells).
+
+Bugs latentes corregidos para llegar hasta aquí:
+
+- `MYSQL_DATABASE`/`MYSQL_USER` se definían como `$MYSQL_DATABASE`/`$MYSQL_USER` sin origen: se movieron a `cells.env` y se cargan con `EnvironmentFile`.
+- Faltaba la dependencia `Requires=`/`After=` de `cells` hacia `cells-mysql`.
+- No había healthchecks en ninguno de los dos contenedores.
+
+Purga: `qctl purge --secrets --images`. Sin restos.
+
 ## Follow-ups
 - (ninguno)
