@@ -1,4 +1,3 @@
 [Network]
 NetworkName=proxy
-DisableDNS=true
 Options=isolate=strict

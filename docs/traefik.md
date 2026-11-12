@@ -6,7 +6,7 @@ Traefik es el **edge router** del host: reverse proxy que descubre los servicios
 
 - **App / imagen (`Image=`):** `docker.io/library/traefik:latest`, contenedor `traefik`.
 - **Nº contenedores:** 1.
-- **Red:** `proxy.network` (red edge, `NetworkName=proxy`, `DisableDNS=true`, `Options=isolate=strict`), que el resto de stacks se unen para ser enrutados.
+- **Red:** `proxy.network` (red edge, `NetworkName=proxy`, `Options=isolate=strict`), que el resto de stacks se unen para ser enrutados.
 - **Dominio:** no declara labels `traefik.*` (es el propio router). Sirve `${FQDN}` y todos los subdominios `<stack>.${FQDN}` según los routers de cada stack.
 - **Puertos:** no usa `PublishPort`; escucha 80/443 mediante **socket activation** de systemd (`Sockets=http.socket https.socket`, `Requires=http.socket https.socket podman.socket`).
 - **Extra:** `AddHost=auth.${FQDN}:host-gateway` para que el contenedor resuelva el servicio de auth del host.
@@ -23,7 +23,7 @@ Traefik es el **edge router** del host: reverse proxy que descubre los servicios
 
 ## Cómo funciona
 
-- **Redes:** `proxy.network` es la red edge compartida; el resto de stacks se unen a ella para que Traefik los descubra. Se define con `DisableDNS=true` y `Options=isolate=strict`.
+- **Redes:** `proxy.network` es la red edge compartida; el resto de stacks se unen a ella para que Traefik los descubra. Se define con `Options=isolate=strict`.
 - **Descubrimiento de servicios:** monta el socket de Podman del usuario en solo lectura (`%t/podman/podman.sock:/var/run/docker.sock:ro`) y `Notify=true`, de modo que Traefik detecta los contenedores y sus labels `traefik.*` en caliente.
 - **Volúmenes:**
   - `%h/.config/traefik/traefik.yml` → `/etc/traefik/traefik.yml` (config estática, `:ro,Z`).
