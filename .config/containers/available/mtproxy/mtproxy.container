@@ -8,6 +8,7 @@ StartLimitBurst=3
 # ==== Image ====
 Image=ghcr.io/dofamin/mtproxy-docker:main
 ContainerName=mtproxy
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====

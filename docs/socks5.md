@@ -8,20 +8,18 @@ Stack de un **único contenedor** que expone un proxy SOCKS5 autenticado por usu
 - **Nº contenedores:** 1.
 - **Red:** ninguna (`Network=` no declarado) → usa la red por defecto de Podman; **no** se une a `proxy.network` ni pasa por Traefik.
 - **Dominio:** no aplica (no hay labels Traefik ni router).
-- **Puerto interno / publicado:** `8388` (`PublishPort=8388:8388`), expuesto directamente al host (no detrás de Traefik).
+- **Puerto interno / publicado:** `8388` interno, publicado en `8389` (`PublishPort=8389:8388`), expuesto directamente al host (no detrás de Traefik). El `8388` del host queda reservado para mtproxy.
 
 ## Ficheros
 
 - Quadlet(s): `.config/containers/available/socks5/socks5.container`
 - Volumen(es): ninguno (no hay fichero `.volume`).
 - Config no secreta: no existe `.env` de stack (no hay `.config/socks5/`).
-- Fichero de config montado: `%h/.config/socks5/config.json` → `/etc/shadowsocks-rust/config.json` (bind mount, no versionado en el stack).
 - Secretos: `socks5_proxy_password`.
 
 ## Cómo funciona
 
-- **Red:** el quadlet no declara `Network=`, por lo que el contenedor queda en la red por defecto de Podman. No se integra con `proxy.network` ni con el enrutado de Traefik: el único acceso es el puerto publicado `8388` en el host.
-- **Volumen:** bind mount del fichero de configuración `%h/.config/socks5/config.json` sobre `/etc/shadowsocks-rust/config.json` (con `:Z`). Es una ruta de host, no un volumen nombrado, y no está versionada.
+- **Red:** el quadlet no declara `Network=`, por lo que el contenedor queda en la red por defecto de Podman. No se integra con `proxy.network` ni con el enrutado de Traefik: el único acceso es el puerto publicado `8389` en el host.
 - **Secretos:** `socks5_proxy_password` se inyecta como variable de entorno con `Secret=socks5_proxy_password,type=env,target=PROXY_PASSWORD` (driver `crypta`). No hay `EnvironmentFile`.
 - **Socket del daemon:** no aplica (no monta `podman.sock`).
 - **Healthcheck:** no define `Health*`.
@@ -35,9 +33,9 @@ Stack de un **único contenedor** que expone un proxy SOCKS5 autenticado por usu
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
 | `PROXY_USER` | `socks5.container` (`Environment=`) | `someuser` | Usuario para autenticarse en el proxy SOCKS5 |
-| `PROXY_PORT` | `socks5.container` (`Environment=`) | `8388` | Puerto de escucha del proxy |
+| `PROXY_PORT` | `socks5.container` (`Environment=`) | `8388` | Puerto de escucha interno del proxy |
 | `PROXY_PASSWORD` | `socks5.container` (`Secret=socks5_proxy_password`) | *(secreto)* | Password del proxy SOCKS5 |
-| `8388` | `socks5.container` (`PublishPort=8388:8388`) | `8388` | Puerto publicado en el host |
+| `8389` | `socks5.container` (`PublishPort=8389:8388`) | `8389` | Puerto publicado en el host (el `8388` queda para mtproxy) |
 
 No hay `.env` de stack para este servicio.
 
@@ -55,6 +53,6 @@ printf '%s' '<valor>' | podman secret create socks5_proxy_password -
 ## Follow-ups
 
 - `PROXY_USER=someuser` es un valor placeholder: cámbialo antes de exponer el proxy.
-- El `PublishPort=8388:8388` expone el proxy directamente al host sin TLS ni filtrado por Traefik; conviene restringir el acceso por firewall (nftables) al puerto 8388.
-- Inconsistencia a revisar: la imagen es `serjs/go-socks5-proxy` pero el fichero se monta en `/etc/shadowsocks-rust/config.json`; verificar que la ruta de configuración es la que espera la imagen.
+- El `PublishPort=8389:8388` expone el proxy directamente al host sin TLS ni filtrado por Traefik; conviene restringir el acceso por firewall (nftables) al puerto 8389.
+- El puerto `8388` del host queda reservado para mtproxy, por lo que no se publica en este stack.
 - Sin healthcheck ni hardening.

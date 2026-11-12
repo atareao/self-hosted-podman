@@ -10,19 +10,22 @@ Puerto interno: 8080
 
 ## Ficheros
 - Quadlet(s): `/data/self-hosted-podman/.config/containers/available/webdav/webdav.container`
-- Volumen(es): ninguno (volúmenes definidos directamente)
+- Volumen(es): 2 binds (`%h/.config/webdav/share` → `/share` y `%h/.config/webdav/htpasswd` → `/opt/nginx/conf/.htpasswd`)
 - Config no secreta: ninguno
-- Secretos: ninguno
+- Secretos: `htpasswd` es credencial (credenciales de autenticación básica, no un secreto de Podman)
 
 ## Cómo funciona
-El contenedor se une a la red `proxy.network` y expone el puerto 8080 a Traefik. Se monta el directorio de compartición en `/share` y el archivo `.htpasswd` para la autenticación. Traefik dirige las peticiones a `webdav.${FQDN}`.
+El contenedor se une a la red `proxy.network` y expone el puerto 8080 a Traefik. Se monta el directorio de compartición en `/share` y el archivo `htpasswd` en `/opt/nginx/conf/.htpasswd` para la autenticación básica. Traefik dirige las peticiones a `webdav.${FQDN}`.
 
 ## Variables / configuración
 (ninguna)
 
 ## Cómo habilitar / desplegar
-1. `cd .config/containers/available/webdav && qctl install`
-2. `systemctl --user daemon-reload`
+1. Crear en prod los bind mounts **antes** de arrancar:
+   - `%h/.config/webdav/share/` (directorio de compartición)
+   - `%h/.config/webdav/htpasswd` (fichero de credenciales, p. ej. generado con `htpasswd -Bc`)
+2. `cd .config/containers/available/webdav && qctl install`
+3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- `%h/.config/webdav/htpasswd` y `%h/.config/webdav/share/` deben existir en prod antes de arrancar el contenedor.

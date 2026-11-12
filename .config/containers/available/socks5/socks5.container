@@ -15,10 +15,9 @@ PodmanArgs=--init
 
 
 # ==== Ports ====
-PublishPort=8388:8388
+PublishPort=8389:8388
 
 # ==== Volumes ====
-Volume=%h/.config/socks5/config.json:/etc/shadowsocks-rust/config.json:Z
 
 # ==== Networks ====
 

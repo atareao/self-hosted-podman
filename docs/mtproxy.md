@@ -35,4 +35,4 @@
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- El puerto `8388` queda expuesto directamente a Internet (sin Traefik ni TLS); revisar la configuración de nftables para restringirlo o protegerlo.
