@@ -17,7 +17,7 @@ PodmanArgs=--init
 # ==== Ports ====
 
 # ==== Volumes ====
-Volume=%h/.config/tick/telegraf.conf:/etc/telegraf/telegraf.conf:ro,Z
+Volume=%h/.config/tick/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=/sys:/host/sys:ro
 Volume=/proc:/host/proc:ro
@@ -47,6 +47,8 @@ HealthTimeout=5s
 HealthStartPeriod=30s
 
 # ==== Hardening ====
+AddCapability=cap_net_raw
+AddCapability=cap_net_bind_service
 
 # ==== Resources ====
 
