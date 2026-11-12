@@ -34,8 +34,9 @@ Environment=FFMPEG_OUT="-c:v copy -c:a copy -f flv rtmp://127.0.0.1:1935/live/{n
 # ==== Labels ====
 
 # ==== Healthcheck ====
-# ffmpeg lo lanza el recorder por canal; la imagen no trae procps.
-HealthCmd=grep -qx ffmpeg /proc/[0-9]*/comm || exit 1
+# El demonio del recorder es el interprete Python (la imagen no trae procps);
+# ffmpeg solo aparece cuando hay audio en un canal, no sirve como senal de vida.
+HealthCmd=grep -q python3 /proc/[0-9]*/comm || exit 1
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s

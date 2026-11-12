@@ -23,7 +23,7 @@
 - **Secretos:** `MUMBLE_SUPERUSER_PASSWORD` inyectado con `Secret=mumble_superuser_password,type=env,target=MUMBLE_SUPERUSER_PASSWORD`.
 - **EnvironmentFile:** ambos contenedores cargan `.config/mumble/mumble.env` y después `.config/mumble/mumble.env.local`. En `mumble` se añadió en esta revisión (antes solo lo tenía el recorder).
 - **Recorder:** `kaffetorsk/mumble-recorder` lee `SERVER` (host del servidor Mumble) del env file. Arranca después de `mumble.service` (`After=` + `Requires=`).
-- **Healthcheck:** `mumble` comprueba que el proceso `mumble-server` existe (`grep -qx mumble-server /proc/[0-9]*/comm`); `mumble-recorder` comprueba el proceso `ffmpeg` (`grep -qx ffmpeg /proc/[0-9]*/comm`). Se usa `/proc/<pid>/comm` porque ninguna de las dos imágenes trae `procps`/`pgrep`.
+- **Healthcheck:** `mumble` comprueba que el proceso `mumble-server` existe (`grep -qx mumble-server /proc/[0-9]*/comm`); `mumble-recorder` comprueba el proceso del intérprete Python (`python3`, `grep -q python3 /proc/[0-9]*/comm`), porque `ffmpeg` solo se lanza cuando hay audio en un canal y no sirve como señal de vida. Se usa `/proc/<pid>/comm` porque ninguna de las dos imágenes trae `procps`/`pgrep`.
 - **Traefik:** sin labels; se expone el puerto TCP/UDP 64738 con `PublishPort`.
 - **User:** no especificado (el entrypoint de la imagen hace `su-exec` a uid/gid 10000 por defecto dentro del contenedor).
 
@@ -56,5 +56,28 @@ Notas:
 - **Exposición**: publica `64738/tcp` y `64738/udp` directamente con `PublishPort` (no vía Traefik), por ser un protocolo no HTTP. Ver los invariantes de enrutado en `docs/traefik.md`.
 - **TLS**: al quitar `MUMBLE_CONFIG_SSL{CERT,KEY}` el servidor usa un certificado autofirmado generado por murmur (los clientes Mumble aceptan el fingerprint). Si se quiere certificado válido, la vía es ACME integrado (`ACME_DOMAIN`) o montar certs reales en `/data`.
 - **RTMP**: `mumble-recorder` apunta a `rtmp://127.0.0.1:1935/live/{name}` (dentro de su propio contenedor), pero **no hay servidor RTMP** en el stack: el recorder no podrá publicar el stream. Pendiente añadir un receptor RTMP (p. ej. nginx-rtmp/mediamtx) o cambiar `FFMPEG_OUT` a fichero local.
-- El healthcheck del recorder depende de que exista un proceso `ffmpeg`; si el recorder está conectado pero sin audio/grabación activa, el contenedor puede reportar `unhealthy` sin estar realmente roto.
 - El recorder no tiene `ReadOnly` ni `User` y escribe en el directorio de trabajo del contenedor; sin volumen, las grabaciones no persisten.
+
+## Verificación E2E (2026-11-12)
+
+Verificado en producción (`new_atareao`, usuario `runner`) y después purgado. `mumble` es TCP/UDP
+puro, así que los puntos 3-5 (router, certificado, HTTP) se sustituyen por alcance de puerto:
+
+1. Units `mumble` y `mumble-recorder` → `active`.
+2. Contenedores `mumble` y `mumble-recorder` → `Up (healthy)`.
+3. (excepción TCP/UDP) Puerto `64738/tcp` y `64738/udp` publicados en el host (`rootlessport`).
+4. (excepción TCP/UDP) `64738/tcp` alcanzable desde el exterior (`mumble.${FQDN}` resuelve y el
+   socket conecta; el servidor no envía banner porque espera el paquete inicial del cliente).
+5. Proceso `mumble-server` presente en el contenedor y el recorder conectado
+   (`Connected to mumble:64738` → `Recording in Root`).
+
+Bugs latentes corregidos para llegar hasta aquí:
+
+- `MUMBLE_CONFIG_SSLCERT`/`SSLKEY` apuntaban a `/certs/...` en un volumen vacío y rompían el TLS;
+  se eliminaron y murmur autogenera su certificado autofirmado en `/data`.
+- `mumble.container` no declaraba `EnvironmentFile` (solo el recorder).
+- La variable del recorder es `SERVER` (no `SERVER_IP`).
+- Healthcheck del recorder: pasó de comprobar `ffmpeg` (solo presente bajo audio) a comprobar el
+  proceso Python real.
+
+Purga: `qctl purge --secrets --images` (sin `--data`, porque los binds son ficheros versionados).
