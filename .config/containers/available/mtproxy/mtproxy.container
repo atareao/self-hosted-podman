@@ -27,6 +27,8 @@ PublishPort=8388:8889
 Secret=mtproxy_secret,type=env,target=SECRET
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/mtproxy/mtproxy.env
+EnvironmentFile=%h/.config/mtproxy/mtproxy.env.local
 Environment=MTPROTO_REPO_URL=https://github.com/TelegramMessenger/MTProxy
 Environment=WORKERS=1
 Environment=TZ=Europe/Madrid
