@@ -56,3 +56,12 @@ printf '%s' '<valor>' | podman secret create socks5_proxy_password -
 - El `PublishPort=8389:8388` expone el proxy directamente al host sin TLS ni filtrado por Traefik; conviene restringir el acceso por firewall (nftables) al puerto 8389.
 - El puerto `8388` del host queda reservado para mtproxy, por lo que no se publica en este stack.
 - Sin healthcheck ni hardening.
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado y verificado el **2026-11-12**: unit `active`, contenedor up y escucha en 8389
+(verificado por puerto). Servicio **interno, sin Traefik** (excepción documentada). Fix: quitado el
+bind inexistente a `/etc/shadowsocks-rust/config.json`; publica 8389 (el 8388 del host queda
+reservado a mtproxy); password por secreto `socks5_proxy_password`.
+
+Follow-up: `PROXY_USER=someuser` es placeholder; el 8389 queda sin TLS ni filtrado.

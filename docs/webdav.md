@@ -29,3 +29,11 @@ El contenedor se une a la red `proxy.network` y expone el puerto 8080 a Traefik.
 
 ## Follow-ups
 - `%h/.config/webdav/htpasswd` y `%h/.config/webdav/share/` deben existir en prod antes de arrancar el contenedor.
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado y verificado el **2026-11-12**: unit `active`, contenedor up, **cert Let's Encrypt real** y
+`401` vía Traefik en `webdav.servidorlinux.es`. Bind `~/.config/webdav/htpasswd` (user `admin`,
+bcrypt) + `~/.config/webdav/share/`.
+
+Follow-up: sin `HealthCmd`.

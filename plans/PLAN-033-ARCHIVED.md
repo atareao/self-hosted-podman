@@ -2,7 +2,7 @@
 
 - **Issue:** #28
 - **Fecha:** 2026-11-12
-- **Estado:** EN CURSO
+- **Estado:** COMPLETADO (2026-11-12)
 
 ## Objetivo
 
@@ -87,13 +87,13 @@ verifican por puerto/API y se anota en su `docs/`.
 
 ## Cierre
 
-- [ ] Revisión estática de los 6 stacks
-- [ ] Correcciones aplicadas
-- [ ] Secretos y configuración creados
-- [ ] 6 stacks desplegados
-- [ ] 5 puntos E2E verificados por stack
-- [ ] `docs/` actualizados
-- [ ] 6 stacks purgados
-- [ ] Inventario y cifras actualizados
-- [ ] Commit en `main` y plan archivado
-- [ ] `HANDOFF.md` actualizado
+- [x] Revisión estática de los 6 stacks
+- [x] Correcciones aplicadas
+- [x] Secretos y configuración creados
+- [x] 6 stacks desplegados
+- [x] 5 puntos E2E verificados por stack
+- [x] `docs/` actualizados
+- [x] 6 stacks purgados
+- [x] Inventario y cifras actualizados
+- [x] Commit en `main` y plan archivado
+- [x] `HANDOFF.md` actualizado

@@ -68,3 +68,10 @@ Para comprobar el estado: `systemctl --user status zennotes` o `journalctl --use
 - Si en el futuro la imagen publica su propio `HEALTHCHECK`, se puede eliminar el `HealthCmd` del quadlet.
 - No hay persistencia de volúmenes a menos que el volume `zennotes-data` exista; debe crearse con `podman volume create` o será creado automáticamente por quadlet.
 - Servido en subdominio propio desde PLAN-023 (antes reclamaba el apex `${FQDN}`, compartido con otros 3 stacks).
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado y verificado el **2026-11-12**: unit `active`, contenedor `healthy`, **cert LE real** y
+`200` vía Traefik en `zennotes.servidorlinux.es`. Secreto `zennotes_auth_token`.
+
+Sin follow-ups relevantes.

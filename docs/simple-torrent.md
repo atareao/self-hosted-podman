@@ -50,3 +50,14 @@
 ## Follow-ups
 - El JSON `cloud-torrent.json` no se versiona en el repo; debe crearse en prod antes de arrancar el contenedor.
 - El puerto de entrada de torrents de jpillora por defecto es 50007; el `PublishPort=50012:50012/udp` actual no lo cubre. Revisar si se quiere publicar/tagear ese puerto.
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado y verificado el **2026-11-12**: unit `active`, contenedor up y HTTP `401` en el puerto
+50012. Servicio **interno, sin Traefik** (excepción documentada). Fix: la imagen
+`docker.io/boypt/cloud-torrent` fue **retirada de Docker Hub** → se pasó a
+`docker.io/jpillora/cloud-torrent:latest` (upstream del fork), config `cloud-torrent.json` (**JSON**,
+no YAML) y `PORT=50012`; `AUTH` por secreto `simple_torrent_auth`.
+
+Follow-up: el puerto de entrada de torrents de jpillora por defecto es 50007; el
+`PublishPort=50012:50012/udp` no lo cubre.

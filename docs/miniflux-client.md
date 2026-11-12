@@ -50,3 +50,13 @@
 
 ## Follow-ups
 - **Sin enrutado por diseño**: el stack no declara labels de Traefik (igual que en el repo origen `atareao/self-hosted`); si hay que exponerlo, se añaden labels `Host(`<subdominio>.${FQDN}`)` propias. Ver los invariantes de enrutado en `docs/traefik.md`.
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado el **2026-11-12**: solo se verificó el **arranque** — arranca (v0.1.8, «Start») y hace
+**panic** al no poder conectar con `miniflux.servidorlinux.es` (dependencias `miniflux`/`matrix` no
+desplegadas) → **bloqueado por dependencia**. Servicio **interno, sin Traefik** (excepción
+documentada).
+
+Follow-up: bloqueado hasta desplegar `miniflux`/`matrix`; los 4 secretos quedaron con valores
+placeholder.

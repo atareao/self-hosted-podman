@@ -41,3 +41,14 @@ La imagen detecta la IP pública con `curl ifconfig.co/ip`; en este host eso dev
 
 ## Follow-ups
 - El puerto `8388` queda expuesto directamente a Internet (sin Traefik ni TLS); revisar la configuración de nftables para restringirlo o protegerlo.
+
+## Verificación E2E (PLAN-033 / #28)
+
+Desplegado y verificado el **2026-11-12**: unit `active`, contenedor `healthy` y escucha en el puerto
+8388. Servicio **interno, sin Traefik** (excepción documentada). Fix aplicado: la imagen forma
+`--nat-info` con la IPv6 de `curl ifconfig.co/ip` y `mtproto-proxy` abortaba
+(`cannot translate host ... in --nat-info`); se fuerza `IP=<IPv4 pública>` en
+`~/.config/mtproxy/mtproxy.env.local` (override de máquina, gitignored).
+
+Follow-ups: el puerto `8388` sigue expuesto a Internet sin TLS ni filtrado; la `IP` vive en
+`.env.local`, así que hay que recrearla si se re-despliega.

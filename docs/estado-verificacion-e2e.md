@@ -24,16 +24,18 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 77 |
+| Verificados E2E (probados y purgados) | 83 |
 | Bloqueados / hallazgos (ver sección) | 2 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **44** |
+| **Sin verificar E2E** | **38** |
 
 ## Verificados E2E (probados y purgados)
 
 Todos entre el **2026-11-09** y el **2026-11-12** (el **lote 3** — `bookstack`, `dnote`,
 `focalboard`, `snibox`, `umami` y `hedgedoc` — es del **2026-11-11**; el **lote 4** — `wallabag`,
-`vscode`, `whisper`, `unbound`, `watchbeat` y `publirs` —, del **2026-11-11/12**): desplegados,
+`vscode`, `whisper`, `unbound`, `watchbeat` y `publirs` —, del **2026-11-11/12**; el **lote 5** —
+`mtproxy`, `simple-torrent`, `socks5`, `webdav`, `miniflux-client` y `zennotes` — se verificó y
+purgó el **2026-11-12**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -117,6 +119,12 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | unbound | `docs/unbound.md` | PLAN-032 / #27 | n/a | **interno, sin Traefik** (excepción); fix: publica **5353** (rootless no puede enlazar el 53) y monta la config por el include real de la imagen; recursión verificada (`NOERROR` con `ad`); ACL de la IP de host pendiente (comentada) |
 | watchbeat | `docs/watchbeat.md` | PLAN-032 / #27 | 200 (/), 200 (/health), 303 (/auth/login) | fix: issuer OIDC real de PocketID + redirect al **subdominio**; healthcheck en `127.0.0.1` + `AddHost=auth.${FQDN}:host-gateway`; **OIDC pendiente** (no existe cliente `watchbeat` en PocketID y `watchbeat_oidc_client_secret` quedó con placeholder) |
 | publirs | `docs/publirs.md` | PLAN-032 / #27 | 200 (/api/v1/status) | 2 units (`publirs` + `publirs-croni`); fix: expuesto por Traefik en `publirs.${FQDN}`, `crontab.txt` montado en croni, quitado el bind a `/etc/timezone`; croni carga las 3 tareas; `publirs_token` **placeholder** (envío a Telegram no probado) |
+| mtproxy | `docs/mtproxy.md` | PLAN-033 / #28 | n/a | **interno, sin Traefik** (excepción); fix: `--nat-info` formado con IPv6 → override `IP=<IPv4>` en `mtproxy.env.local`; publica 8388→8889 |
+| simple-torrent | `docs/simple-torrent.md` | PLAN-033 / #28 | 401 | **interno, sin Traefik** (excepción); fix: imagen `boypt/cloud-torrent` retirada de Docker Hub → `docker.io/jpillora/cloud-torrent:latest` (config `cloud-torrent.json` JSON, `PORT=50012`); `AUTH` por secreto |
+| socks5 | `docs/socks5.md` | PLAN-033 / #28 | n/a | **interno, sin Traefik** (excepción); fix: quitado bind inexistente y publica 8389 (8388 reservado a mtproxy); verificado por puerto |
+| webdav | `docs/webdav.md` | PLAN-033 / #28 | 401 | cert LE real; bind `htpasswd` (bcrypt, user `admin`) + `share/` |
+| zennotes | `docs/zennotes.md` | PLAN-033 / #28 | 200 | cert LE real; secreto `zennotes_auth_token`; contenedor `healthy` |
+| miniflux-client | `docs/miniflux-client.md` | PLAN-033 / #28 | n/a | **interno, sin Traefik** (excepción); solo **arranque** verificado: arranca y hace panic al no alcanzar `miniflux.servidorlinux.es` (dependencia `miniflux`/`matrix` no desplegadas) → **bloqueado por dependencia** |
 
 ## Bloqueados / hallazgos
 
@@ -150,7 +158,7 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (44)
+## Sin verificar E2E (38)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
@@ -159,13 +167,12 @@ chevereto, codimd, crowdsec, dev,
 facturascripts, firefly,
 gitea, grafana-influx-telegraf, huginn,
 immich, invidious, jellystat, matrix, matrixmail,
-miniflux, miniflux-client, mtproxy, mumble, mysteryshack, nextcloud, nitter,
+miniflux, mumble, mysteryshack, nextcloud, nitter,
 odoo, open-webui, photoprism,
 pinepods, planka, plausible, postgres, rabbitmq,
-registry, simple-torrent, socks5,
+registry,
 tick, vector,
-weaviate, webdav, wger, wordpress, wordpress-wp1, wordpress-wp2,
-zennotes.
+weaviate, wger, wordpress, wordpress-wp1, wordpress-wp2.
 
 ## Notas
 
