@@ -30,5 +30,32 @@
 2. `cd .config/containers/available/mysteryshack && qctl install`
 3. `systemctl --user daemon-reload`
 
+## Estado: BLOQUEADO (2026-11-12)
+
+No se puede desplegar ni verificar E2E: la imagen `docker.io/atareao/mysteryshack:v1.0` **no
+existe** en ningún registro público (Docker Hub devuelve 404 para el repo `atareao/mysteryshack`;
+GHCR también falla para `v1.0` y `latest`). Verificado en producción el 2026-11-12:
+
+```
+podman pull docker.io/atareao/mysteryshack:v1.0   -> denied (repo inexistente)
+podman pull ghcr.io/atareao/mysteryshack:v1.0     -> FALLA
+podman pull ghcr.io/atareao/mysteryshack:latest   -> FALLA
+podman pull docker.io/atareao/mysteryshack:latest -> FALLA
+```
+
+La imagen se **construía localmente** en el repo origen (`atareao/self-hosted`, carpeta
+`mysteryshack/`) con `build: .` y se etiquetaba como `atareao/mysteryshack:v1.0`; nunca se publicó
+(o se retiró). Su `Dockerfile` es multi-stage: usa `bnjbvr/mysteryshack-docker` como *builder*
+(de 2017) y una base `ubuntu:18.04` con `libssl1.0.0` (ambas EOL), por lo que reconstruirla hoy
+exigiría actualizar la base y probablemente `libssl`.
+
+Alternativas evaluadas (todas de 2017, no recomendadas sin re-verificación):
+`bnjbvr/mysteryshack-docker` (imagen upstream no-oficial, requiere montar `config.ini`, un
+`create-user.sh` de un solo uso y el bind `/rs/data`) y `kapolos/mysteryshack`.
+
+Acción pendiente (fuera del alcance de PLAN-034): decidir entre (a) reconstruir y publicar la
+imagen con base actualizada, o (b) migrar el quadlet a la imagen upstream `bnjbvr/mysteryshack-docker`
+adaptando el entrypoint/usuario, y entonces verificar E2E.
+
 ## Follow-ups
 - (ninguno)
