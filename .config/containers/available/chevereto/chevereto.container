@@ -42,21 +42,24 @@ Environment=CHEVERETO_ASSET_STORAGE_BUCKET=/var/www/html/images/_assets
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.services.chevereto.loadbalancer.server.port=80
+Label=traefik.http.services.chevereto.loadbalancer.server.port=8080
 Label=traefik.http.routers.chevereto.rule=Host(`chevereto.${FQDN}`)
 Label=traefik.http.routers.chevereto.entrypoints=websecure
 Label=traefik.http.routers.chevereto.tls.certresolver=letsencrypt
 Label=traefik.http.routers.chevereto.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=wget -q --spider http://127.0.0.1/
+# La imagen no trae wget; usa curl. Apache sirve en 8080 (vhost *:8080).
+HealthCmd=curl -fsS -o /dev/null http://127.0.0.1:8080/
 HealthInterval=30s
 HealthRetries=3
 HealthStartPeriod=30s
 
 
 # ==== Hardening ====
-
+# La imagen declara USER www-data, pero su Apache con módulo ssl intenta bindear
+# 443 y aborta como usuario no privilegiado; como root arranca y sirve en 8080.
+User=0
 
 # ==== Resources ====
 

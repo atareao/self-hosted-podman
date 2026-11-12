@@ -7,7 +7,7 @@
 *nº contenedores*: 2
 *Red*: proxy.network, chevereto.network
 *Dominio*: Host(`chevereto.${FQDN}`)
-*Puerto interno*: 80 (chevereto)
+*Puerto interno*: 8080 (chevereto)
 
 ## Ficheros
 - Quadlet(s):
@@ -23,9 +23,9 @@
 Red: proxy.network (chevereto) y chevereto.network (chevereto + mariadb).
 Volúmenes: chevereto-data.volume -> /var/www/html/images, chevereto-mariadb.volume -> /var/lib/mysql.
 Secretos: chevereto_db_pass (compartido por app y MariaDB), chevereto_mariadb_root_password.
-Healthcheck: chevereto (`wget -q --spider http://127.0.0.1/`), MariaDB (`mariadb-admin ping -h 127.0.0.1`).
-Enrutado Traefik: Host(`chevereto.${FQDN}`), puerto 80, middleware seguridadHeaders@file, compresionHeaders@file.
-User/UserNS/NoNewPrivileges: N/A
+Healthcheck: chevereto (`curl -fsS -o /dev/null http://127.0.0.1:8080/`), MariaDB (`mariadb-admin ping -h 127.0.0.1`).
+Enrutado Traefik: Host(`chevereto.${FQDN}`), puerto 8080, middleware seguridadHeaders@file, compresionHeaders@file.
+User/UserNS/NoNewPrivileges: `User=0` (root dentro del contenedor); la imagen declara `USER www-data`, pero su Apache con módulo ssl intenta bindear 443 y no arranca como usuario no privilegiado.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
@@ -49,4 +49,27 @@ User/UserNS/NoNewPrivileges: N/A
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- **`User=0`**: se ejecuta el contenedor como root porque la imagen (Apache + módulo ssl,
+  `Listen 443`) no arranca como `www-data`. Alternativa más segura pendiente: montar un
+  `ports.conf` propio sin el `Listen 443` para poder volver a `www-data`.
+- **Licencia**: Chevereto V4 requiere clave de licencia para uso en producción; la verificación E2E
+  solo comprobó que sirve el instalador.
+
+## Verificación E2E (2026-11-12)
+
+Verificado en producción (`new_atareao`, usuario `runner`) y después purgado:
+
+1. Units `chevereto-mariadb` y `chevereto` → `active`.
+2. Contenedores `chevereto` y `chevereto-mariadb` → `Up (healthy)`.
+3. Router `chevereto@docker` registrado en Traefik (servicio → `8080`).
+4. Certificado Let's Encrypt válido para `chevereto.${FQDN}`.
+5. `https://chevereto.${FQDN}` → `302` (redirección a la instalación/`/install` de Chevereto).
+
+Bugs latentes corregidos para llegar hasta aquí:
+
+- El label de Traefik apuntaba al puerto **80**, pero el vhost de la imagen escucha en **8080**.
+- La imagen declara `USER www-data`; su Apache (con módulo ssl, `Listen 443`) no puede bindear 443
+  como no-root y el contenedor moría. Se ejecuta con `User=0`.
+- El healthcheck usaba `wget`, que no existe en la imagen; se cambió a `curl` sobre el 8080.
+
+Purga: `qctl purge --secrets --images` (sin `--data`, binds versionados).
