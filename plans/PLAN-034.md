@@ -3,7 +3,7 @@
 
 - **Issue:** #29
 - **Fecha:** 2026-11-12
-- **Estado:** EN CURSO
+- **Estado:** EN CURSO (tick ✅ verificado E2E y purgado; 5 stacks pendientes)
 
 ## Objetivo
 
@@ -59,6 +59,12 @@ Excepción documentada: stacks sin dominio propio (servicio interno, sin labels 
 - `chevereto`: 2 contenedores con Traefik. Revisar app/BD y volumen de datos/imágenes.
 - `jellystat`: 2 contenedores con Traefik. Revisar app/BD.
 
+## Progreso
+
+- **`tick`** — ✅ verificado E2E (5/5) y purgado el 2026-11-12. Correcciones: `telegraf.conf` creado y adaptado a Telegraf 1.40; `influxdb:2.7` + `/var/lib/influxdb2` + setup por secretos; `tick-telegraf` con `User=telegraf` y `--group-add keep-groups`; dependencias telegraf→influxdb y healthchecks en los 3. Purga sin `--data` (binds versionados). Nota: se usaron certificados LE de producción, no staging.
+- **`mumble`, `mysteryshack`, `cells`, `chevereto`, `jellystat`** — correcciones estáticas aplicadas y en `main`; aún **no desplegados**.
+- **Hallazgo fuera de alcance:** `grafana-influx-telegraf` figura como verificado en `docs/estado-verificacion-e2e.md` pero está roto (su unit monta `%h/.config/grafana-influx-telegraf/telegraf.conf`, directorio inexistente en el repo, y su telegraf no lleva `User`/`keep-groups`). Requiere plan propio.
+
 ## Tareas
 
 1. **Revisión estática** de los 6 stacks: canonical quadlet, `[Unit]`/`[Service]`, dependencias,
@@ -92,8 +98,8 @@ Excepción documentada: stacks sin dominio propio (servicio interno, sin labels 
 
 ## Cierre
 
-- [ ] Revisión estática de los 6 stacks
-- [ ] Correcciones aplicadas
+- [x] Revisión estática de los 6 stacks
+- [x] Correcciones aplicadas
 - [ ] Secretos y configuración creados
 - [ ] 6 stacks desplegados
 - [ ] 5 puntos E2E verificados por stack

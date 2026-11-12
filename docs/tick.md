@@ -41,7 +41,7 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 - **Interpolación de `telegraf.conf`:** Telegraf sustituye `${VAR}` desde el entorno del contenedor: `DOCKER_INFLUXDB_INIT_ORG`/`_BUCKET` desde `tick.env` y `DOCKER_INFLUXDB_INIT_ADMIN_TOKEN` desde el secreto. El token nunca se escribe en el fichero.
 - **EnvironmentFile:** los tres units cargan `tick.env` y después `tick.env.local` (el segundo sobreescribe al primero).
 - **Healthchecks:** `tick-grafana` → `wget --spider http://127.0.0.1:3000/api/health`; `tick-influxdb` → `influx ping --host http://127.0.0.1:8086`; `tick-telegraf` → `pgrep -x telegraf`.
-- **Hardening:** solo `tick-grafana` declara `User=1000:1000`. InfluxDB y Telegraf no tienen `Hardening` (Telegraf corre además con acceso a socket y rutas del host).
+- **Hardening:** `tick-grafana` declara `User=1000:1000` y `tick-telegraf` declara `User=telegraf` (y `PodmanArgs=--init --group-add keep-groups`; ver follow-ups). `tick-influxdb` no tiene `Hardening` (Telegraf conserva además acceso a socket y rutas del host).
 - **AutoUpdate:** los tres usan `AutoUpdate=registry`.
 - **Arranque:** `tick-grafana` y `tick-influxdb` con `After=network-online.target traefik.service`; `tick-telegraf` con `After=network-online.target tick-influxdb.service` y `Requires=tick-influxdb.service`. Los tres: `Restart=always`, `RestartSec=10s`, `StartLimitIntervalSec=300` y `StartLimitBurst=3` (van en `[Unit]`), `TimeoutStartSec=60`, `WantedBy=default.target`, `PodmanArgs=--init` (ninguna imagen es LinuxServer).
 
@@ -77,8 +77,29 @@ Stack TICK para monitorización: visualización (Grafana), almacenamiento de ser
 ## Follow-ups
 
 - Colisión de routers resuelta en PLAN-023: routers/servicios renombrados a `tick-grafana`/`tick-influxdb` (evita el nombre global `grafana` compartido con `grafana-influx-telegraf`) e InfluxDB movido a `influxdb.${FQDN}`.
-- Telegraf monta `podman.sock` y rutas del host (`/proc`, `/sys`, `/etc`) en solo lectura; es funcionalmente necesario pero amplía la superficie de exposición. No tiene `NoNewPrivileges` ni `User`.
+- Telegraf monta `podman.sock` y rutas del host (`/proc`, `/sys`, `/etc`) en solo lectura; es funcionalmente necesario pero amplía la superficie de exposición. Declara `User=telegraf` (con `--group-add keep-groups`) pero no `NoNewPrivileges`.
 - **Grafana sin credenciales configuradas:** el `tick.env` original traía `GF_SECURITY_ADMIN_USER`/`GF_SECURITY_ADMIN_PASSWORD`, que no se migraron (no son config pública). Grafana arranca con `admin/admin`; pendiente crear `Secret=grafana_admin_password,type=env,target=GF_SECURITY_ADMIN_PASSWORD`.
 - **`User=1000:1000` en `tick-grafana`:** riesgo conocido. El volumen `tick-grafana.volume` se crea como root y Grafana corre como uid 1000; en rootless el mapeo suele funcionar, pero si aparecen errores de permisos en `/var/lib/grafana` hay que revisar el propietario del volumen (no se ha cambiado).
 - `tick-telegraf` usa `telegraf:latest` sin pin de versión (solo InfluxDB se ha fijado a `2.7`).
 - **`tick-telegraf` corre con `User=telegraf` + `PodmanArgs=--init --group-add keep-groups`:** con `User=telegraf` el entrypoint de `telegraf:latest` (1.40.3) hace `if [ $EUID -ne 0 ]; then exec "$@"; fi`, así que no ejecuta `setcap` ni `setpriv` (y por eso ya no hacen falta `cap_net_raw` ni `cap_net_bind_service`). `--group-add keep-groups` hace que el proceso conserve los grupos suplementarios del host y pueda leer el socket de Podman (`%t/podman/podman.sock`, propiedad de `runner`); sin `keep-groups` el input `docker` falla con `permission denied`. El healthcheck usa `pgrep -x telegraf` (busybox de la imagen).
+
+## Verificación E2E (2026-11-12)
+
+Verificado en producción (`new_atareao`, usuario `runner`) y después purgado:
+
+1. Units `tick-influxdb`, `tick-telegraf` y `tick-grafana` → `active`.
+2. Contenedores `tick-influxdb`, `tick-telegraf` y `tick-grafana` → `Up (healthy)`.
+3. Routers `tick-grafana` e `tick-influxdb` registrados en Traefik.
+4. Certificado Let's Encrypt válido para `tick.${FQDN}` e `influxdb.${FQDN}` (`CN=YR1`, 2026-11-12 → 2027-02-10).
+5. `https://tick.${FQDN}` → `302` a `/login` (Grafana); `https://influxdb.${FQDN}` → `200`.
+
+Desviación: se usó el resolver de **producción** `letsencrypt` en lugar de `letsencrypt-staging`, así que se emitieron 2 certificados reales (consume cuota; funciona).
+
+Bugs latentes corregidos para llegar hasta aquí:
+
+- `telegraf.conf` no existía en el repo (bind a fichero ausente): se creó adaptado a Telegraf 1.40 (campos `perdevice_include`/`total_include`/`container_state_include`; los antiguos `perdevice`/`total`/`container_names`/`docker_label_*` ya no existen).
+- `influxdb:latest` es 2.x: se fijó a `influxdb:2.7` con el volumen en `/var/lib/influxdb2` y el setup inicial por entorno/secretos.
+- `tick-telegraf` requería `User=telegraf` + `PodmanArgs=--init --group-add keep-groups` (entrypoint con setcap/setpriv y acceso al socket de Podman).
+- Faltaban dependencias `After=`/`Requires=` de telegraf hacia InfluxDB y healthchecks en los tres contenedores.
+
+Purga: `qctl purge --secrets --images` (sin `--data`, porque los binds son ficheros versionados del repo). Sin restos.

@@ -6,7 +6,7 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/grafana/grafana
+Image=docker.io/grafana/grafana:latest
 AutoUpdate=registry
 ContainerName=tick-grafana
 
