@@ -1,6 +1,7 @@
 [Unit]
 Description=cells
-After=network-online.target traefik.service
+After=network-online.target traefik.service cells-mysql.service
+Requires=cells-mysql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -30,6 +31,8 @@ NetworkAlias=cells
 
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/cells/cells.env
+EnvironmentFile=%h/.config/cells/cells.env.local
 Environment=CELLS_SITE_NO_TLS=1
 Environment=CELLS_SITE_EXTERNAL="https://cells.${FQDN}"
 
@@ -42,6 +45,10 @@ Label=traefik.http.routers.cells.tls.certresolver=letsencrypt
 Label=traefik.http.routers.cells.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
+HealthCmd=wget -q --spider http://127.0.0.1:8080/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

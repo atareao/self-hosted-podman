@@ -1,6 +1,7 @@
 [Unit]
 Description=chevereto
-After=network-online.target traefik.service
+After=network-online.target traefik.service chevereto-mariadb.service
+Requires=chevereto-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -22,12 +23,15 @@ Volume=chevereto-data.volume:/var/www/html/images:Z
 
 # ==== Networks ====
 Network=proxy.network
+Network=chevereto.network
 NetworkAlias=chevereto
 
 # ==== Secrets ====
 Secret=chevereto_db_pass,type=env,target=CHEVERETO_DB_PASS
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/chevereto/chevereto.env
+EnvironmentFile=%h/.config/chevereto/chevereto.env.local
 Environment=CHEVERETO_DB_HOST=mariadb
 Environment=CHEVERETO_DB_USER=chevereto_user
 Environment=CHEVERETO_DB_PORT=3306
@@ -45,6 +49,10 @@ Label=traefik.http.routers.chevereto.tls.certresolver=letsencrypt
 Label=traefik.http.routers.chevereto.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
+HealthCmd=wget -q --spider http://127.0.0.1/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

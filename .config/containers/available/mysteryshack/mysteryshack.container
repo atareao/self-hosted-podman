@@ -38,6 +38,10 @@ Label=traefik.http.routers.mysteryshack.tls.certresolver=letsencrypt
 Label=traefik.http.routers.mysteryshack.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
+HealthCmd=wget -q --spider http://127.0.0.1:6767/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

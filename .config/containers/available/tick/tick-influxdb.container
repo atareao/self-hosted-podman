@@ -1,23 +1,22 @@
 [Unit]
-Description=influxdb
+Description=InfluxDB 2.7 (stack tick)
 After=network-online.target traefik.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/influxdb:latest
+Image=docker.io/library/influxdb:2.7
 AutoUpdate=registry
 ContainerName=tick-influxdb
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=tick-influxdb.volume:/var/lib/influxdb:Z
+Volume=tick-influxdb.volume:/var/lib/influxdb2:Z
 
 # ==== Networks ====
 Network=proxy.network
@@ -25,10 +24,14 @@ Network=tick.network
 NetworkAlias=influxdb
 
 # ==== Secrets ====
-
+Secret=influxdb_admin_password,type=env,target=DOCKER_INFLUXDB_INIT_PASSWORD
+Secret=influxdb_admin_token,type=env,target=DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
 
 # ==== Environment ====
-
+EnvironmentFile=%h/.config/tick/tick.env
+EnvironmentFile=%h/.config/tick/tick.env.local
+Environment=DOCKER_INFLUXDB_INIT_MODE=setup
+Environment=DOCKER_INFLUXDB_INIT_RETENTION=30d
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -39,10 +42,13 @@ Label=traefik.http.routers.tick-influxdb.tls.certresolver=letsencrypt
 Label=traefik.http.routers.tick-influxdb.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=influx ping --host http://127.0.0.1:8086 || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=60s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

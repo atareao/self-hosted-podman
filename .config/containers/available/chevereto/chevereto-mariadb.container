@@ -25,10 +25,12 @@ Network=chevereto.network
 NetworkAlias=mariadb
 
 # ==== Secrets ====
-Secret=chevereto_mysql_password,type=env,target=MYSQL_PASSWORD
+Secret=chevereto_db_pass,type=env,target=MYSQL_PASSWORD
 Secret=chevereto_mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/chevereto/chevereto.env
+EnvironmentFile=%h/.config/chevereto/chevereto.env.local
 Environment=MYSQL_DATABASE=cheveretor
 Environment=MYSQL_USER=chevereto_user
 
@@ -36,6 +38,10 @@ Environment=MYSQL_USER=chevereto_user
 
 
 # ==== Healthcheck ====
+HealthCmd=mariadb-admin ping -h 127.0.0.1
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

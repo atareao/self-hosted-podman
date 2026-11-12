@@ -27,13 +27,17 @@ NetworkAlias=jellystat-db
 Secret=jellystat_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-Environment=POSTGRES_DB=jfstat
-Environment=POSTGRES_USER=postgres
+EnvironmentFile=%h/.config/jellystat/jellystat.env
+EnvironmentFile=%h/.config/jellystat/jellystat.env.local
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
+HealthCmd=pg_isready -h 127.0.0.1 -U postgres
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

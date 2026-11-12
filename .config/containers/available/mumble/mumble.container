@@ -19,7 +19,6 @@ PublishPort=64738:64738/udp
 
 # ==== Volumes ====
 Volume=mumble-data.volume:/data:Z
-Volume=mumble-certs.volume:/certs:Z
 
 # ==== Networks ====
 Network=proxy.network
@@ -30,6 +29,8 @@ NetworkAlias=mumble
 Secret=mumble_superuser_password,type=env,target=MUMBLE_SUPERUSER_PASSWORD
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/mumble/mumble.env
+EnvironmentFile=%h/.config/mumble/mumble.env.local
 Environment=MUMBLE_VERBOSE=true
 Environment=MUMBLE_CONFIG_WELCOME_TEXT="Bienvenido"
 Environment=MUMBLE_CONFIG_OPUSTHRESHOLD=0
@@ -37,12 +38,17 @@ Environment=MUMBLE_CONFIG_MESSAGEBURST=1
 Environment=MUMBLE_CONFIG_MESSAGELIMIT=1
 Environment=MUMBLE_CONFIG_USERS=10
 Environment=MUMBLE_CONFIG_BANDWIDTH=512000
-Environment=MUMBLE_CONFIG_SSLCERT=/certs/mumble.${FQDN}/cert.pem
-Environment=MUMBLE_CONFIG_SSLKEY=/certs/mumble.${FQDN}/key.pem
 
 # ==== Labels ====
 
 # ==== Healthcheck ====
+# El daemon se llama `mumble-server` (PID 1 tras el exec de su-exec en el entrypoint).
+# La imagen es Ubuntu y no trae procps, asi que comprobamos /proc/<pid>/comm.
+HealthCmd=grep -qx mumble-server /proc/[0-9]*/comm || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
 

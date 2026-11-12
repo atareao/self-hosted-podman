@@ -1,5 +1,5 @@
 [Unit]
-Description=grafana
+Description=Grafana (stack tick)
 After=network-online.target traefik.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
@@ -12,9 +12,7 @@ ContainerName=tick-grafana
 
 # ==== Command ====
 
-
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=tick-grafana.volume:/var/lib/grafana:Z
@@ -26,9 +24,9 @@ NetworkAlias=grafana
 
 # ==== Secrets ====
 
-
 # ==== Environment ====
-
+EnvironmentFile=%h/.config/tick/tick.env
+EnvironmentFile=%h/.config/tick/tick.env.local
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -39,7 +37,11 @@ Label=traefik.http.routers.tick-grafana.tls.certresolver=letsencrypt
 Label=traefik.http.routers.tick-grafana.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
 User=1000:1000

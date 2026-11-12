@@ -16,20 +16,21 @@
 - Volumen(es):
   - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-data.volume
   - /data/self-hosted-podman/.config/containers/available/chevereto/chevereto-mariadb.volume
-- Config no secreta: N/A
-- Secretos: chevereto_db_pass, chevereto_mysql_password, chevereto_mariadb_root_password
+- Config no secreta: /data/self-hosted-podman/.config/chevereto/chevereto.env (TZ)
+- Secretos: chevereto_db_pass, chevereto_mariadb_root_password
 
 ## Cómo funciona
-Red: proxy.network y internal chevereto.network.
+Red: proxy.network (chevereto) y chevereto.network (chevereto + mariadb).
 Volúmenes: chevereto-data.volume -> /var/www/html/images, chevereto-mariadb.volume -> /var/lib/mysql.
-Secretos: chevereto_db_pass, chevereto_mysql_password, chevereto_mariadb_root_password.
-Healthcheck: N/A
+Secretos: chevereto_db_pass (compartido por app y MariaDB), chevereto_mariadb_root_password.
+Healthcheck: chevereto (`wget -q --spider http://127.0.0.1/`), MariaDB (`mariadb-admin ping -h 127.0.0.1`).
 Enrutado Traefik: Host(`chevereto.${FQDN}`), puerto 80, middleware seguridadHeaders@file, compresionHeaders@file.
 User/UserNS/NoNewPrivileges: N/A
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
+| TZ | EnvironmentFile | Europe/Madrid | Zona horaria (app y MariaDB).
 | CHEVERETO_DB_HOST | Environment | mariadb | Host de la BD.
 | CHEVERETO_DB_USER | Environment | chevereto_user | Usuario de la BD.
 | CHEVERETO_DB_PORT | Environment | 3306 | Puerto de la BD.
@@ -41,12 +42,11 @@ User/UserNS/NoNewPrivileges: N/A
 | MYSQL_USER | Environment | chevereto_user | Usuario en MariaDB.
 
 ## Cómo habilitar / desplegar
-1. `pd install`? Wait missing secrets.
-1. Secretos: `printf '%s' '<valor>' | podman secret create chevereto_db_pass -`
-2. `printf '%s' '<valor>' | podman secret create chevereto_mysql_password -`
-3. `printf '%s' '<valor>' | podman secret create chevereto_mariadb_root_password -`
-4. `cd .config/containers/available/chevereto && qctl install`
-5. `systemctl --user daemon-reload`
+1. Secretos (NUNCA crypta store):
+   - `printf '%s' '<valor>' | podman secret create chevereto_db_pass -`
+   - `printf '%s' '<valor>' | podman secret create chevereto_mariadb_root_password -`
+2. `cd .config/containers/available/chevereto && qctl install`
+3. `systemctl --user daemon-reload`
 
 ## Follow-ups
 - (ninguno)

@@ -28,13 +28,17 @@ Secret=cells_mysql_root_password,type=env,target=MYSQL_ROOT_PASSWORD
 Secret=cells_mysql_password,type=env,target=MYSQL_PASSWORD
 
 # ==== Environment ====
-Environment=MYSQL_DATABASE=$MYSQL_DATABASE
-Environment=MYSQL_USER=$MYSQL_USER
+EnvironmentFile=%h/.config/cells/cells.env
+EnvironmentFile=%h/.config/cells/cells.env.local
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
+HealthCmd=mysqladmin ping -h 127.0.0.1
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

@@ -1,6 +1,7 @@
 [Unit]
 Description=jellystat
-After=network-online.target traefik.service
+After=network-online.target traefik.service jellystat-db.service
+Requires=jellystat-db.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -30,7 +31,8 @@ Secret=jellystat_postgres_password,type=env,target=POSTGRES_PASSWORD
 Secret=jellystat_jwt_secret,type=env,target=JWT_SECRET
 
 # ==== Environment ====
-Environment=POSTGRES_USER=postgres
+EnvironmentFile=%h/.config/jellystat/jellystat.env
+EnvironmentFile=%h/.config/jellystat/jellystat.env.local
 Environment=POSTGRES_IP=jellystat-db
 Environment=POSTGRES_PORT=5432
 
@@ -43,6 +45,10 @@ Label=traefik.http.routers.jellystat.tls.certresolver=letsencrypt
 Label=traefik.http.routers.jellystat.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
+HealthCmd=wget -q --spider http://127.0.0.1:3000/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

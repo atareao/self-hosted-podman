@@ -1,6 +1,7 @@
 [Unit]
 Description=mumble-recorder
-After=network-online.target
+After=network-online.target mumble.service
+Requires=mumble.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -24,15 +25,21 @@ NetworkAlias=recorder
 # ==== Secrets ====
 
 # ==== Environment ====
+# SERVER apunta al NetworkAlias de mumble dentro de mumble.network.
 EnvironmentFile=%h/.config/mumble/mumble.env
 EnvironmentFile=%h/.config/mumble/mumble.env.local
-
 Environment=PASSWORD=
 Environment=FFMPEG_OUT="-c:v copy -c:a copy -f flv rtmp://127.0.0.1:1935/live/{name}"
 
 # ==== Labels ====
 
 # ==== Healthcheck ====
+# ffmpeg lo lanza el recorder por canal; la imagen no trae procps.
+HealthCmd=grep -qx ffmpeg /proc/[0-9]*/comm || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=60s
 
 # ==== Hardening ====
 

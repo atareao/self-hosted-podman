@@ -1,6 +1,7 @@
 [Unit]
-Description=telegraf
-After=network-online.target
+Description=Telegraf (stack tick)
+After=network-online.target tick-influxdb.service
+Requires=tick-influxdb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -9,15 +10,14 @@ StartLimitBurst=3
 Image=docker.io/library/telegraf:latest
 AutoUpdate=registry
 ContainerName=tick-telegraf
+PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=%h/.config/tick/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+Volume=%h/.config/tick/telegraf.conf:/etc/telegraf/telegraf.conf:ro,Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
 Volume=/sys:/host/sys:ro
 Volume=/proc:/host/proc:ro
@@ -28,21 +28,25 @@ Network=tick.network
 NetworkAlias=telegraf
 
 # ==== Secrets ====
-
+Secret=influxdb_admin_token,type=env,target=DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
 
 # ==== Environment ====
+EnvironmentFile=%h/.config/tick/tick.env
+EnvironmentFile=%h/.config/tick/tick.env.local
 Environment=HOST_PROC=/host/proc
 Environment=HOST_SYS=/host/sys
 Environment=HOST_ETC=/host/etc
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=pgrep -x telegraf || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
