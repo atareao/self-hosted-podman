@@ -24,10 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 97 |
+| Verificados E2E (probados y purgados) | 100 |
 | Bloqueados / hallazgos (ver sección) | 3 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **23** |
+| **Sin verificar E2E** | **20** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -38,7 +38,7 @@ Todos entre el **2026-11-09** y el **2026-11-13** (el **lote 3** — `bookstack`
 purgó el **2026-11-12**; el **lote 6** — `tick`, `mumble`, `cells`, `chevereto` y `jellystat` — se
 verificó y purgó el **2026-11-12**; el **lote 7** — `photoprism`, `rabbitmq`, `weaviate` y
 `wordpress` —, el **2026-11-13**; el **lote 8** — `codimd`, `huginn`, `planka`, `facturascripts` y
-`postgres` —, el **2026-11-13**): desplegados,
+`postgres` —, el **2026-11-13**; el **lote 9** — `wordpress-wp1`, `wordpress-wp2` y `registry` —, el **2026-11-13**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -142,6 +142,9 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | planka | `docs/planka.md` | PLAN-036 / #31 | 200 | fix: app añadida a `planka.network` (`EAI_AGAIN postgres`); `Requires=`/`After=planka-postgresql.service`; `BASE_URL` https y `TRUST_PROXY=true`; `/api/config` JSON |
 | facturascripts | `docs/facturascripts.md` | PLAN-036 / #31 | 200 (login) | fix: app añadida a `facturascripts.network`; MariaDB con `MARIADB_ROOT_PASSWORD` + `MYSQL_*`; `FS_DB_*`/`FS_INITIAL_*`/`FS_LANG`; binds → volúmenes `:U`; **instalación desatendida por POST a `/`** (302 → `/login`) |
 | postgres | `docs/postgres.md` | PLAN-036 / #31 | 302 (pgAdmin) | fix: pgAdmin añadido a `postgres.network`; **pérdida de datos** con `postgres:latest` (18.x, `VOLUME` en `/var/lib/postgresql`) → pin `17-alpine` con volumen en `/var/lib/postgresql/data`; sin `AutoUpdate`; PG healthy y TCP `postgres:5432` desde pgAdmin |
+| wordpress-wp1 | `docs/wordpress-wp1.md` | PLAN-037 / #32 | 302 | volumen en `/var/www/html/wp-content` (sin bind de `wp-config.php`); secreto de BD compartido app/BD (`wordpress_wp1_wordpress_db_password`); MariaDB 11 pinnada + healthchecks |
+| wordpress-wp2 | `docs/wordpress-wp2.md` | PLAN-037 / #32 | 302 | ídem `wordpress-wp1` con `wp2` |
+| registry | `docs/registry.md` | PLAN-037 / #32 | 401/200 | fix: `registry:latest` (v3.1.2) lee el config en `/etc/distribution/config.yml` (el htpasswd no se aplicaba: 200 sin auth); login+push+catálogo OK |
 
 ## Bloqueados / hallazgos
 
@@ -185,6 +188,17 @@ Hallazgo transversal (PLAN-036 / #31): **clientes PG antiguos necesitan md5**. E
 forzar `POSTGRES_HOST_AUTH_METHOD=md5` + `POSTGRES_INITDB_ARGS=--auth-host=md5` (solo válido con datadir
 vacío; con datos hay que resetear contraseñas).
 
+Hallazgo transversal (PLAN-037 / #32): **`registry:latest` = 3.x lee el config en otra ruta**. La
+imagen 3.1.2 usa `/etc/distribution/config.yml` por defecto; montar el config en la ruta antigua
+`/etc/docker/registry/config.yml` hace que se **ignore**: el registry arranca con su config de fábrica
+(sin `auth` ni CORS) y la API queda **abierta** (el htpasswd no se aplica). Fix: bind a
+`/etc/distribution/config.yml`.
+
+Hallazgo transversal (PLAN-037 / #32): **recrear `registry` deja `registry-ui` en 502**. La nginx de
+`joxit/docker-registry-ui` cachea el upstream (`registry:5000`) al arrancar; si se recrea solo el
+contenedor `registry`, la UI devuelve 502 en `/v2/` hasta reiniciar `registry-ui`. Y, como siempre,
+tras recrear contenedores puede hacer falta `systemctl --user restart traefik`.
+
 ### Pendientes abiertos del lote 4 (PLAN-032 / #27)
 
 Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con follow-ups abiertos (no bloquean la ronda):
@@ -203,7 +217,7 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (23)
+## Sin verificar E2E (20)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
@@ -214,9 +228,8 @@ immich, invidious, matrix, matrixmail,
 miniflux, nextcloud, nitter,
 odoo, open-webui,
 pinepods, plausible,
-registry,
 vector,
-wger, wordpress-wp1, wordpress-wp2.
+wger.
 
 ## Notas
 
@@ -236,3 +249,4 @@ wger, wordpress-wp1, wordpress-wp2.
 - PLAN-032 (issue #27): ronda E2E lote 4 **completada** — verificados y purgados: `wallabag`, `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs`. Bugs latentes corregidos: wallabag (placeholder `SYMFONY__ENV__SERVER_NAME`), whisper (imagen `:latest` sin GPU + modelo `small` + host 9000→9001), unbound (publica 5353 y config por el include real de la imagen), watchbeat (issuer OIDC real + redirect al subdominio, healthcheck en `127.0.0.1` + `AddHost`), publirs (Traefik en `publirs.${FQDN}`, `crontab.txt` en croni, sin bind a `/etc/timezone`). Excepciones internas sin Traefik: `whisper` y `unbound`. Pendientes abiertos en la sección «Bloqueados / hallazgos». Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 77 verificados + 4 en producción + 2 bloqueados + 44 sin verificar.
 - PLAN-035 (issue #30): ronda E2E lote 7 **completada** — verificados y purgados: `photoprism`, `rabbitmq`, `weaviate` y `wordpress`. Bugs latentes corregidos: photoprism (sin secretos ni `SITE_URL`; se añadió `photoprism_admin_password` + `SITE_URL`/`TZ`; sin `--init` porque la imagen ya trae s6-overlay; healthcheck por `curl` porque `photoprism status` no conecta), rabbitmq (volumen `mnseia`→`mnesia` con `:U`, secreto inexistente, usuario `admin`, healthcheck), weaviate (dejaba de publicar 8080/50051 sin auth: red propia + `NetworkAlias` y sin `PublishPort`) y wordpress (`Requires=` a units inexistentes, router `wp`→`wordpress` + `service.port=80`, secretos `type=env`, `WP_CONFIG_EXTRA` unificado; plantilla de wp1/wp2). `weaviate` es la excepción interna sin Traefik. Dos patrones nuevos documentados en «Bloqueados / hallazgos»: healthchecks que corren como root en imágenes con `gosu`/`su-exec`, e imágenes que migran a s6-overlay y rompen con `PodmanArgs=--init`. Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 92 verificados + 4 en producción + 3 bloqueados + 28 sin verificar.
 - PLAN-036 (issue #31): ronda E2E lote 8 **completada** — verificados y purgados: `codimd`, `huginn`, `planka`, `facturascripts` y `postgres`. Bugs latentes corregidos: codimd (app en `codimd.network`, `CMD_*` + `CMD_DB_URL` por secreto, PG 17-alpine con healthcheck, comilla huérfana y binds → volúmenes `:U`), huginn (`DATABASE_HOST`/`ADAPTER`/`PORT`, `APP_SECRET_TOKEN` estable y dependencia de MariaDB), planka (app en `planka.network`, `Requires=`/`After=`, `BASE_URL` https y `TRUST_PROXY=true`), facturascripts (app en su red, MariaDB con root/BD, `FS_DB_*`/`FS_INITIAL_*`, volúmenes `:U` e instalación desatendida por POST a `/`) y postgres (pgAdmin en `postgres.network`; **pérdida de datos** de `postgres:latest` 18.x → pin `17-alpine` con `/var/lib/postgresql/data` y sin `AutoUpdate`). Tres patrones nuevos en «Bloqueados / hallazgos»: app y BD en redes distintas, `postgres:latest` = 18.x cambia la ruta del volumen, y clientes PG antiguos que necesitan `md5`. `grafana-influx-telegraf` se **aplaza a un plan propio** (solape con `openobserve` + `vector` + `alloy`). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 97 verificados + 4 en producción + 3 bloqueados + 23 sin verificar.
+- PLAN-037 (issue #32): ronda E2E lote 9 **completada** — verificados y purgados: `wordpress-wp1`, `wordpress-wp2` y `registry`. Bugs latentes corregidos: wordpress-wp1/wp2 (bind a un `wp-config.php` inexistente, volumen en `/var/www/html` en vez de `/var/www/html/wp-content`, **dos secretos distintos para el mismo password de BD**, sin `Requires=`/`After=` ni healthchecks, MariaDB sin pinnear) y registry (faltaban `config.yml` y `htpasswd`, host de Traefik placeholder `tu.${FQDN}`, `NGINX_PROXY_PASS_URL` como secreto). Dos patrones nuevos en «Bloqueados / hallazgos»: ruta del config de `registry` v3 y el 502 de `registry-ui` al recrear el registry. Certificados con el resolver de **producción** `letsencrypt` (CN reales para wp1/wp2/registry). Cifras: 127 = 100 verificados + 4 en producción + 3 bloqueados + 20 sin verificar.
