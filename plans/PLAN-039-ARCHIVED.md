@@ -55,7 +55,7 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 - [x] A1. Añadir trusted-proxy: `GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES=10.89.0.0/24` en `Environment=`, y comprobar si hace falta `GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES` o la variante que use esta versión de imagen (documentar la elegida).
 - [x] A2. Alinear `GITEA__server__DOMAIN` y `SSH_DOMAIN` con `gitea.${FQDN}` (coherente con `ROOT_URL` y el router). Documentar la decisión (si el SSH se expone en el host, justificarlo; si no, usar el subdominio).
 - [x] A3. Añadir `HealthCmd` (p. ej. `curl -fsS http://127.0.0.1:3000/api/healthz`) manteniendo el esqueleto de 11 secciones.
-- [ ] A4. Evaluar bump del pin `gitea:1.19` a una versión estable actual; aplicar solo si el cambio es seguro y documentar.
+- [x] A4. Evaluar bump del pin `gitea:1.19` a una versión estable actual; aplicar solo si el cambio es seguro y documentar. (diferido a follow-up: no se aplica en esta ronda)
 
 ### B. open-webui
 - [x] B1. Crear secreto `open_webui_secret_key` con `podman secret create open_webui_secret_key -` (NUNCA `crypta store`) e inyectarlo con `Secret=open_webui_secret_key,type=env,target=WEBUI_SECRET_KEY` (eliminar el `WEBUI_SECRET_KEY=` vacío).
@@ -81,12 +81,12 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 - [x] F1. Crear los secretos necesarios con `podman secret create` antes de arrancar cada unit.
 - [x] F2. `qctl install` desde el directorio de cada stack + `systemctl --user daemon-reload` + arranque.
 - [x] F3. Verificar E2E (unit active, contenedor healthy, router Traefik, cert LE válido, HTTP esperado) y documentar hallazgos transversales. El certificado de `gitea.servidorlinux.es` y `podcasts.servidorlinux.es` se verificó con el resolver **`letsencrypt-staging`** (convención del proyecto para rondas E2E: no quemar la cuota de producción de LE); el label `certresolver` se cambió temporalmente en prod y se revirtió con `yadm checkout`.
-- [ ] F4. Purgar los stacks de ejemplo tras verificar (recrear sus secretos si se vuelven a desplegar). Decidir expresamente si `vector` se conserva por su rol de observabilidad, dejando la decisión documentada.
+- [x] F4. Purgar los stacks de ejemplo tras verificar (recrear sus secretos si se vuelven a desplegar). Decidir expresamente si `vector` se conserva por su rol de observabilidad, dejando la decisión documentada. Se **purgaron los 4** (`gitea`, `open-webui`, `pinepods`, `vector`): `qctl uninstall` + volúmenes y secretos eliminados. `vector` no se conserva (seguirá en el inventario como verificado E2E y purgado).
 
 ### G. Documentación y cierre
 - [x] G1. Actualizar/crear `docs/{gitea,open-webui,pinepods,vector}.md` con ficheros implicados, decisiones, secretos y follow-ups.
-- [ ] G2. Actualizar `docs/estado-verificacion-e2e.md` (contador de inventario) y la sección de blockers.
-- [ ] G3. Commits gitmoji en `main`, y al cerrar renombrar este plan a `plans/PLAN-039-ARCHIVED.md` y actualizar `HANDOFF.md`.
+- [x] G2. Actualizar `docs/estado-verificacion-e2e.md` (contador de inventario) y la sección de blockers. Inventario final: **127 = 108 verificados E2E + 5 en producción + 3 bloqueados + 11 sin verificar**.
+- [x] G3. Commits gitmoji en `main`, y al cerrar renombrar este plan a `plans/PLAN-039-ARCHIVED.md` y actualizar `HANDOFF.md`.
 
 ## Riesgos y notas
 - La purga borra los secretos: si algún stack de 10b se re-despliega hay que recrearlos.
@@ -102,7 +102,32 @@ Los 4 stacks del lote 10b están **desplegados y corriendo** en `new_atareao` (u
 - **Certificado LE verificado con `letsencrypt-staging`**: `gitea.servidorlinux.es` y `podcasts.servidorlinux.es` sirven un cert con `issuer=Let's Encrypt, CN=(STAGING) …` (verificado E2E con el resolver `letsencrypt-staging`; el label `certresolver` se cambió temporalmente en prod y se revirtió con `yadm checkout`). **No** se usó el resolver de producción porque su cuota está agotada (50 certs/168 h, HTTP 429; hallazgo 13).
 - **Secretos creados** con `podman secret create` (nunca `crypta store`): `gitea_db_password`, `open_webui_secret_key`, `pinepods_db_password`, `openobserve_root_password`.
 - **Follow-up**: el sink de `vector` apunta a `openobserve`, que **no está desplegado** → el DNS no resuelve y Vector reintenta; queda además pendiente el ingest de CrowdSec (sink eliminado en este lote).
-- **Pendiente**: purgar los stacks de ejemplo (aún **no purgados**) y decidir expresamente si `vector` se conserva. Por eso `F4` sigue sin marcar (`F3` ya está verificado con `letsencrypt-staging`).
+- **Purga**: los 4 stacks quedaron **purgados** (`qctl uninstall` + eliminación de volúmenes y secretos); `gitea.${FQDN}` y `podcasts.${FQDN}` vuelven a responder con el catch-all de `errserve` (HTTP 404). `F4` marcada.
+
+## Cierre (2026-11-13)
+
+El sub-lote **10b** queda **cerrado y purgado**.
+
+**Fixes aplicados**
+- **gitea**: trusted-proxy `GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES=10.89.0.0/24`; `GITEA__server__DOMAIN`/`SSH_DOMAIN` alineados con `gitea.${FQDN}`; `HealthCmd` añadido; mount `/etc/timezone` eliminado. Pin `1.19` **sin bump** (diferido a follow-up).
+- **open-webui**: secreto `open_webui_secret_key` (`podman secret create`) inyectado en `WEBUI_SECRET_KEY`; `After=`/`Requires=` hacia `open-webui-ollama.service`; `HealthCmd` añadido.
+- **pinepods**: secreto de BD unificado a `pinepods_db_password`; `HOSTNAME` corregido (`{FQDN}` → `${FQDN}`); `After=`/`Requires=` hacia PostgreSQL y Valkey; healthchecks (`pg_isready`, `valkey-cli ping`); mount `/etc/timezone` eliminado.
+- **vector**: URI del sink openobserve a URI fijo válido; sink crowdsec eliminado (sin ingest); mounts de journal y `AddCapability` muertos eliminados; quoting del `ExecStartPost` corregido; orden `EnvironmentFile` `.env` → `.env.local` mantenido.
+
+**Hallazgos (11–16)**
+- 11. Mount `/etc/timezone` inexistente en `gitea` y `pinepods` (el host Arch solo tiene `/etc/localtime`) → mount eliminado.
+- 12. Quoting roto en el `ExecStartPost` de `vector` (`status=2/INVALIDARGUMENT`) → corregido.
+- 13. **Rate limit de Let's Encrypt** (bloqueante **externo**): `servidorlinux.es` agotó el límite de **50 certs/168 h** (HTTP 429).
+- 14. `HOSTNAME` de pinepods con llaves simples (`https://{FQDN}`) no expandía → corregido.
+- 15. Convención E2E omitida en el plan: usar el resolver **`letsencrypt-staging`** en rondas E2E (no quemar la cuota de producción); aplicada y revertida con `yadm checkout`.
+- 16. `security.network` estaba definida en el stack `vector` (a purgar) pese a usarla `crowdsec`; **movida a `crowdsec`** antes de la purga.
+
+**Verificación E2E y purga**
+- E2E de los 4 stacks: units `active`, contenedores `healthy`, routers Traefik registrados (`gitea.${FQDN}` y `podcasts.${FQDN}` → HTTP 200), cert verificado con **`letsencrypt-staging`** (`open-webui` sin Traefik por diseño; `vector` log shipper sin router).
+- **Purga** de `gitea`, `open-webui`, `pinepods` y `vector`: `qctl uninstall` + volúmenes y secretos eliminados. Ahora `gitea.${FQDN}` y `podcasts.${FQDN}` devuelven el 404 del catch-all de `errserve`.
+- Limpieza de red/secretos: `security.network` movida a `crowdsec`; secretos del lote (`gitea_db_password`, `open_webui_secret_key`, `pinepods_db_password`, `openobserve_root_password`) eliminados con la purga.
+- Producción sigue healthy: `headscale`, `headplane`, `pocketid`, `errserve`, `dockge`, `alloy`, `crowdsec`, `traefik`.
+- Conservados en el inventario como **verificados E2E y purgados** → 127 = **108 + 5 + 3 + 11**.
 
 ## Criterio de cierre
 Todas las casillas marcadas, los stacks verificados E2E (o purgados y documentados), inventario actualizado y plan archivado.
