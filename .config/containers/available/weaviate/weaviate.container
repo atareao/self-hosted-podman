@@ -14,14 +14,13 @@ PodmanArgs=--init
 Exec=--host 0.0.0.0 --port 8080 --scheme http
 
 # ==== Ports ====
-PublishPort=8080:8080
-PublishPort=50051:50051
 
 # ==== Volumes ====
 Volume=weaviate-data.volume:/var/lib/weaviate:Z
 
 # ==== Networks ====
-
+Network=weaviate.network
+NetworkAlias=weaviate
 
 # ==== Secrets ====
 
@@ -38,7 +37,11 @@ Environment=CLUSTER_HOSTNAME=node1
 
 
 # ==== Healthcheck ====
-
+HealthCmd=wget -q -O /dev/null http://127.0.0.1:8080/v1/.well-known/ready
+HealthInterval=30s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=20s
 
 # ==== Hardening ====
 
