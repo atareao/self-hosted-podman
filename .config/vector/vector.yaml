@@ -34,13 +34,14 @@ transforms:
 # Las credenciales las inyecta la unidad (vector.container) como entorno:
 #   - OO_USER_EMAIL  -> EnvironmentFile=.config/vector/vector.env   (NO secreto)
 #   - OO_USER_PASSWORD -> Secret=openobserve_root_password          (mismo secret que OpenObserve)
-#   - VECTOR_INGEST_PASSWORD -> Secret pendiente (CrowdSec aún sin ingest)
 sinks:
   openobserve:
     type: "http"
     inputs:
       - "process_traefik"
-    uri: "http://openobserve:5080/api/default/${.container_name:-syslog}/_json"
+    # URI fija: el sink `http` de Vector no interpola campos por evento (${.container_name} no
+    # se sustituye y genera una ruta inválida), así que todas las líneas van al stream `vector`.
+    uri: "http://openobserve:5080/api/default/vector/_json"
     auth:
       strategy: "basic"
       user: "${OO_USER_EMAIL}"
@@ -48,18 +49,4 @@ sinks:
     encoding:
       codec: "json"
 
-  crowdsec:
-    type: "http"
-    inputs:
-      - "process_traefik"
-    uri: "http://crowdsec:8080/v1/logs"
-    method: "post"
-    auth:
-      strategy: "basic"
-      user: "vector-ingest"
-      password: "${VECTOR_INGEST_PASSWORD:-}"
-    encoding:
-      codec: "json"
-    batch:
-      max_events: 10
-      timeout_secs: 1
+# TODO follow-up: ingest de CrowdSec

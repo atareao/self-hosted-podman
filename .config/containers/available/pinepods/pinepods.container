@@ -1,6 +1,7 @@
 [Unit]
 Description=pinepods
-After=network-online.target traefik.service
+After=network-online.target traefik.service pinepods-postgresql.service pinepods-valkey.service
+Requires=pinepods-postgresql.service pinepods-valkey.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -34,7 +35,7 @@ Secret=pinepods_db_password,type=env,target=DB_PASSWORD
 # ==== Environment ====
 Environment=SEARCH_API_URL=https://search.pinepods.online/api/search
 Environment=PEOPLE_API_URL=https://people.pinepods.online
-Environment=HOSTNAME=https://{FQDN}
+Environment=HOSTNAME=https://${FQDN}
 Environment=DB_TYPE=postgresql
 Environment=DB_HOST=pinepods_db
 Environment=DB_PORT=5432
@@ -56,7 +57,11 @@ Label=traefik.http.routers.pinepods.tls.certresolver=letsencrypt
 Label=traefik.http.routers.pinepods.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=curl -fsS http://localhost:8040/api/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
 

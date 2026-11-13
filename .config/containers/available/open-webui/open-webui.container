@@ -1,6 +1,7 @@
 [Unit]
 Description=open-webui
-After=network-online.target
+After=network-online.target open-webui-ollama.service
+Requires=open-webui-ollama.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -24,16 +25,21 @@ Network=open-webui.network
 NetworkAlias=open-webui
 
 # ==== Secrets ====
+Secret=open_webui_secret_key,type=env,target=WEBUI_SECRET_KEY
 
 
 # ==== Environment ====
 Environment=OLLAMA_BASE_URL=http://ollama:11434
-Environment=WEBUI_SECRET_KEY=
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
+HealthCmd=curl -fsS http://127.0.0.1:8080/health
+HealthInterval=30s
+HealthRetries=5
+HealthTimeout=10s
+HealthStartPeriod=30s
 
 
 # ==== Hardening ====

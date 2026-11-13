@@ -16,8 +16,6 @@ AutoUpdate=registry
 
 # ==== Volumes ====
 Volume=%t/podman/podman.sock:/var/run/docker.sock:ro
-Volume=/var/log/journal:/var/log/journal:ro
-Volume=/run/log/journal:/run/log/journal:ro
 Volume=%h/.config/vector/vector.yaml:/etc/vector/vector.yaml:ro,Z
 Volume=vector-data.volume:/var/lib/vector:Z
 
@@ -27,8 +25,7 @@ Network=security.network
 # ==== Secrets ====
 # Mismo secret que openobserve (garantiza que el login coincide).
 Secret=openobserve_root_password,type=env,target=OO_USER_PASSWORD
-# TODO: CrowdSec aún no define ingest; cuando exista, descomentar y crear el secret:
-# Secret=crowdsec_ingest_password,type=env,target=VECTOR_INGEST_PASSWORD
+# TODO follow-up: ingest de CrowdSec
 
 # ==== Environment ====
 Environment=VECTOR_SELF_DATA_DIR=/var/lib/vector
@@ -45,7 +42,6 @@ HealthTimeout=5s
 HealthStartPeriod=15s
 
 # ==== Hardening ====
-AddCapability=CAP_DAC_READ_SEARCH
 
 # ==== Resources ====
 

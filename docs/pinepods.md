@@ -18,7 +18,7 @@
   - /data/self-hosted-podman/.config/containers/available/pinepods/pinepods-downloads.volume
   - /data/self-hosted-podman/.config/containers/available/pinepods/pinepods-pgdata.volume
 - Config no secreta: none
-- Secretos: pinepods_db_password, pinepods_postgres_password
+- Secretos: pinepods_db_password
 
 ## Cómo funciona
 Conecta a la red proxy.network y pinepods.network. Usa volúmenes para backups, downloads y datos de PostgreSQL. Inyecta credenciales DB y valkey. No dispone de sockets del daemon ni healthcheck. Traefik enruta a https://podcasts.${FQDN} con puerto 8040.
@@ -46,7 +46,6 @@ Conecta a la red proxy.network y pinepods.network. Usa volúmenes para backups, 
 ## Cómo habilitar / desplegar
 1. Secretos (solo si existen; NUNCA crypta store):
    - `printf '%s' '\u003cvalor\u003e' | podman secret create pinepods_db_password -`
-   - `printf '%s' '\u003cvalor\u003e' | podman secret create pinepods_postgres_password -`
 2. `cd .config/containers/available/pinepods && qctl install`
 3. `systemctl --user daemon-reload`
 
