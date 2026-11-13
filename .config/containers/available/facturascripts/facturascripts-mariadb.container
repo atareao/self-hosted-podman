@@ -1,5 +1,5 @@
 [Unit]
-Description=mariadb
+Description=facturascripts-mariadb
 After=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=3
@@ -7,8 +7,8 @@ StartLimitBurst=3
 [Container]
 # ==== Image ====
 Image=docker.io/library/mariadb
-AutoUpdate=registry
 ContainerName=facturascripts-mariadb
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -17,23 +17,29 @@ ContainerName=facturascripts-mariadb
 
 
 # ==== Volumes ====
-Volume=%h/.config/facturascripts/mariadb:/var/lib/mysql:Z
+Volume=facturascripts-mariadb.volume:/var/lib/mysql:U
 
 # ==== Networks ====
 Network=facturascripts.network
 NetworkAlias=mariadb
 
 # ==== Secrets ====
-
+Secret=facturascripts_mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=facturascripts_mysql_password,type=env,target=MYSQL_PASSWORD
 
 # ==== Environment ====
-
+Environment=MYSQL_DATABASE=facturascripts
+Environment=MYSQL_USER=facturascripts
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
-
+HealthCmd=mariadb-admin ping --silent -uroot -p$$MARIADB_ROOT_PASSWORD
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=15s
 
 # ==== Hardening ====
 

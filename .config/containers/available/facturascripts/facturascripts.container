@@ -1,14 +1,15 @@
 [Unit]
 Description=facturascripts
-After=network-online.target traefik.service
+After=network-online.target facturascripts-mariadb.service traefik.service
+Requires=facturascripts-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
 Image=docker.io/facturascripts/facturascripts:latest
-AutoUpdate=registry
 ContainerName=facturascripts
+AutoUpdate=registry
 
 # ==== Command ====
 
@@ -17,17 +18,25 @@ ContainerName=facturascripts
 
 
 # ==== Volumes ====
-Volume=%h/.config/facturascripts/facturascripts:/var/www/html:Z
+Volume=facturascripts-data.volume:/var/www/html:U
 
 # ==== Networks ====
 Network=proxy.network
+Network=facturascripts.network
 NetworkAlias=facturascripts
 
 # ==== Secrets ====
-
+Secret=facturascripts_db_password,type=env,target=FS_DB_PASS
+Secret=facturascripts_initial_password,type=env,target=FS_INITIAL_PASS
 
 # ==== Environment ====
-
+Environment=FS_DB_TYPE=mysql
+Environment=FS_DB_HOST=mariadb
+Environment=FS_DB_PORT=3306
+Environment=FS_DB_NAME=facturascripts
+Environment=FS_DB_USER=facturascripts
+Environment=FS_INITIAL_USER=admin
+Environment=FS_LANG=es_ES
 
 # ==== Labels ====
 Label=traefik.enable=true
