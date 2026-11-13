@@ -18,6 +18,7 @@ ContainerName=nitter
 
 # ==== Volumes ====
 Volume=%h/.config/nitter/nitter.conf:/src/nitter.conf:ro
+Volume=%h/.config/nitter/sessions.jsonl:/src/sessions.jsonl:ro,Z
 
 # ==== Networks ====
 Network=proxy.network
