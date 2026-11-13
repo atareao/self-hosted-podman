@@ -1,21 +1,18 @@
 [Unit]
-Description=wordpress-wp1-mariadb
+Description=MariaDB wp1
 After=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/mariadb
-AutoUpdate=registry
+Image=docker.io/library/mariadb:11
 ContainerName=wordpress-wp1-mariadb
-PodmanArgs=--init
 
 # ==== Command ====
-
+Exec=--innodb-buffer-pool-size=256M --innodb-flush-log-at-trx-commit=2
 
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=wordpress-wp1-mariadb.volume:/var/lib/mysql:Z
@@ -25,28 +22,30 @@ Network=wordpress-wp1.network
 NetworkAlias=mariadb
 
 # ==== Secrets ====
-Secret=wordpress_wp1_mysql_password,type=env,target=MYSQL_PASSWORD
 Secret=wordpress_wp1_mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=wordpress_wp1_wordpress_db_password,type=env,target=MARIADB_PASSWORD
 
 # ==== Environment ====
-Environment=MYSQL_DATABASE=wp1
-Environment=MYSQL_USER=wp1
+Environment=MARIADB_DATABASE=wp1
+Environment=MARIADB_USER=wp1
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=mariadb-admin ping --user=root --password="$MARIADB_ROOT_PASSWORD" --silent
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
 [Service]
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-Restart=always
+Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=60
 

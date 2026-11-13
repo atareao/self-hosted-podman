@@ -1,5 +1,5 @@
 [Unit]
-Description=wordpress-wp1-redis
+Description=Redis Cache para wordpress-wp1
 After=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=3
@@ -8,16 +8,13 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/library/redis:6
 ContainerName=wordpress-wp1-redis
-PodmanArgs=--init
 
 # ==== Command ====
-
+Exec=redis-server --save "" --appendonly no --maxmemory 128mb --maxmemory-policy allkeys-lru
 
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=wordpress-wp1-redis.volume:/data:Z
 
 # ==== Networks ====
 Network=wordpress-wp1.network
@@ -25,27 +22,28 @@ NetworkAlias=redis
 
 # ==== Secrets ====
 
-
 # ==== Environment ====
-
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=redis-cli ping | grep PONG || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=10s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
 [Service]
 Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
-Restart=always
+Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=60
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress-wp1-redis)" != "healthy" ]; do sleep 2; done'
 
 [Install]
 WantedBy=default.target

@@ -1,2 +1,3 @@
 [Network]
 NetworkName=wordpress-wp1
+Label=app=wordpress-wp1
