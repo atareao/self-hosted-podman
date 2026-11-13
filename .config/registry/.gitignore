@@ -1,0 +1,4 @@
+# Renderizado en tiempo de deploy por unjinja (contiene el FQDN real del host)
+config.yml
+# Credenciales basic-auth del registry (bcrypt). No se versionan.
+htpasswd

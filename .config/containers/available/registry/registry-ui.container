@@ -8,15 +8,13 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/joxit/docker-registry-ui:main
 ContainerName=registry-ui
+AutoUpdate=registry
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-
 
 # ==== Networks ====
 Network=proxy.network
@@ -24,11 +22,11 @@ Network=registry.network
 NetworkAlias=registry-ui
 
 # ==== Secrets ====
-Secret=registry_nginx_proxy_pass_url,type=env,target=NGINX_PROXY_PASS_URL
 
 # ==== Environment ====
 Environment=SINGLE_REGISTRY=true
-Environment=REGISTRY_TITLE="Atareao Docker Registry"
+Environment="REGISTRY_TITLE=Atareao Docker Registry"
+Environment=NGINX_PROXY_PASS_URL=http://registry:5000
 Environment=DELETE_IMAGES=true
 Environment=SHOW_CONTENT_DIGEST=true
 Environment=SHOW_CATALOG_NB_TAGS=true
@@ -41,16 +39,14 @@ Environment=CATALOG_ELEMENTS_LIMIT=1000
 # ==== Labels ====
 Label=traefik.enable=true
 Label=traefik.http.services.registryui.loadbalancer.server.port=80
-Label=traefik.http.routers.registryui.rule=Host(`tu.${FQDN}`)
+Label=traefik.http.routers.registryui.rule=Host(`registry.${FQDN}`)
 Label=traefik.http.routers.registryui.entrypoints=websecure
 Label=traefik.http.routers.registryui.tls.certresolver=letsencrypt
 Label=traefik.http.routers.registryui.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
