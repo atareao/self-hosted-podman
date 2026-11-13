@@ -8,6 +8,7 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/library/rabbitmq:3-management
 ContainerName=rabbitmq
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
@@ -17,7 +18,7 @@ PodmanArgs=--init
 
 
 # ==== Volumes ====
-Volume=rabbitmq-data.volume:/var/lib/rabbitmq/mnseia/:Z
+Volume=rabbitmq-data.volume:/var/lib/rabbitmq/mnesia:U
 
 # ==== Networks ====
 Network=proxy.network
@@ -27,7 +28,7 @@ NetworkAlias=rabbitmq
 Secret=rabbitmq_default_pass,type=env,target=RABBITMQ_DEFAULT_PASS
 
 # ==== Environment ====
-Environment=RABBITMQ_DEFAULT_USER=usuario
+Environment=RABBITMQ_DEFAULT_USER=admin
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -38,10 +39,14 @@ Label=traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt
 Label=traefik.http.routers.rabbitmq.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=rabbitmq-diagnostics -q ping
+HealthInterval=30s
+HealthRetries=5
+HealthTimeout=10s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
+User=rabbitmq
 
 # ==== Resources ====
 
