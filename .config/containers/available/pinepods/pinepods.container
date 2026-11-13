@@ -22,7 +22,6 @@ PodmanArgs=--init
 Volume=pinepods-downloads.volume:/opt/pinepods/downloads:Z
 Volume=pinepods-backups.volume:/opt/pinepods/backups:Z
 Volume=/etc/localtime:/etc/localtime:ro
-Volume=/etc/timezone:/etc/timezone:ro
 
 # ==== Networks ====
 Network=proxy.network

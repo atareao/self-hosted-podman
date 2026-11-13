@@ -18,7 +18,6 @@ PublishPort=2222:22
 
 # ==== Volumes ====
 Volume=gitea-data.volume:/data:Z
-Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 # ==== Networks ====
