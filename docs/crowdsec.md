@@ -14,6 +14,7 @@ Security Engine **global** de análisis de logs y protección DDoS; su LAPI alim
   - /data/self-hosted-podman/.config/containers/available/crowdsec/crowdsec.container
   - /data/self-hosted-podman/.config/containers/available/crowdsec/crowdsec-config.volume
   - /data/self-hosted-podman/.config/containers/available/crowdsec/crowdsec-data.volume
+- **Red(es)**: /data/self-hosted-podman/.config/containers/available/crowdsec/security.network (red compartida; la consumen también `vector` y `openobserve`)
 - **Volumen(es)**:
   - /data/self-hosted-podman/.config/containers/available/crowdsec/crowdsec-config.volume -> /etc/crowdsec
   - /data/self-hosted-podman/.config/containers/available/crowdsec/crowdsec-data.volume -> /var/lib/crowdsec/data

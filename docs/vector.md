@@ -8,7 +8,7 @@ Vector: recolector, transformador y enrutador de logs basado en Rust (imagen `do
 
 - Quadlet(s): `.config/containers/available/vector/vector.container`
 - Volumen(es): `.config/containers/available/vector/vector-data.volume`
-- Red(es): `.config/containers/available/vector/security.network`
+- Red(es): `security.network` (red compartida, definida en el stack `crowdsec`: `.config/containers/available/crowdsec/security.network`)
 - Config no secreta: `.config/vector/vector.env` (versionada); overrides de máquina en `.config/vector/vector.env.local` (gitignored, creado por el hook `post_pull`)
 - Secretos: `openobserve_root_password` (activo, el mismo que usa la stack OpenObserve)
 

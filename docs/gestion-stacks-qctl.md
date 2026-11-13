@@ -171,7 +171,7 @@ Host `new_atareao` (usuario `runner`), 2026-11-07:
    (`ghcr.io/atareao/errserve:latest`, escucha `0.0.0.0:8080`, red `proxy.network`,
    `NetworkAlias=errserve`). Sin secretos ni volúmenes.
 4. `qctl check` → **rc=0** con 2 avisos de convención: `proxy.network` (stack `traefik`) y
-   `security.network` (stack `vector`). Son redes **compartidas**, no units de stack → falso positivo
+   `security.network` (stack `crowdsec`). Son redes **compartidas**, no units de stack → falso positivo
    conocido de la regla actual.
 5. `qctl status --compact` → `errserve`, `pocketid` y `traefik` los tres `linked` + `running`.
 6. Pruebas HTTPS externas: subdominio inexistente y ruta inexistente → **404 real** servido por

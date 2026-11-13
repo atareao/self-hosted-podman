@@ -88,7 +88,7 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | rustfs | `docs/rustfs.md` | PLAN-019 / #14 | 200 | corregido: healthcheck exec; console en /rustfs/console |
 | storyteller | `docs/storyteller.md` | PLAN-019 / #14 | 200 | corregido: volumen :rw:Z→:Z |
 | pdfding | `docs/pdfding.md` | PLAN-019 / #14 | 200 | 2 volúmenes |
-| openobserve | `docs/openobserve.md` | PLAN-019 / #14 | 200 | requiere security.network (stack vector) |
+| openobserve | `docs/openobserve.md` | PLAN-019 / #14 | 200 | requiere security.network (stack crowdsec) |
 | ntfy | `docs/ntfy.md` | PLAN-021 / #16 | 200 | corregido: imagen oficial + `Exec=serve` |
 | opengist | `docs/opengist.md` | PLAN-021 / #16 | 302 | router/servicio `gist`; secretos Gitea obligatorios |
 | filebrowser | `docs/filebrowser.md` | PLAN-021 / #16 | 200 | layout v2.63 (`/config`,`/database`); puerto 8080 |

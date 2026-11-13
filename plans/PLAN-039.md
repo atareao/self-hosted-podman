@@ -47,6 +47,7 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 13. **Rate limit de Let's Encrypt** (bloqueante **externo**, no un bug de configuración): `servidorlinux.es` agotó el límite de **50 certificados / 168 h** (HTTP 429). Traefik sirve su certificado por defecto en `gitea.${FQDN}` y `podcasts.${FQDN}` hasta el reset (~20:05 UTC del 2026-11-13); `dockge`/`headscale` siguen sirviendo un LE válido. Ver `docs/estado-verificacion-e2e.md`.
 14. **`HOSTNAME` de pinepods con llaves simples** (`pinepods.container`): `HOSTNAME=https://{FQDN}` no expandía → corregido a `https://podcasts.${FQDN}`, alineado con el router `Host(`podcasts.${FQDN}`)`.
 15. **Convención E2E omitida en el plan original**: el plan no recogía la convención del proyecto de usar el resolver **`letsencrypt-staging`** en las rondas E2E (para no agotar la cuota de producción de LE). Se corrigió durante la ejecución: la verificación de certificado se hizo con `letsencrypt-staging` (cambio temporal del label `certresolver` en prod, revertido con `yadm checkout`).
+16. **`security.network` estaba definida en el stack `vector`** (a purgar) pese a ser usada por `crowdsec` en producción; se movió a `crowdsec` antes de la purga.
 
 ## Tareas
 
