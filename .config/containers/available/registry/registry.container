@@ -19,7 +19,7 @@ PodmanArgs=--init
 
 # ==== Volumes ====
 Volume=registry-data.volume:/var/lib/registry:Z
-Volume=%h/.config/registry/config.yml:/etc/docker/registry/config.yml:Z
+Volume=%h/.config/registry/config.yml:/etc/distribution/config.yml:Z
 Volume=%h/.config/registry/htpasswd:/auth/htpasswd:ro
 
 # ==== Networks ====
