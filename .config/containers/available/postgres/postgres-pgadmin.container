@@ -21,6 +21,7 @@ Volume=postgres-pgadmin.volume:/var/lib/pgadmin:Z
 
 # ==== Networks ====
 Network=proxy.network
+Network=postgres.network
 NetworkAlias=pgadmin
 
 # ==== Secrets ====

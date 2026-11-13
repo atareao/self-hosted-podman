@@ -6,9 +6,9 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/postgres:latest
-AutoUpdate=registry
+Image=docker.io/library/postgres:17-alpine
 ContainerName=postgres-postgres
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -34,7 +34,11 @@ Environment=POSTGRES_DB=test_db
 
 
 # ==== Healthcheck ====
-
+HealthCmd=pg_isready -U root -d test_db
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=15s
 
 # ==== Hardening ====
 
