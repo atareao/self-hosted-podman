@@ -1,5 +1,6 @@
 [Unit]
 Description=MariaDB
+After=network-online.target
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -21,19 +22,17 @@ Network=wordpress.network
 NetworkAlias=mariadb
 
 # ==== Secrets ====
-Secret=mariadb_root_password
-Secret=wordpress_db_password
+Secret=mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=wordpress_db_password,type=env,target=MARIADB_PASSWORD
 
 # ==== Environment ====
-Environment=MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
-Environment=MARIADB_PASSWORD_FILE=/run/secrets/wordpress_db_password
 Environment=MARIADB_DATABASE=wordpress
 Environment=MARIADB_USER=wp_user
 
 # ==== Labels ====
 
 # ==== Healthcheck ====
-HealthCmd=mariadb-admin ping --user=root --password=$(cat /run/secrets/mariadb_root_password) --silent
+HealthCmd=mariadb-admin ping --user=root --password="$MARIADB_ROOT_PASSWORD" --silent
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s

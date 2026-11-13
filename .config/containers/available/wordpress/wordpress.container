@@ -1,7 +1,7 @@
 [Unit]
 Description=WordPress Engine
-After=wordpress.network mariadb.service valkey.service
-Requires=mariadb.service valkey.service
+After=network-online.target wordpress-mariadb.service wordpress-valkey.service traefik.service
+Requires=wordpress-mariadb.service wordpress-valkey.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -10,6 +10,7 @@ StartLimitBurst=3
 Image=docker.io/library/wordpress:latest
 ContainerName=wordpress
 AutoUpdate=registry
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -23,28 +24,27 @@ Network=wordpress.network
 Network=proxy.network
 
 # ==== Secrets ====
-Secret=wordpress_db_password
+Secret=wordpress_db_password,type=env,target=WORDPRESS_DB_PASSWORD
 
 # ==== Environment ====
 Environment=WORDPRESS_DB_HOST=mariadb
 Environment=WORDPRESS_DB_USER=wp_user
 Environment=WORDPRESS_DB_NAME=wordpress
-Environment=WORDPRESS_DB_PASSWORD_FILE=/run/secrets/wordpress_db_password
-Environment="WORDPRESS_CONFIG_EXTRA=define('WP_REDIS_HOST', 'valkey');"
-# Configuración para que WP reconozca el Proxy Inverso (Traefik)
-#Environment=WORDPRESS_CONFIG_EXTRA=define('FORCE_SSL_ADMIN', true); if ($_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $_SERVER['HTTPS']='on';
+Environment="WORDPRESS_CONFIG_EXTRA=define('WP_REDIS_HOST', 'valkey'); if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') { $_SERVER['HTTPS'] = 'on'; } define('FORCE_SSL_ADMIN', true);"
 
 # ==== Labels ====
 Label=traefik.enable=true
-Label=traefik.http.routers.wp.rule=Host(`blog.${FQDN}`)
-Label=traefik.http.routers.wp.entrypoints=websecure
-Label=traefik.http.routers.wp.tls.certresolver=letsencrypt
-Label=traefik.http.routers.wp.middlewares=seguridadHeaders@file,compresionHeaders@file
+Label=traefik.http.services.wordpress.loadbalancer.server.port=80
+Label=traefik.http.routers.wordpress.rule=Host(`blog.${FQDN}`)
+Label=traefik.http.routers.wordpress.entrypoints=websecure
+Label=traefik.http.routers.wordpress.tls.certresolver=letsencrypt
+Label=traefik.http.routers.wordpress.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 HealthCmd=curl -f http://localhost/wp-login.php || exit 1
 HealthInterval=10s
 HealthRetries=3
+HealthTimeout=5s
 HealthStartPeriod=30s
 
 # ==== Hardening ====
@@ -56,7 +56,7 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=on-failure
 RestartSec=10s
-TimeoutStartSec=60
+TimeoutStartSec=300
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress)" != "healthy" ]; do sleep 2; done'
 
 [Install]

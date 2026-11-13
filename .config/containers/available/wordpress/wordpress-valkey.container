@@ -1,5 +1,8 @@
 [Unit]
 Description=Valkey Cache para WordPress
+After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
 
 [Container]
 # ==== Image ====
@@ -25,15 +28,22 @@ NetworkAlias=valkey
 # ==== Labels ====
 
 # ==== Healthcheck ====
-HealthCmd=redis-cli ping | grep PONG || exit 1
-HealthInterval=5s
+HealthCmd=valkey-cli ping | grep PONG || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=10s
 
 # ==== Hardening ====
 
 # ==== Resources ====
 
 [Service]
+Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
+Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
+RestartSec=10s
+TimeoutStartSec=60
 ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" wordpress-valkey)" != "healthy" ]; do sleep 2; done'
 
 [Install]
