@@ -6,39 +6,38 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/yobasystems/alpine-mariadb:latest
-AutoUpdate=registry
+Image=docker.io/library/mariadb:11
 ContainerName=firefly-mariadb
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=%h/.config/firefly/firefly_db:/var/lib/mysql:Z
+Volume=firefly-mariadb.volume:/var/lib/mysql:Z
 
 # ==== Networks ====
 Network=firefly.network
 NetworkAlias=db_for_firefly
 
 # ==== Secrets ====
-Secret=firefly_mysql_random_root_password,type=env,target=MYSQL_RANDOM_ROOT_PASSWORD
-Secret=firefly_mysql_password,type=env,target=MYSQL_PASSWORD
+Secret=firefly_mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=firefly_db_password,type=env,target=MARIADB_PASSWORD
 
 # ==== Environment ====
-Environment=MYSQL_USER=firefly
-Environment=MYSQL_DATABASE=firefly
+Environment=MARIADB_DATABASE=firefly
+Environment=MARIADB_USER=firefly
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=mariadb-admin ping --user=root --password="$MARIADB_ROOT_PASSWORD" --silent
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

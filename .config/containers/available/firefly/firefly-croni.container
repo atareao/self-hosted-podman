@@ -11,12 +11,10 @@ ContainerName=firefly-croni
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=%h/.config/firefly/crontab:/crontab:Z
+Volume=%h/.config/firefly/crontab:/crontab.txt:ro,Z
 
 # ==== Networks ====
 Network=firefly.network
@@ -24,18 +22,14 @@ NetworkAlias=croni_for_firefly
 
 # ==== Secrets ====
 
-
 # ==== Environment ====
-
+Environment=LOGLEVEL=info
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

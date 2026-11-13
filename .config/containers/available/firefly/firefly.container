@@ -1,33 +1,41 @@
 [Unit]
 Description=firefly
-After=network-online.target traefik.service
+After=network-online.target firefly-mariadb.service traefik.service
+Requires=firefly-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/fireflyiii/core:latest
-AutoUpdate=registry
+Image=docker.io/fireflyiii/core:version-6.7.9
 ContainerName=firefly
 
 # ==== Command ====
 
-
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=%h/.config/firefly/firefly_upload:/var/www/html/storage/upload:Z
 
 # ==== Networks ====
+Network=firefly.network
 Network=proxy.network
 NetworkAlias=fireflyiii
 
 # ==== Secrets ====
-
+Secret=firefly_app_key,type=env,target=APP_KEY
+Secret=firefly_db_password,type=env,target=DB_PASSWORD
 
 # ==== Environment ====
-
+Environment=APP_ENV=production
+Environment=APP_URL=https://firefly.${FQDN}
+Environment=TRUSTED_PROXIES=10.89.0.0/24
+Environment=DB_CONNECTION=mysql
+Environment=DB_HOST=db_for_firefly
+Environment=DB_PORT=3306
+Environment=DB_DATABASE=firefly
+Environment=DB_USERNAME=firefly
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -38,10 +46,13 @@ Label=traefik.http.routers.firefly.tls.certresolver=letsencrypt
 Label=traefik.http.routers.firefly.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=curl -fsS http://127.0.0.1:8080/ || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=60s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
@@ -50,7 +61,8 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 RestartSec=10s
-TimeoutStartSec=60
+TimeoutStartSec=300
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" firefly)" != "healthy" ]; do sleep 2; done'
 
 [Install]
 WantedBy=default.target

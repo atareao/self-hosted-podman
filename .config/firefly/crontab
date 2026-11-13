@@ -1,0 +1,4 @@
+# Firefly III v6 ejecuta su cron real vía `php artisan firefly-iii:cron` dentro del
+# contenedor de la app; este sidecar (atareao/croni) queda como latido/placeholder.
+# Ver docs/firefly.md.
+0 * * * * echo "firefly-croni alive" >/proc/1/fd/1
