@@ -6,8 +6,9 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/postgres:11.6-alpine
+Image=docker.io/library/postgres:17-alpine
 ContainerName=codimd-postgresql
+PodmanArgs=--init
 
 # ==== Command ====
 
@@ -16,23 +17,30 @@ ContainerName=codimd-postgresql
 
 
 # ==== Volumes ====
-Volume=%h/.config/codimd/codimddb:/var/lib/postgresql/data":Z
+Volume=codimd-postgresql.volume:/var/lib/postgresql/data:U
 
 # ==== Networks ====
 Network=codimd.network
 NetworkAlias=codimddb
 
 # ==== Secrets ====
-
+Secret=codimd_postgres_password,type=env,target=POSTGRES_PASSWORD
 
 # ==== Environment ====
-
+Environment=POSTGRES_USER=codimd
+Environment=POSTGRES_DB=codimd
+Environment=POSTGRES_HOST_AUTH_METHOD=md5
+Environment=POSTGRES_INITDB_ARGS=--auth-host=md5
 
 # ==== Labels ====
 
 
 # ==== Healthcheck ====
-
+HealthCmd=pg_isready -U codimd -d codimd
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=15s
 
 # ==== Hardening ====
 

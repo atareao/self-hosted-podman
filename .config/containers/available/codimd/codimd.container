@@ -1,6 +1,7 @@
 [Unit]
 Description=codimd
-After=network-online.target traefik.service
+After=network-online.target codimd-postgresql.service traefik.service
+Requires=codimd-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -8,6 +9,7 @@ StartLimitBurst=3
 # ==== Image ====
 Image=docker.io/hackmdio/hackmd:2.4.2-cjk
 ContainerName=codimd
+AutoUpdate=registry
 
 # ==== Command ====
 
@@ -16,17 +18,21 @@ ContainerName=codimd
 
 
 # ==== Volumes ====
-Volume=%h/.config/codimd/codimd:/home/hackmd/app/public/uploads:Z
+Volume=codimd-uploads.volume:/home/hackmd/app/public/uploads:U
 
 # ==== Networks ====
 Network=proxy.network
+Network=codimd.network
 NetworkAlias=codimd
 
 # ==== Secrets ====
-
+Secret=codimd_db_url,type=env,target=CMD_DB_URL
+Secret=codimd_session_secret,type=env,target=CMD_SESSION_SECRET
 
 # ==== Environment ====
-
+Environment=CMD_DOMAIN=codimd.${FQDN}
+Environment=CMD_PROTOCOL_USESSL=true
+Environment=CMD_URL_ADDPORT=false
 
 # ==== Labels ====
 Label=traefik.enable=true
