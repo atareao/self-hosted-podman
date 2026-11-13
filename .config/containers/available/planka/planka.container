@@ -1,6 +1,7 @@
 [Unit]
 Description=planka
-After=network-online.target traefik.service
+After=network-online.target planka-postgresql.service traefik.service
+Requires=planka-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -24,14 +25,15 @@ Volume=planka-attachments.volume:/app/private/attachments:Z
 
 # ==== Networks ====
 Network=proxy.network
+Network=planka.network
 NetworkAlias=planka
 
 # ==== Secrets ====
 Secret=planka_secret_key,type=env,target=SECRET_KEY
 
 # ==== Environment ====
-Environment=BASE_URL="http://planka.${FQDN}"
-Environment=TRUST_PROXY=0
+Environment=BASE_URL=https://planka.${FQDN}
+Environment=TRUST_PROXY=true
 Environment=DATABASE_URL=postgresql://postgres@postgres/planka
 
 # ==== Labels ====
