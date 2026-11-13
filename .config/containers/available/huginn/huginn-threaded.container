@@ -1,6 +1,7 @@
 [Unit]
 Description=huginn-threaded
-After=network-online.target
+After=network-online.target huginn-mariadb.service
+Requires=huginn-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
@@ -26,10 +27,14 @@ NetworkAlias=threaded
 
 # ==== Secrets ====
 Secret=huginn_database_password,type=env,target=DATABASE_PASSWORD
+Secret=huginn_app_secret_token,type=env,target=APP_SECRET_TOKEN
 
 # ==== Environment ====
 Environment=DATABASE_NAME=huginn
 Environment=DATABASE_USERNAME=huginn
+Environment=DATABASE_ADAPTER=mysql2
+Environment=DATABASE_HOST=mariadb
+Environment=DATABASE_PORT=3306
 Environment=WORKER_CMD=bin/threaded.rb
 
 # ==== Labels ====
