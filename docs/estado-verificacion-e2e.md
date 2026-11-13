@@ -1,6 +1,6 @@
 # Estado de verificación E2E de los stacks
 
-Última actualización: 2026-11-12.
+Última actualización: 2026-11-13.
 
 Inventario de fiabilidad del repo: distingue lo que ya se ha **probado end-to-end en producción**
 de lo que sólo existe como quadlet + doc sin validar en el host real.
@@ -24,19 +24,20 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 88 |
+| Verificados E2E (probados y purgados) | 92 |
 | Bloqueados / hallazgos (ver sección) | 3 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **32** |
+| **Sin verificar E2E** | **28** |
 
 ## Verificados E2E (probados y purgados)
 
-Todos entre el **2026-11-09** y el **2026-11-12** (el **lote 3** — `bookstack`, `dnote`,
+Todos entre el **2026-11-09** y el **2026-11-13** (el **lote 3** — `bookstack`, `dnote`,
 `focalboard`, `snibox`, `umami` y `hedgedoc` — es del **2026-11-11**; el **lote 4** — `wallabag`,
 `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs` —, del **2026-11-11/12**; el **lote 5** —
 `mtproxy`, `simple-torrent`, `socks5`, `webdav`, `miniflux-client` y `zennotes` — se verificó y
 purgó el **2026-11-12**; el **lote 6** — `tick`, `mumble`, `cells`, `chevereto` y `jellystat` — se
-verificó y purgó el **2026-11-12**): desplegados,
+verificó y purgó el **2026-11-12**; el **lote 7** — `photoprism`, `rabbitmq`, `weaviate` y
+`wordpress` —, el **2026-11-13**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -131,6 +132,10 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | cells | `docs/cells.md` | PLAN-034 / #29 | 200 | 2 contenedores; `MYSQL_DATABASE`/`MYSQL_USER` por `cells.env`; dependencia app→MySQL |
 | chevereto | `docs/chevereto.md` | PLAN-034 / #29 | 302 | service port 8080; `User=0`; healthcheck con `curl` |
 | jellystat | `docs/jellystat.md` | PLAN-034 / #29 | 200 | 2 contenedores; `POSTGRES_*` por `jellystat.env`; dependencia app→PostgreSQL |
+| photoprism | `docs/photoprism.md` | PLAN-035 / #30 | 307 (/), 200 (login) | fix: sin `--init` (la imagen ya trae s6-overlay), secreto `photoprism_admin_password` + `SITE_URL`, healthcheck por `curl` a `127.0.0.1:2342`, `HealthStartPeriod=120s` |
+| rabbitmq | `docs/rabbitmq.md` | PLAN-035 / #30 | 200 | fix: volumen `mnseia`→`mnesia` + `:U`, secreto `rabbitmq_default_pass` inexistente, usuario `admin`, healthcheck; **`User=rabbitmq`** porque el healthcheck (root) creaba `.erlang.cookie` como root |
+| weaviate | `docs/weaviate.md` | PLAN-035 / #30 | n/a | **interno, sin Traefik** (excepción); fix: deja de publicar 8080/50051 sin auth → red propia `weaviate.network` + `NetworkAlias`; healthcheck `/v1/.well-known/ready`; gRPC validado con `grpc_health_probe` |
+| wordpress | `docs/wordpress.md` | PLAN-035 / #30 | 302 (/), 200 (/wp-login.php) | fix: `Requires=` a units inexistentes (`mariadb`/`valkey` → `wordpress-*`), router `wp`→`wordpress`, `service.port=80`, secretos `type=env`, `WP_CONFIG_EXTRA` unificado; 3 contenedores healthy; será plantilla de wp1/wp2 |
 
 ## Bloqueados / hallazgos
 
@@ -146,6 +151,18 @@ Hallazgo transversal (PLAN-031 / #26): `PodmanArgs=--init` es **incompatible** c
 (`lscr.io/linuxserver/*`): usan s6-overlay y exigen ser PID 1, y abortan con
 `s6-overlay-suexec: fatal: can only run as pid 1`. Se omitió `--init` en los quadlets afectados. Ver
 `docs/bookstack.md` y `docs/hedgedoc.md`.
+
+Hallazgo transversal (PLAN-035 / #30): el patrón **no es exclusivo de LinuxServer.io**. La imagen
+oficial `photoprism/photoprism:latest` (26.04, Ubuntu 26.04) también pasó a **s6-overlay** y rompe
+igual con `PodmanArgs=--init`. Antes de añadir `--init`, comprobar si la imagen trae s6-overlay.
+
+Hallazgo transversal (PLAN-035 / #30): **healthchecks que corren como root** en imágenes con
+`gosu`/`su-exec` (`rabbitmq`, y candidatos del mismo patrón como `postgres`, `redis`/`valkey`,
+`mongo`). El healthcheck se ejecuta con el usuario del contenedor (root), no con el de servicio, y
+crea ficheros en el HOME del usuario de servicio (`/var/lib/rabbitmq/.erlang.cookie` como
+`root:root 400`). El proceso real, ya sin privilegios, falla con `eacces` y entra en crash-loop.
+Fix: `User=<usuario-de-servicio>` en `[Container]` **y** volumen con `:U` para que el `chown` cuadre.
+Ver `docs/rabbitmq.md`.
 
 ### Pendientes abiertos del lote 4 (PLAN-032 / #27)
 
@@ -165,7 +182,7 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (32)
+## Sin verificar E2E (28)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
@@ -174,11 +191,11 @@ facturascripts, firefly,
 gitea, grafana-influx-telegraf, huginn,
 immich, invidious, matrix, matrixmail,
 miniflux, nextcloud, nitter,
-odoo, open-webui, photoprism,
-pinepods, planka, plausible, postgres, rabbitmq,
+odoo, open-webui,
+pinepods, planka, plausible, postgres,
 registry,
 vector,
-weaviate, wger, wordpress, wordpress-wp1, wordpress-wp2.
+wger, wordpress-wp1, wordpress-wp2.
 
 ## Notas
 
@@ -196,3 +213,4 @@ weaviate, wger, wordpress, wordpress-wp1, wordpress-wp2.
 - PLAN-030 (issue #25): ronda E2E lote 2 **completada** — verificados y purgados: `atuin`, `beszel`, `radicale`, `wakapi`, `wikijs` y `zincsearch`. Bugs latentes corregidos: atuin (imagen oficial + `Exec=start`, PG 18 con volumen en `/var/lib/postgresql`, red de BD), beszel (login por contraseña, agente SSH/TCP con clave del hub, volumen `beszel-socket` eliminado), radicale (router `expulsabot`→`radicale`, binds uid 1000, htpasswd apr1/md5), wikijs (`DB_HOST` `db`→`postgres`, service port 80→3000). Cifras: 127 = 65 verificados + 4 en producción + 2 bloqueados + 56 sin verificar.
 - PLAN-031 (issue #26): ronda E2E lote 3 **completada** — verificados y purgados: `bookstack`, `dnote`, `focalboard`, `snibox`, `umami` y `hedgedoc`. Bugs latentes corregidos: umami (`Requires=`/`After=` → `umami-postgresql.service`), focalboard (PG 18 con volumen en `/var/lib/postgresql`, secretos `focalboard_postgres_password` + `focalboard_database_url`, bind `config.json` → `FOCALBOARD_DBTYPE=postgres`), bookstack (app en `bookstack.network`, binds separados app/BD, `APP_KEY` por secreto, `DB_USERNAME`/`DB_PASSWORD`), dnote (app en `dnote.network`, secreto único de BD, service port 3001), snibox (nginx en `snibox.network`, `snibox_postgres_password` compartido) y hedgedoc (`Requires=`/`After=` hacia MariaDB). Regla nueva: sin `PodmanArgs=--init` en imágenes LinuxServer.io (s6-overlay exige PID 1). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 71 verificados + 4 en producción + 2 bloqueados + 50 sin verificar.
 - PLAN-032 (issue #27): ronda E2E lote 4 **completada** — verificados y purgados: `wallabag`, `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs`. Bugs latentes corregidos: wallabag (placeholder `SYMFONY__ENV__SERVER_NAME`), whisper (imagen `:latest` sin GPU + modelo `small` + host 9000→9001), unbound (publica 5353 y config por el include real de la imagen), watchbeat (issuer OIDC real + redirect al subdominio, healthcheck en `127.0.0.1` + `AddHost`), publirs (Traefik en `publirs.${FQDN}`, `crontab.txt` en croni, sin bind a `/etc/timezone`). Excepciones internas sin Traefik: `whisper` y `unbound`. Pendientes abiertos en la sección «Bloqueados / hallazgos». Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 77 verificados + 4 en producción + 2 bloqueados + 44 sin verificar.
+- PLAN-035 (issue #30): ronda E2E lote 7 **completada** — verificados y purgados: `photoprism`, `rabbitmq`, `weaviate` y `wordpress`. Bugs latentes corregidos: photoprism (sin secretos ni `SITE_URL`; se añadió `photoprism_admin_password` + `SITE_URL`/`TZ`; sin `--init` porque la imagen ya trae s6-overlay; healthcheck por `curl` porque `photoprism status` no conecta), rabbitmq (volumen `mnseia`→`mnesia` con `:U`, secreto inexistente, usuario `admin`, healthcheck), weaviate (dejaba de publicar 8080/50051 sin auth: red propia + `NetworkAlias` y sin `PublishPort`) y wordpress (`Requires=` a units inexistentes, router `wp`→`wordpress` + `service.port=80`, secretos `type=env`, `WP_CONFIG_EXTRA` unificado; plantilla de wp1/wp2). `weaviate` es la excepción interna sin Traefik. Dos patrones nuevos documentados en «Bloqueados / hallazgos»: healthchecks que corren como root en imágenes con `gosu`/`su-exec`, e imágenes que migran a s6-overlay y rompen con `PodmanArgs=--init`. Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 92 verificados + 4 en producción + 3 bloqueados + 28 sin verificar.
