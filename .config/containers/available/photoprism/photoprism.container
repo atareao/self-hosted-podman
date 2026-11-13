@@ -7,8 +7,8 @@ StartLimitBurst=3
 [Container]
 # ==== Image ====
 Image=docker.io/photoprism/photoprism:latest
-AutoUpdate=registry
 ContainerName=photoprism
+AutoUpdate=registry
 
 # ==== Command ====
 
@@ -19,17 +19,19 @@ ContainerName=photoprism
 # ==== Volumes ====
 Volume=%h/.config/photoprism/Pictures:/photoprism/originals:Z
 Volume=%h/.config/photoprism/Storage:/photoprism/storage:Z
-Volume=%h/.config/photoprism/Import:/photoprism/import:Z
+Volume=%h/.config/photoprism/Import:/photoprism/import:ro
 
 # ==== Networks ====
 Network=proxy.network
 NetworkAlias=photoprism
 
 # ==== Secrets ====
-
+Secret=photoprism_admin_password,type=env,target=PHOTOPRISM_ADMIN_PASSWORD
 
 # ==== Environment ====
-
+Environment=PHOTOPRISM_ADMIN_USER=admin
+Environment=PHOTOPRISM_SITE_URL=https://photoprism.${FQDN}/
+Environment=TZ=Europe/Madrid
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -40,10 +42,11 @@ Label=traefik.http.routers.photoprism.tls.certresolver=letsencrypt
 Label=traefik.http.routers.photoprism.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-HealthCmd=photoprism status || exit 1
+HealthCmd=curl -f -s -o /dev/null http://127.0.0.1:2342/ || exit 1
 HealthInterval=60s
 HealthRetries=5
 HealthTimeout=15s
+HealthStartPeriod=120s
 
 # ==== Hardening ====
 
