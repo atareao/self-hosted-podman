@@ -1,24 +1,22 @@
 [Unit]
 Description=dev-phpmyadmin
-After=network-online.target
+After=network-online.target dev-mariadb.service traefik.service
+Requires=dev-mariadb.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/phpmyadmin
-AutoUpdate=registry
+Image=docker.io/library/phpmyadmin:5
 ContainerName=dev-phpmyadmin
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-
 
 # ==== Networks ====
 Network=proxy.network
@@ -27,18 +25,21 @@ NetworkAlias=phpmyadmin
 
 # ==== Secrets ====
 
-
 # ==== Environment ====
-
+Environment=PMA_HOST=mariadb
+Environment=PMA_PORT=3306
 
 # ==== Labels ====
-
+Label=traefik.enable=true
+Label=traefik.http.services.dev-phpmyadmin.loadbalancer.server.port=80
+Label=traefik.http.routers.dev-phpmyadmin.rule=Host(`dev-pma.${FQDN}`)
+Label=traefik.http.routers.dev-phpmyadmin.entrypoints=websecure
+Label=traefik.http.routers.dev-phpmyadmin.tls.certresolver=letsencrypt
+Label=traefik.http.routers.dev-phpmyadmin.middlewares=oidc-auth@file,seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
 
-
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

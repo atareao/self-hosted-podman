@@ -12,9 +12,7 @@ PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=dev-redis.volume:/data:Z
@@ -25,18 +23,18 @@ NetworkAlias=redis
 
 # ==== Secrets ====
 
-
 # ==== Environment ====
-
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=redis-cli ping | grep PONG || exit 1
+HealthInterval=10s
+HealthRetries=5
+HealthTimeout=5s
+HealthStartPeriod=10s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 

@@ -1,28 +1,23 @@
 [Unit]
 Description=dev-wordpress
-After=network-online.target
+After=network-online.target dev-mariadb.service dev-redis.service traefik.service
+Requires=dev-mariadb.service dev-redis.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/wordpress
-AutoUpdate=registry
+Image=docker.io/library/wordpress:6
 ContainerName=dev-wordpress
+AutoUpdate=registry
 PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
 
-
 # ==== Volumes ====
-Volume=dev-wordpress.volume:/var/www/html:Z
-Volume=%h/.config/dev/plugins:/var/www/html/wp-content/plugins:Z
-Volume=%h/.config/dev/themes:/var/www/html/wp-content/themes:Z
-Volume=%h/.config/dev/uploads:/var/www/html/wp-content/uploads:Z
-Volume=%h/.config/dev/wp-config.php:/var/www/html/wp-config.php:Z
+Volume=dev-wordpress.volume:/var/www/html/wp-content:Z
 
 # ==== Networks ====
 Network=proxy.network
@@ -36,15 +31,24 @@ Secret=dev_wordpress_db_password,type=env,target=WORDPRESS_DB_PASSWORD
 Environment=WORDPRESS_DB_HOST=mariadb
 Environment=WORDPRESS_DB_USER=dev
 Environment=WORDPRESS_DB_NAME=dev
+Environment="WORDPRESS_CONFIG_EXTRA=define('WP_REDIS_HOST', 'redis'); if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') { $_SERVER['HTTPS'] = 'on'; } define('FORCE_SSL_ADMIN', true);"
 
 # ==== Labels ====
-
+Label=traefik.enable=true
+Label=traefik.http.services.dev-wordpress.loadbalancer.server.port=80
+Label=traefik.http.routers.dev-wordpress.rule=Host(`dev.${FQDN}`)
+Label=traefik.http.routers.dev-wordpress.entrypoints=websecure
+Label=traefik.http.routers.dev-wordpress.tls.certresolver=letsencrypt
+Label=traefik.http.routers.dev-wordpress.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=curl -f http://localhost/wp-login.php || exit 1
+HealthInterval=10s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
@@ -53,7 +57,8 @@ Environment=SOPS_AGE_KEY_FILE=%h/.secrets/sops/age/key.txt
 Environment=PATH=/usr/local/bin:/usr/bin:%h/.local/bin
 Restart=always
 RestartSec=10s
-TimeoutStartSec=60
+TimeoutStartSec=300
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" dev-wordpress)" != "healthy" ]; do sleep 2; done'
 
 [Install]
 WantedBy=default.target

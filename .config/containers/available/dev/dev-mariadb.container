@@ -6,16 +6,13 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/library/mariadb
-AutoUpdate=registry
+Image=docker.io/library/mariadb:11
 ContainerName=dev-mariadb
 PodmanArgs=--init
 
 # ==== Command ====
 
-
 # ==== Ports ====
-
 
 # ==== Volumes ====
 Volume=dev-mariadb.volume:/var/lib/mysql:Z
@@ -25,21 +22,23 @@ Network=dev.network
 NetworkAlias=mariadb
 
 # ==== Secrets ====
-Secret=dev_mysql_password,type=env,target=MYSQL_PASSWORD
 Secret=dev_mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=dev_wordpress_db_password,type=env,target=MARIADB_PASSWORD
 
 # ==== Environment ====
-Environment=MYSQL_DATABASE=dev
-Environment=MYSQL_USER=dev
+Environment=MARIADB_DATABASE=dev
+Environment=MARIADB_USER=dev
 
 # ==== Labels ====
 
-
 # ==== Healthcheck ====
-
+HealthCmd=mariadb-admin ping --user=root --password="$MARIADB_ROOT_PASSWORD" --silent
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=30s
 
 # ==== Hardening ====
-
 
 # ==== Resources ====
 
