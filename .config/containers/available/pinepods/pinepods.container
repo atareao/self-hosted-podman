@@ -34,7 +34,7 @@ Secret=pinepods_db_password,type=env,target=DB_PASSWORD
 # ==== Environment ====
 Environment=SEARCH_API_URL=https://search.pinepods.online/api/search
 Environment=PEOPLE_API_URL=https://people.pinepods.online
-Environment=HOSTNAME=https://${FQDN}
+Environment=HOSTNAME=https://podcasts.${FQDN}
 Environment=DB_TYPE=postgresql
 Environment=DB_HOST=pinepods_db
 Environment=DB_PORT=5432
