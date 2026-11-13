@@ -5,7 +5,7 @@
 - imagen: docker.io/gitea/gitea:1.19
 - nº contenedores: 2
 - red: gitea.network, proxy.network
-- dominio: raíz ${FQDN}, subdominio gitea.${FQDN}
+- dominio: gitea.${FQDN} (`DOMAIN`, `SSH_DOMAIN` y `ROOT_URL` alineados con el router)
 - puerto interno: 3000
 
 ## Ficheros
@@ -20,13 +20,14 @@
   - gitea_db_password
 
 ## Cómo funciona
-- red: gitea.network y proxy.network
-- volúmenes: host paths %h/.config/gitea/... y %h/.config/gitea/... dentro de los contenedores
-- secretos: gitea_db_password (tipo env, target POSTGRES_PASSWORD)
+- red: gitea.network (BD) y proxy.network (borde Traefik)
+- volúmenes: `gitea-data.volume` en `/data` y bind de solo lectura `/etc/localtime` (**no** se monta `/etc/timezone`: no existe en el host Arch y el bind fallaba)
+- secretos: `gitea_db_password` (tipo env; target `GITEA__database__PASSWD` en la app y `POSTGRES_PASSWORD` en `gitea-db`)
 - EnvironmentFile: ninguno
 - socket del daemon: ninguno
-- healthcheck: ninguno
+- healthcheck: `curl -fsS http://127.0.0.1:3000/api/healthz` (30 s, 5 reintentos, `HealthStartPeriod=30s`)
 - Traefik enrutado: router "gitea" sobre Host(`gitea.${FQDN}`) con entrada websecure
+- trusted-proxy: `GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES=10.89.0.0/24`; Traefik termina la conexión, así que sin esto Gitea no ve la IP real del cliente
 - User/UserNS/NoNewPrivileges: no se especifica, se ejecuta como root
 
 ## Variables / configuración
@@ -41,8 +42,8 @@
 | GITEA__repository__DEFAULT_BRANCH | Environment= | main | |
 | GITEA__repository__ENABLE_PUSH_CREATE_ORG | Environment= | true | |
 | GITEA__server__OFFLINE_MODE | Environment= | true | |
-| GITEA__server__DOMAIN | Environment= | ${FQDN} | |
-| GITEA__server__SSH_DOMAIN | Environment= | ${FQDN} | |
+| GITEA__server__DOMAIN | Environment= | gitea.${FQDN} | alineado con ROOT_URL y el router |
+| GITEA__server__SSH_DOMAIN | Environment= | gitea.${FQDN} | |
 | GITEA__server__ROOT_URL | Environment= | https://gitea.${FQDN} | |
 | GITEA__server__DISABLE_SSH | Environment= | false | |
 | GITEA__server__SSH_PORT | Environment= | 2222 | |
@@ -50,11 +51,13 @@
 | GITEA__service__DISABLE_REGISTRATION | Environment= | true | |
 | GITEA__service__REQUIRE_SIGNIN_VIEW | Environment= | true | |
 | GITEA__service__DEFAULT_ALLOW_CREATE_ORGANIZATION | Environment= | false | |
+| GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES | Environment= | 10.89.0.0/24 | subred de `proxy.network` (IP real del cliente) |
 
 ## Cómo habilitar / desplegar
-1. Secretos (solo si existen; NUNCA crypta store): `printf '%s' '<valor>' | podman secret create <nombre> -`
+1. Secretos (NUNCA `crypta store`): `printf '%s' '<valor>' | podman secret create gitea_db_password -` (el mismo valor que espera la BD `gitea-db`).
 2. `cd /data/self-hosted-podman/.config/containers/available/gitea && qctl install`
 3. `systemctl --user daemon-reload`
 
 ## Follow-ups
-- (ninguno)
+- **Bump del pin**: la imagen sigue en `gitea:1.19` (tarea A4 sin cerrar); evaluar el salto a una versión estable actual.
+- **Cert LE**: `gitea.servidorlinux.es` quedó pendiente del certificado de producción por el rate limit de Let's Encrypt (bloqueante externo; Traefik sirve su cert por defecto hasta el reset). Ver `docs/estado-verificacion-e2e.md`.

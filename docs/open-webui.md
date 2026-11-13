@@ -16,23 +16,25 @@
   - .config/containers/available/open-webui/open-webui-data.volume
   - .config/containers/available/open-webui/open-webui-ollama.volume
 - Config no secreta: ninguno
-- Secretos: ninguno
+- Secretos: `open_webui_secret_key` (tipo env; target `WEBUI_SECRET_KEY`)
 
 ## Cómo funciona
 - **Red:** `open-webui.network` conecta los dos contenedores y permite la comunicación interna entre la UI y el modelo LLM.
+- **Dependencias:** `After=open-webui-ollama.service` + `Requires=open-webui-ollama.service` — la UI espera a que arranque el contenedor de Ollama.
 - **Volumes:** persistencia de la base de datos de la UI y el modelo de lenguaje.
-- **Healthcheck:** no definido.
-- **Traefik:** no se configuran etiquetas, por lo que el servicio debe exponerse de forma manual o mediante otra capa de reverse proxy.
+- **Secreto:** `open_webui_secret_key` → `WEBUI_SECRET_KEY` (creado con `podman secret create`; antes era una variable vacía).
+- **Healthcheck:** `curl -fsS http://127.0.0.1:8080/health` (30 s, 5 reintentos, `HealthStartPeriod=30s`).
+- **Traefik:** **sin labels por diseño** (igual que el repo origen `atareao/self-hosted`); no se publica por Traefik. Para exponerlo habría que añadir labels propias.
 - **User:** ninguno especificado.
 
 ## Variables / configuración
 | Var | Dónde | Valor | Descripción |
 |---|---|---|---|
 | OLLAMA_BASE_URL | open-webui.container | http://ollama:11434 | URL del backend de ollama |
-| WEBUI_SECRET_KEY | open-webui.container | (vacío) | Clave de seguridad de la UI |
+| WEBUI_SECRET_KEY | open-webui.container (`Secret=open_webui_secret_key`) | *(secreto)* | Clave de seguridad de la UI (antes vacía) |
 
 ## Cómo habilitar / desplegar
-1. Secretos: ninguno que crear.
+1. Secretos (NUNCA `crypta store`): `printf '%s' '<valor>' | podman secret create open_webui_secret_key -`
 2. `cd .config/containers/available/open-webui && qctl install`
 3. `systemctl --user daemon-reload`
 
