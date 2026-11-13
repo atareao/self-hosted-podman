@@ -16,6 +16,7 @@ sirve la UI y el worker consume la cola de trabajos. **No son duplicados** (mism
 stacks con worker, p. ej. `wger`).
 
 - **Redes:** `huginn.network` (interna del stack) para los tres; solo la web se une además a `proxy.network`.
+  La BD lleva `NetworkAlias=mariadb`, que es el host usado por la app.
 - **Dominio:** `huginn.${FQDN}` (subdominio) → router `huginn`, servicio `huginn`, puerto interno `3000`.
 
 ## Ficheros
@@ -29,19 +30,23 @@ stacks con worker, p. ej. `wger`).
 - Red(es):
   - `.config/containers/available/huginn/huginn.network` (`NetworkName=huginn`)
 - Config no secreta: ninguna (todo por `Environment=` y `Secret=`).
-- Secretos: `huginn_database_password`, `huginn_mysql_password`, `huginn_mariadb_root_password`.
+- Secretos: `huginn_database_password`, `huginn_mysql_password`, `huginn_mariadb_root_password`,
+  `huginn_app_secret_token`.
 
 ## Cómo funciona
 
 - **Web** (`huginn.container`): labels de Traefik (`Host(\`huginn.${FQDN}\`)`, puerto `3000`), `DATABASE_NAME=huginn`,
-  `DATABASE_USERNAME=huginn` y `Secret=huginn_database_password` → `DATABASE_PASSWORD`.
-- **Worker** (`huginn-threaded.container`): `WORKER_CMD=bin/threaded.rb`, `NetworkAlias=threaded`; **sin labels**
-  (no se expone).
-- **BD** (`huginn-mariadb.container`): `MYSQL_DATABASE=huginn`, `MYSQL_USER=huginn`, secretos
-  `huginn_mysql_password` (`MYSQL_PASSWORD`) y `huginn_mariadb_root_password` (`MARIADB_ROOT_PASSWORD`);
-  volumen `huginn-mariadb.volume` en `/var/lib/mysql:Z`.
-- Ninguno de los tres declara healthcheck ni `After=`/`Requires=` sobre la BD: si la web arranca antes que
-  MariaDB, reintenta.
+  `DATABASE_USERNAME=huginn`, `DATABASE_ADAPTER=mysql2`, `DATABASE_HOST=mariadb`, `DATABASE_PORT=3306` y
+  `Secret=huginn_database_password` → `DATABASE_PASSWORD`; `Requires=`/`After=` sobre `huginn-mariadb.service`.
+- **Worker** (`huginn-threaded.container`): mismas variables de BD, `WORKER_CMD=bin/threaded.rb`,
+  `NetworkAlias=threaded`; **sin labels** (no se expone) y con `Requires=`/`After=` sobre la BD.
+- **BD** (`huginn-mariadb.container`): `MYSQL_DATABASE=huginn`, `MYSQL_USER=huginn`, `NetworkAlias=mariadb`;
+  secretos `huginn_mysql_password` (`MYSQL_PASSWORD`) y `huginn_mariadb_root_password`
+  (`MARIADB_ROOT_PASSWORD`); volumen `huginn-mariadb.volume` en `/var/lib/mysql:Z`.
+- `APP_SECRET_TOKEN` se inyecta con `Secret=huginn_app_secret_token` en web y worker. Si no se fija, la
+  imagen lo regenera en cada arranque e invalida las sesiones; además rechaza el token público histórico
+  que trae por defecto.
+- Ningún contenedor declara healthcheck.
 
 ## Variables / configuración
 
@@ -50,6 +55,10 @@ stacks con worker, p. ej. `wger`).
 | `DATABASE_NAME` | `huginn.container`, `huginn-threaded.container` | Nombre de la BD (`huginn`) |
 | `DATABASE_USERNAME` | `huginn.container`, `huginn-threaded.container` | Usuario de la BD (`huginn`) |
 | `DATABASE_PASSWORD` | `Secret=huginn_database_password` | Contraseña del usuario de la app |
+| `DATABASE_ADAPTER` | `huginn.container`, `huginn-threaded.container` | `mysql2` |
+| `DATABASE_HOST` | `huginn.container`, `huginn-threaded.container` | `mariadb` (alias de la BD) |
+| `DATABASE_PORT` | `huginn.container`, `huginn-threaded.container` | `3306` |
+| `APP_SECRET_TOKEN` | `Secret=huginn_app_secret_token` | Firma de sesiones; estable entre arranques |
 | `WORKER_CMD` | `huginn-threaded.container` | `bin/threaded.rb` (rol worker) |
 | `MYSQL_DATABASE` / `MYSQL_USER` | `huginn-mariadb.container` | Base y usuario a crear en MariaDB |
 | `MYSQL_PASSWORD` | `Secret=huginn_mysql_password` | Contraseña del usuario `MYSQL_USER` |
@@ -63,6 +72,7 @@ stacks con worker, p. ej. `wger`).
 printf '%s' "$(openssl rand -base64 24)" | podman secret create huginn_database_password -
 printf '%s' "$(openssl rand -base64 24)" | podman secret create huginn_mysql_password -
 printf '%s' "$(openssl rand -base64 24)" | podman secret create huginn_mariadb_root_password -
+printf '%s' "$(openssl rand -base64 32)" | podman secret create huginn_app_secret_token -
 
 # 2. Enlazar y arrancar
 cd .config/containers/available/huginn
@@ -80,6 +90,28 @@ systemctl --user daemon-reload
 | `depends_on` | eliminado (resuelto por la red compartida) |
 | `restart: unless-stopped` | `Restart=always` |
 
+## Verificación E2E (2026-11-13)
+
+Verificado en producción (`new_atareao`, usuario `runner`) con certificado `letsencrypt-staging`
+(purgado después):
+
+1. Units `huginn`, `huginn-threaded` y `huginn-mariadb` → `active`.
+2. Contenedores arrancados (`podman ps`).
+3. Router `huginn` registrado en Traefik.
+4. Certificado staging válido para `huginn.servidorlinux.es`.
+5. `https://huginn.servidorlinux.es` → **200** (login); **13 tablas** creadas en MariaDB.
+
+Bugs corregidos para llegar hasta aquí:
+
+- La web solo estaba en `proxy.network`; la BD vive en `huginn.network` → la web no la resolvía.
+- **Faltaba `DATABASE_HOST`** (y `DATABASE_ADAPTER`/`DATABASE_PORT`): sin host, `setup_env` cae en
+  `START_MYSQL=true` y la imagen intenta arrancar un MySQL interno.
+- Faltaba `APP_SECRET_TOKEN`: se regeneraba en cada arranque (sesiones invalidadas) y la imagen rechaza
+  el token público histórico.
+- Añadidos `Requires=`/`After=` hacia `huginn-mariadb.service` en web y worker.
+
 ## Follow-ups
 
+- Sin `SEED_USERNAME`/`SEED_PASSWORD`, el administrador se crea con una contraseña **aleatoria** que solo
+  aparece una vez en el log del primer arranque. Fijarla en el quadlet o usar `DO_NOT_SEED=true`.
 - Ningún contenedor declara healthcheck.

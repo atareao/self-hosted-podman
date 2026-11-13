@@ -24,10 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 92 |
+| Verificados E2E (probados y purgados) | 97 |
 | Bloqueados / hallazgos (ver sección) | 3 |
 | En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **28** |
+| **Sin verificar E2E** | **23** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -37,7 +37,8 @@ Todos entre el **2026-11-09** y el **2026-11-13** (el **lote 3** — `bookstack`
 `mtproxy`, `simple-torrent`, `socks5`, `webdav`, `miniflux-client` y `zennotes` — se verificó y
 purgó el **2026-11-12**; el **lote 6** — `tick`, `mumble`, `cells`, `chevereto` y `jellystat` — se
 verificó y purgó el **2026-11-12**; el **lote 7** — `photoprism`, `rabbitmq`, `weaviate` y
-`wordpress` —, el **2026-11-13**): desplegados,
+`wordpress` —, el **2026-11-13**; el **lote 8** — `codimd`, `huginn`, `planka`, `facturascripts` y
+`postgres` —, el **2026-11-13**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -136,6 +137,11 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | rabbitmq | `docs/rabbitmq.md` | PLAN-035 / #30 | 200 | fix: volumen `mnseia`→`mnesia` + `:U`, secreto `rabbitmq_default_pass` inexistente, usuario `admin`, healthcheck; **`User=rabbitmq`** porque el healthcheck (root) creaba `.erlang.cookie` como root |
 | weaviate | `docs/weaviate.md` | PLAN-035 / #30 | n/a | **interno, sin Traefik** (excepción); fix: deja de publicar 8080/50051 sin auth → red propia `weaviate.network` + `NetworkAlias`; healthcheck `/v1/.well-known/ready`; gRPC validado con `grpc_health_probe` |
 | wordpress | `docs/wordpress.md` | PLAN-035 / #30 | 302 (/), 200 (/wp-login.php) | fix: `Requires=` a units inexistentes (`mariadb`/`valkey` → `wordpress-*`), router `wp`→`wordpress`, `service.port=80`, secretos `type=env`, `WP_CONFIG_EXTRA` unificado; 3 contenedores healthy; será plantilla de wp1/wp2 |
+| codimd | `docs/codimd.md` | PLAN-036 / #31 | 200 | fix: app añadida a `codimd.network`; `CMD_*` (sin `CMD_DB_URL` HackMD muere en Sequelize), secretos `codimd_db_url`/`codimd_session_secret`; PG 11.6→17-alpine con `pg_isready`; bind con comilla huérfana → volúmenes nombrados `:U`; PG17 fuerza auth `md5` (cliente `pg` antiguo) |
+| huginn | `docs/huginn.md` | PLAN-036 / #31 | 200 (login) | fix: web añadida a `huginn.network`; `DATABASE_HOST`/`ADAPTER`/`PORT` (sin host `setup_env` arranca un MySQL interno), `APP_SECRET_TOKEN` por secreto; `Requires=`/`After=` hacia MariaDB; 13 tablas |
+| planka | `docs/planka.md` | PLAN-036 / #31 | 200 | fix: app añadida a `planka.network` (`EAI_AGAIN postgres`); `Requires=`/`After=planka-postgresql.service`; `BASE_URL` https y `TRUST_PROXY=true`; `/api/config` JSON |
+| facturascripts | `docs/facturascripts.md` | PLAN-036 / #31 | 200 (login) | fix: app añadida a `facturascripts.network`; MariaDB con `MARIADB_ROOT_PASSWORD` + `MYSQL_*`; `FS_DB_*`/`FS_INITIAL_*`/`FS_LANG`; binds → volúmenes `:U`; **instalación desatendida por POST a `/`** (302 → `/login`) |
+| postgres | `docs/postgres.md` | PLAN-036 / #31 | 302 (pgAdmin) | fix: pgAdmin añadido a `postgres.network`; **pérdida de datos** con `postgres:latest` (18.x, `VOLUME` en `/var/lib/postgresql`) → pin `17-alpine` con volumen en `/var/lib/postgresql/data`; sin `AutoUpdate`; PG healthy y TCP `postgres:5432` desde pgAdmin |
 
 ## Bloqueados / hallazgos
 
@@ -164,6 +170,21 @@ crea ficheros en el HOME del usuario de servicio (`/var/lib/rabbitmq/.erlang.coo
 Fix: `User=<usuario-de-servicio>` en `[Container]` **y** volumen con `:U` para que el `chown` cuadre.
 Ver `docs/rabbitmq.md`.
 
+Hallazgo transversal (PLAN-036 / #31): **app y BD en redes distintas**. Siete stacks del inventario
+declaraban la red interna de la BD pero no unían la app a ella (la app solo estaba en `proxy.network`), así
+que la resolución del host de la BD fallaba (`EAI_AGAIN`, `getaddrinfo`, `no such host`). Regla: la app debe
+estar en la red de su BD **y** declarar `Requires=`/`After=` sobre el unit de la BD.
+
+Hallazgo transversal (PLAN-036 / #31): **`postgres:latest` = 18.x cambia la ruta del volumen**. Desde
+PostgreSQL 18 la imagen declara `VOLUME /var/lib/postgresql` (no `/var/lib/postgresql/data`); un volumen
+montado en la ruta antigua queda **sin usar** y los datos viven en la capa del contenedor (se pierden al
+recrear). Pin de major (`postgres:17-alpine` + `/var/lib/postgresql/data`) y sin `AutoUpdate` en BDs.
+
+Hallazgo transversal (PLAN-036 / #31): **clientes PG antiguos necesitan md5**. El cliente `pg` de HackMD
+2.4.2 no soporta SCRAM y falla con `Unknown authenticationOk message type ... length 23` contra PG 17;
+forzar `POSTGRES_HOST_AUTH_METHOD=md5` + `POSTGRES_INITDB_ARGS=--auth-host=md5` (solo válido con datadir
+vacío; con datos hay que resetear contraseñas).
+
 ### Pendientes abiertos del lote 4 (PLAN-032 / #27)
 
 Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con follow-ups abiertos (no bloquean la ronda):
@@ -182,17 +203,17 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
 
-## Sin verificar E2E (28)
+## Sin verificar E2E (23)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-authentik, caddy, codimd, crowdsec, dev,
-facturascripts, firefly,
-gitea, grafana-influx-telegraf, huginn,
+authentik, caddy, crowdsec, dev,
+firefly,
+gitea, grafana-influx-telegraf,
 immich, invidious, matrix, matrixmail,
 miniflux, nextcloud, nitter,
 odoo, open-webui,
-pinepods, planka, plausible, postgres,
+pinepods, plausible,
 registry,
 vector,
 wger, wordpress-wp1, wordpress-wp2.
@@ -214,3 +235,4 @@ wger, wordpress-wp1, wordpress-wp2.
 - PLAN-031 (issue #26): ronda E2E lote 3 **completada** — verificados y purgados: `bookstack`, `dnote`, `focalboard`, `snibox`, `umami` y `hedgedoc`. Bugs latentes corregidos: umami (`Requires=`/`After=` → `umami-postgresql.service`), focalboard (PG 18 con volumen en `/var/lib/postgresql`, secretos `focalboard_postgres_password` + `focalboard_database_url`, bind `config.json` → `FOCALBOARD_DBTYPE=postgres`), bookstack (app en `bookstack.network`, binds separados app/BD, `APP_KEY` por secreto, `DB_USERNAME`/`DB_PASSWORD`), dnote (app en `dnote.network`, secreto único de BD, service port 3001), snibox (nginx en `snibox.network`, `snibox_postgres_password` compartido) y hedgedoc (`Requires=`/`After=` hacia MariaDB). Regla nueva: sin `PodmanArgs=--init` en imágenes LinuxServer.io (s6-overlay exige PID 1). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 71 verificados + 4 en producción + 2 bloqueados + 50 sin verificar.
 - PLAN-032 (issue #27): ronda E2E lote 4 **completada** — verificados y purgados: `wallabag`, `vscode`, `whisper`, `unbound`, `watchbeat` y `publirs`. Bugs latentes corregidos: wallabag (placeholder `SYMFONY__ENV__SERVER_NAME`), whisper (imagen `:latest` sin GPU + modelo `small` + host 9000→9001), unbound (publica 5353 y config por el include real de la imagen), watchbeat (issuer OIDC real + redirect al subdominio, healthcheck en `127.0.0.1` + `AddHost`), publirs (Traefik en `publirs.${FQDN}`, `crontab.txt` en croni, sin bind a `/etc/timezone`). Excepciones internas sin Traefik: `whisper` y `unbound`. Pendientes abiertos en la sección «Bloqueados / hallazgos». Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 77 verificados + 4 en producción + 2 bloqueados + 44 sin verificar.
 - PLAN-035 (issue #30): ronda E2E lote 7 **completada** — verificados y purgados: `photoprism`, `rabbitmq`, `weaviate` y `wordpress`. Bugs latentes corregidos: photoprism (sin secretos ni `SITE_URL`; se añadió `photoprism_admin_password` + `SITE_URL`/`TZ`; sin `--init` porque la imagen ya trae s6-overlay; healthcheck por `curl` porque `photoprism status` no conecta), rabbitmq (volumen `mnseia`→`mnesia` con `:U`, secreto inexistente, usuario `admin`, healthcheck), weaviate (dejaba de publicar 8080/50051 sin auth: red propia + `NetworkAlias` y sin `PublishPort`) y wordpress (`Requires=` a units inexistentes, router `wp`→`wordpress` + `service.port=80`, secretos `type=env`, `WP_CONFIG_EXTRA` unificado; plantilla de wp1/wp2). `weaviate` es la excepción interna sin Traefik. Dos patrones nuevos documentados en «Bloqueados / hallazgos»: healthchecks que corren como root en imágenes con `gosu`/`su-exec`, e imágenes que migran a s6-overlay y rompen con `PodmanArgs=--init`. Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 92 verificados + 4 en producción + 3 bloqueados + 28 sin verificar.
+- PLAN-036 (issue #31): ronda E2E lote 8 **completada** — verificados y purgados: `codimd`, `huginn`, `planka`, `facturascripts` y `postgres`. Bugs latentes corregidos: codimd (app en `codimd.network`, `CMD_*` + `CMD_DB_URL` por secreto, PG 17-alpine con healthcheck, comilla huérfana y binds → volúmenes `:U`), huginn (`DATABASE_HOST`/`ADAPTER`/`PORT`, `APP_SECRET_TOKEN` estable y dependencia de MariaDB), planka (app en `planka.network`, `Requires=`/`After=`, `BASE_URL` https y `TRUST_PROXY=true`), facturascripts (app en su red, MariaDB con root/BD, `FS_DB_*`/`FS_INITIAL_*`, volúmenes `:U` e instalación desatendida por POST a `/`) y postgres (pgAdmin en `postgres.network`; **pérdida de datos** de `postgres:latest` 18.x → pin `17-alpine` con `/var/lib/postgresql/data` y sin `AutoUpdate`). Tres patrones nuevos en «Bloqueados / hallazgos»: app y BD en redes distintas, `postgres:latest` = 18.x cambia la ruta del volumen, y clientes PG antiguos que necesitan `md5`. `grafana-influx-telegraf` se **aplaza a un plan propio** (solape con `openobserve` + `vector` + `alloy`). Certificados con el resolver `letsencrypt-staging` (revertido después; producción sin labels staging). Cifras: 127 = 97 verificados + 4 en producción + 3 bloqueados + 23 sin verificar.
