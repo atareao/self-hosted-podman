@@ -6,21 +6,21 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/crowdsecurity/crowdsec:latest
+Image=docker.io/crowdsecurity/crowdsec:v1.8.2
 ContainerName=crowdsec
-AutoUpdate=registry
 
 # ==== Command ====
 
 # ==== Ports ====
 
 # ==== Volumes ====
-Volume=%h/.config/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml:Z
 Volume=crowdsec-data.volume:/var/lib/crowdsec/data:Z
 Volume=crowdsec-config.volume:/etc/crowdsec:Z
+Volume=%h/.config/crowdsec/acquis.yaml:/etc/crowdsec/acquis.d/local.yaml:ro,Z
 
 # ==== Networks ====
 Network=security.network
+Network=proxy.network
 
 # ==== Secrets ====
 
