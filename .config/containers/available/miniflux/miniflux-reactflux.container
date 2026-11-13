@@ -6,7 +6,7 @@ StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/electh/reactflux
+Image=docker.io/electh/reactflux:2026.11.07
 AutoUpdate=registry
 ContainerName=miniflux-reactflux
 PodmanArgs=--init
@@ -39,7 +39,11 @@ Label=traefik.http.routers.reactflux.tls.certresolver=letsencrypt
 Label=traefik.http.routers.reactflux.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=wget -q --spider http://localhost:2000/ || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=10s
 
 # ==== Hardening ====
 

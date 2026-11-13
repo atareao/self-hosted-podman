@@ -1,12 +1,13 @@
 [Unit]
 Description=miniflux
-After=network-online.target traefik.service
+After=network-online.target miniflux-postgresql.service traefik.service
+Requires=miniflux-postgresql.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Container]
 # ==== Image ====
-Image=docker.io/miniflux/miniflux:latest
+Image=docker.io/miniflux/miniflux:2.3.5
 AutoUpdate=registry
 ContainerName=miniflux
 PodmanArgs=--init
@@ -30,9 +31,9 @@ Secret=miniflux_database_url,type=env,target=DATABASE_URL
 Secret=miniflux_admin_password,type=env,target=ADMIN_PASSWORD
 
 # ==== Environment ====
-Environment=RUN_MIGRATIONS=$RUN_MIGRATIONS
-Environment=CREATE_ADMIN=$CREATE_ADMIN
-Environment=ADMIN_USERNAME=$ADMIN_USERNAME
+Environment=RUN_MIGRATIONS=1
+Environment=CREATE_ADMIN=1
+Environment=ADMIN_USERNAME=admin
 
 # ==== Labels ====
 Label=traefik.enable=true
@@ -43,7 +44,11 @@ Label=traefik.http.routers.miniflux.tls.certresolver=letsencrypt
 Label=traefik.http.routers.miniflux.middlewares=seguridadHeaders@file,compresionHeaders@file
 
 # ==== Healthcheck ====
-
+HealthCmd=wget -q --spider http://localhost:8080/health || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+HealthStartPeriod=15s
 
 # ==== Hardening ====
 
