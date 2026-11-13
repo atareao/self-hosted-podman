@@ -50,7 +50,7 @@ Restart=on-failure
 RestartSec=10s
 TimeoutStartSec=60
 ExecStartPre=/usr/bin/sleep 2
-ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" vector) != "healthy" ]; do sleep 2; done'
+ExecStartPost=/usr/bin/bash -c 'while [ "$(podman inspect --format "{{.State.Health.Status}}" vector)" != "healthy" ]; do sleep 2; done'
 
 [Install]
 WantedBy=default.target
