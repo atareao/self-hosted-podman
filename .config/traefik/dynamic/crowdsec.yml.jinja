@@ -6,6 +6,6 @@ http:
           enabled: true
           crowdsecLapiScheme: http
           crowdsecLapiHost: "crowdsec:8080"
-          crowdsecLapiKey: "TU_API_KEY_GENERADA_CON_CSCLI"
+          crowdsecLapiKey: {{ env.CROWDSEC_BOUNCER_KEY }}
           remediationStrategy: ban
           updateIntervalSeconds: 60
