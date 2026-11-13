@@ -45,6 +45,8 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 11. **Mount `/etc/timezone` inexistente** (`gitea.container`, `pinepods.container`): el host Arch no tiene `/etc/timezone` (solo `/etc/localtime`), así que el bind fallaba. Se eliminó el mount en ambos stacks (se conserva `/etc/localtime`).
 12. **Quoting roto en el `ExecStartPost` de `vector`** (`vector.container`): faltaba la `"` de cierre tras `vector)` en `podman inspect --format "{{.State.Health.Status}}" vector)`, lo que hacía fallar la unit con `status=2/INVALIDARGUMENT`. Corregido.
 13. **Rate limit de Let's Encrypt** (bloqueante **externo**, no un bug de configuración): `servidorlinux.es` agotó el límite de **50 certificados / 168 h** (HTTP 429). Traefik sirve su certificado por defecto en `gitea.${FQDN}` y `podcasts.${FQDN}` hasta el reset (~20:05 UTC del 2026-11-13); `dockge`/`headscale` siguen sirviendo un LE válido. Ver `docs/estado-verificacion-e2e.md`.
+14. **`HOSTNAME` de pinepods con llaves simples** (`pinepods.container`): `HOSTNAME=https://{FQDN}` no expandía → corregido a `https://podcasts.${FQDN}`, alineado con el router `Host(`podcasts.${FQDN}`)`.
+15. **Convención E2E omitida en el plan original**: el plan no recogía la convención del proyecto de usar el resolver **`letsencrypt-staging`** en las rondas E2E (para no agotar la cuota de producción de LE). Se corrigió durante la ejecución: la verificación de certificado se hizo con `letsencrypt-staging` (cambio temporal del label `certresolver` en prod, revertido con `yadm checkout`).
 
 ## Tareas
 
@@ -61,7 +63,7 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 
 ### C. pinepods
 - [x] C1. Unificar a **un solo** secreto de BD: usar `pinepods_db_password` en ambos contenedores (target `DB_PASSWORD` en la app, `POSTGRES_PASSWORD` en postgresql) y eliminar `pinepods_postgres_password` del repo y de la lista de secretos.
-- [x] C2. Corregir `HOSTNAME=https://{FQDN}` → `https://${FQDN}` (`pinepods.container:37`).
+- [x] C2. Corregir `HOSTNAME=https://{FQDN}` → `https://podcasts.${FQDN}` (`pinepods.container:37`), alineado con el router `Host(`podcasts.${FQDN}`)`.
 - [x] C3. Añadir `Requires`/`After` hacia `pinepods-postgresql.service` y `pinepods-valkey.service`.
 - [x] C4. Añadir Healthchecks: `pg_isready` en postgresql, `valkey-cli ping` en valkey, health de la app si es viable.
 
@@ -77,7 +79,7 @@ Detectados durante el despliegue y la verificación E2E del lote 10b (no aparec�
 ### F. Despliegue y verificación E2E (producción `new_atareao`, usuario `runner` vía `lorenzo` + `rr`)
 - [x] F1. Crear los secretos necesarios con `podman secret create` antes de arrancar cada unit.
 - [x] F2. `qctl install` desde el directorio de cada stack + `systemctl --user daemon-reload` + arranque.
-- [ ] F3. Verificar E2E (unit active, contenedor healthy, router Traefik, cert LE válido, HTTP esperado) y documentar hallazgos transversales.
+- [x] F3. Verificar E2E (unit active, contenedor healthy, router Traefik, cert LE válido, HTTP esperado) y documentar hallazgos transversales. El certificado de `gitea.servidorlinux.es` y `podcasts.servidorlinux.es` se verificó con el resolver **`letsencrypt-staging`** (convención del proyecto para rondas E2E: no quemar la cuota de producción de LE); el label `certresolver` se cambió temporalmente en prod y se revirtió con `yadm checkout`.
 - [ ] F4. Purgar los stacks de ejemplo tras verificar (recrear sus secretos si se vuelven a desplegar). Decidir expresamente si `vector` se conserva por su rol de observabilidad, dejando la decisión documentada.
 
 ### G. Documentación y cierre
@@ -96,10 +98,10 @@ Los 4 stacks del lote 10b están **desplegados y corriendo** en `new_atareao` (u
 
 - **Units `active`** y **contenedores `healthy`** en todos los stacks (`open-webui-ollama` no define healthcheck; arranca igual). `vector` pasa su healthcheck (`vector validate`).
 - **Routers Traefik registrados**: `https://gitea.servidorlinux.es` → HTTP 200 (página «Installation - Gitea»); `https://podcasts.servidorlinux.es` → HTTP 200 (PinePods). `open-webui` **no declara labels por diseño** (igual que el repo origen) y `vector` es un log shipper (sin router).
-- **Certificado LE pendiente por rate limit** (hallazgo 13): hasta el reset, Traefik sirve su cert por defecto en `gitea.${FQDN}` y `podcasts.${FQDN}`. No es un fallo de configuración.
+- **Certificado LE verificado con `letsencrypt-staging`**: `gitea.servidorlinux.es` y `podcasts.servidorlinux.es` sirven un cert con `issuer=Let's Encrypt, CN=(STAGING) …` (verificado E2E con el resolver `letsencrypt-staging`; el label `certresolver` se cambió temporalmente en prod y se revirtió con `yadm checkout`). **No** se usó el resolver de producción porque su cuota está agotada (50 certs/168 h, HTTP 429; hallazgo 13).
 - **Secretos creados** con `podman secret create` (nunca `crypta store`): `gitea_db_password`, `open_webui_secret_key`, `pinepods_db_password`, `openobserve_root_password`.
 - **Follow-up**: el sink de `vector` apunta a `openobserve`, que **no está desplegado** → el DNS no resuelve y Vector reintenta; queda además pendiente el ingest de CrowdSec (sink eliminado en este lote).
-- **Pendiente**: purgar los stacks de ejemplo tras verificar el certificado (aún **no purgados**) y decidir expresamente si `vector` se conserva. Por eso `F3`/`F4` siguen sin marcar.
+- **Pendiente**: purgar los stacks de ejemplo (aún **no purgados**) y decidir expresamente si `vector` se conserva. Por eso `F4` sigue sin marcar (`F3` ya está verificado con `letsencrypt-staging`).
 
 ## Criterio de cierre
 Todas las casillas marcadas, los stacks verificados E2E (o purgados y documentados), inventario actualizado y plan archivado.

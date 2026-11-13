@@ -60,4 +60,4 @@
 
 ## Follow-ups
 - **Bump del pin**: la imagen sigue en `gitea:1.19` (tarea A4 sin cerrar); evaluar el salto a una versión estable actual.
-- **Cert LE**: `gitea.servidorlinux.es` quedó pendiente del certificado de producción por el rate limit de Let's Encrypt (bloqueante externo; Traefik sirve su cert por defecto hasta el reset). Ver `docs/estado-verificacion-e2e.md`.
+- **Cert LE**: `gitea.servidorlinux.es` verificado E2E con `letsencrypt-staging` (cert con `issuer=Let's Encrypt, CN=(STAGING) …`); el resolver de producción (`letsencrypt`) se deja configurado para cuando la cuota de LE lo permita (50 certs/168 h, agotada). Ver `docs/estado-verificacion-e2e.md`.
