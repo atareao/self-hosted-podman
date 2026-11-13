@@ -24,10 +24,10 @@ sólo aparecieron al ejecutarlo de verdad.
 | Categoría | Nº |
 |---|---|
 | Stacks en `.config/containers/available/` | 127 |
-| Verificados E2E (probados y purgados) | 100 |
+| Verificados E2E (probados y purgados) | 104 |
 | Bloqueados / hallazgos (ver sección) | 3 |
-| En producción (desplegados y corriendo) | 4 (el stack `headscale` lleva 2 contenedores) |
-| **Sin verificar E2E** | **20** |
+| En producción (desplegados y corriendo) | 5 (el stack `headscale` lleva 2 contenedores) |
+| **Sin verificar E2E** | **15** |
 
 ## Verificados E2E (probados y purgados)
 
@@ -38,7 +38,7 @@ Todos entre el **2026-11-09** y el **2026-11-13** (el **lote 3** — `bookstack`
 purgó el **2026-11-12**; el **lote 6** — `tick`, `mumble`, `cells`, `chevereto` y `jellystat` — se
 verificó y purgó el **2026-11-12**; el **lote 7** — `photoprism`, `rabbitmq`, `weaviate` y
 `wordpress` —, el **2026-11-13**; el **lote 8** — `codimd`, `huginn`, `planka`, `facturascripts` y
-`postgres` —, el **2026-11-13**; el **lote 9** — `wordpress-wp1`, `wordpress-wp2` y `registry` —, el **2026-11-13**): desplegados,
+`postgres` —, el **2026-11-13**; el **lote 9** — `wordpress-wp1`, `wordpress-wp2` y `registry` —, el **2026-11-13**; el **lote 10a** — `crowdsec`, `miniflux`, `nitter`, `dev` y `firefly` —, el **2026-11-13**): desplegados,
 verificados end-to-end y
 **purgados** el mismo día (unit
 desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: **no desplegados**.
@@ -145,6 +145,10 @@ desenlazado, volúmenes/binds/secretos e imágenes eliminados). Estado actual: *
 | wordpress-wp1 | `docs/wordpress-wp1.md` | PLAN-037 / #32 | 302 | volumen en `/var/www/html/wp-content` (sin bind de `wp-config.php`); secreto de BD compartido app/BD (`wordpress_wp1_wordpress_db_password`); MariaDB 11 pinnada + healthchecks |
 | wordpress-wp2 | `docs/wordpress-wp2.md` | PLAN-037 / #32 | 302 | ídem `wordpress-wp1` con `wp2` |
 | registry | `docs/registry.md` | PLAN-037 / #32 | 401/200 | fix: `registry:latest` (v3.1.2) lee el config en `/etc/distribution/config.yml` (el htpasswd no se aplicaba: 200 sin auth); login+push+catálogo OK |
+| dev | `docs/dev.md` | PLAN-038 / #33 | 302 (dev), 401 (dev-pma) | fix: fuera el bind a `wp-config.php` inexistente (Podman creaba un directorio) → volumen único en `/var/www/html/wp-content`; phpMyAdmin con `PMA_HOST=mariadb`; secreto de BD unificado `dev_wordpress_db_password`; `mariadb:11`/`wordpress:6`/`phpmyadmin:5` pinned; expuesto en `dev.${FQDN}` y `dev-pma.${FQDN}` (phpMyAdmin con `oidc-auth@file`); `WP_REDIS_HOST=redis`; healthchecks |
+| firefly | `docs/firefly.md` | PLAN-038 / #33 | 302 → 200 (/register) | fix: faltaban `APP_KEY`/`DB_*` (no arrancaba); app añadida a `firefly.network` (la BD no resolvía); `yobasystems/alpine-mariadb:latest` → `library/mariadb:11` con volumen nombrado; crontab de croni montado en `/crontab.txt`; `TRUSTED_PROXIES`; healthchecks |
+| miniflux | `docs/miniflux.md` | PLAN-038 / #33 | 200 | fix: **pérdida de datos** con `postgres:18-alpine` (VOLUME en `/var/lib/postgresql`) → pin `17-alpine` con volumen en `/var/lib/postgresql/data`; `RUN_MIGRATIONS`/`CREATE_ADMIN`/`ADMIN_USERNAME` con `$VAR` inexistentes → literales; `After=`/`Requires=` a postgres; app 2.3.5 y reactflux pinned |
+| nitter | `docs/nitter.md` | PLAN-038 / #33 | 200 | fix: app y redis en redes disjuntas → app en `nitter.network`; `Requires=` a redis; imagen pinned a tag de commit; `sessions.jsonl` obligatorio (placeholder versionado); `nitter.conf.jinja` versionado; healthcheck sin endpoint de Twitter |
 
 ## Bloqueados / hallazgos
 
@@ -216,16 +220,16 @@ Los seis stacks del lote 4 quedaron **verificados E2E y purgados**, pero con fol
 | headscale | `docs/headscale.md` | healthy — 2 contenedores: `headscale` + `headscale-headplane` (doc en `docs/headplane.md`) |
 | pocketid | `docs/pocketid.md` | healthy — proveedor OIDC |
 | traefik | `docs/traefik.md` | healthy — edge |
+| crowdsec | `docs/crowdsec.md` | healthy — Security Engine global; LAPI up y bouncer de Traefik `traefik-bouncer` validado (middleware global en `websecure`) |
 
-## Sin verificar E2E (20)
+## Sin verificar E2E (15)
 
 Quadlet y doc existen, pero **nunca se han desplegado ni verificado en el host real**:
 
-authentik, caddy, crowdsec, dev,
-firefly,
+authentik, caddy,
 gitea, grafana-influx-telegraf,
 immich, invidious, matrix, matrixmail,
-miniflux, nextcloud, nitter,
+nextcloud,
 odoo, open-webui,
 pinepods, plausible,
 vector,
